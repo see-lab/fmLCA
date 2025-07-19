@@ -6,6 +6,8 @@
 |----------------------------------------------------------------------|--------|
 | Import a Modelica FMU into Python                                    | [x]    |
 | Output power from Modelica FMU                                       | [x]    |
+| Create fmu in python                                     | [x]    |
+| import python fmu into python as fmu                                    | []  |
 | Connect power output to a second (basic) FMU                         | [ ]    |
 | Add feedback from second FMU to Modelica FMU                         | [ ]    |
 | Generate basic LCA (e.g., block of steel or water bottle)            | [ ]    |
