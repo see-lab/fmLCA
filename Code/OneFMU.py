@@ -24,7 +24,7 @@ print(json.dumps(d, indent=2, separators=(',', ': '), sort_keys=True))
 model = load_fmu(fmu_name)
 opts = model.simulate_options()
 opts['solver'] = 'CVode'
-res = model.simulate(start_time=0, final_time=3600000, options=opts)
+res = model.simulate(start_time=0, final_time=1, options=opts)
 
 # Set variables to plot
 time = res['time']
