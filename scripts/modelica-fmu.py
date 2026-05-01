@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-File: OneFMU.py
+File: modelica-fmu.py
 Author: Kathryn Hinkelman
 Date: 2025-08-18
 Description: Creates and loads an FMU from a Modelica library, simulates and plots  
