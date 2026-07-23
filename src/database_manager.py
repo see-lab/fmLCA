@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
 Database Manager for LCA System
+
+Library module for database operations. Import this module, do not run directly.
+
+Usage:
+    from src.database_manager import DatabaseManager
+
 Flexible database detection and process matching
 """
 

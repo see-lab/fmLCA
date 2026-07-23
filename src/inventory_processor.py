@@ -2,6 +2,11 @@
 """
 inventory_processor.py - Inventory file loading and validation
 
+Library module for inventory processing. Import this module, do not run directly.
+
+Usage:
+    from src.inventory_processor import load_inventory, validate_inventory_format
+
 Centralized handling of LCI inventory files:
 - Load inventory files from JSON
 - Validate inventory format and structure
@@ -432,23 +437,3 @@ def print_inventory_summary(data: Dict[str, Any]) -> None:
         print(f"\n⚠️  No energy metadata found")
     
     print(f"{'='*60}\n")
-
-
-if __name__ == "__main__":
-    # Simple test
-    print("Testing inventory_processor.py...")
-    
-    try:
-        # Try to load grid inventory
-        inv_path = get_inventory_path("grid")
-        print(f"✅ Found grid inventory: {inv_path}")
-        
-        inventory = load_inventory(inv_path)
-        print(f"✅ Loaded inventory: {inventory['name']}")
-        
-        print_inventory_summary(inventory)
-        
-    except Exception as e:
-        print(f"⚠️  Test failed: {e}")
-    
-    print("✅ Module loaded successfully!")

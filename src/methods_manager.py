@@ -1,6 +1,11 @@
 """
 LCIA Methods Manager for LCA-FMU
 
+Library module for LCIA methods management. Import this module, do not run directly.
+
+Usage:
+    from src.methods_manager import load_lcia_methods, extract_all_methods
+
 Centralized management of Life Cycle Impact Assessment (LCIA) methods including:
 - Loading and validating method configurations from JSON files
 - Extracting all methods from Brightway databases

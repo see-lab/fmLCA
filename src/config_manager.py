@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
 Configuration Manager for LCA-FMU System
+
+Library module for configuration management. Import this module, do not run directly.
+
+Usage:
+    from src.config_manager import get_config
+
 Centralized configuration loading and management
 """
 

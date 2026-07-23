@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
 LCI Data Manager for Flexible Data Import and Processing
+
+Library module for LCI data processing. Import this module, do not run directly.
+
+Usage:
+    from src.lci_data_manager import load_lci_data, process_csv_to_json
+
 Supports CSV, JSON, and other formats with configurable mappings
 """
 

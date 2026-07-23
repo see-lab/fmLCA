@@ -2,8 +2,13 @@
 """
 fmu_generator.py - FMU generation logic for LCA-FMU
 
+Library module for FMU generation. Import this module, do not run directly.
+
 Extracted core functionality from create_fmu.py script.
 Provides reusable FMU generation as a library.
+
+Usage:
+    from src.fmu_generator import generate_fmu_class_code, build_fmu_with_pythonfmu
 
 Key features:
 - Extract emission factors from LCA results
@@ -522,12 +527,3 @@ def validate_fmu(fmu_path: Path) -> Tuple[bool, str]:
         return False, "fmpy not installed"
     except Exception as e:
         return False, f"Validation failed: {e}"
-
-
-if __name__ == "__main__":
-    print("Testing fmu_generator.py...")
-    print("✅ Module loaded successfully!")
-    
-    # Test class name sanitization
-    test_name = safe_classname("IPCC 2021 Climate")
-    print(f"safe_classname('IPCC 2021 Climate') = '{test_name}'")
