@@ -44,7 +44,7 @@ def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     Convert CSV inventory data to LCI JSON format using flexible configuration
     
     Args:
-        csv_file: Path to input CSV file
+        csv_file: Path to input CSV file (or stem name to search in data/inventory/)
         output_file: Path to output JSON file (optional, defaults to same name with .json)
     
     Returns:
@@ -52,15 +52,30 @@ def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     """
     
     csv_path = Path(csv_file)
+    
+    # If file doesn't exist, try searching in data/inventory/
     if not csv_path.exists():
-        raise FileNotFoundError(f"CSV file not found: {csv_file}")
+        # Try as stem name (without .csv)
+        stem = csv_file.replace('.csv', '')
+        inventory_dir = project_root / 'data' / 'inventory'
+        
+        # Search for file with .csv extension
+        candidate = inventory_dir / f"{stem}.csv"
+        if candidate.exists():
+            csv_path = candidate
+        else:
+            raise FileNotFoundError(
+                f"CSV file not found: {csv_file}\n"
+                f"   Tried: {csv_file}\n"
+                f"   Tried: {candidate}"
+            )
     
     # Determine output file name
     if output_file is None:
         output_file = csv_path.with_suffix('.json')
     
     print(f"🔄 Converting CSV to LCI JSON using flexible configuration...")
-    print(f"   📁 Input: {csv_file}")
+    print(f"   📁 Input: {csv_path}")
     print(f"   📁 Output: {output_file}")
     
     # Initialize managers
@@ -68,8 +83,8 @@ def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     lci_manager = LCIDataManager()
     
     try:
-        # Import CSV data using flexible manager
-        lci_data = lci_manager.import_data(csv_file, format_type="csv")
+        # Import CSV data using flexible manager (use resolved path)
+        lci_data = lci_manager.import_data(str(csv_path), format_type="csv")
         
         if not lci_data:
             raise Exception("Failed to import CSV data")
@@ -120,13 +135,20 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python scripts/csv_to_lci_json.py data/inventory/sandbattery.csv
-  python scripts/csv_to_lci_json.py my_product.csv my_product.json
-  python scripts/csv_to_lci_json.py battery.csv --validate
+  # Using short name (searches in data/inventory/)
+  python scripts/csv_to_json_translator.py example
+  python scripts/csv_to_json_translator.py example.csv
+  
+  # Using full path
+  python scripts/csv_to_json_translator.py data/inventory/sandbattery.csv
+  python scripts/csv_to_json_translator.py my_product.csv my_product.json
+  
+  # With validation
+  python scripts/csv_to_json_translator.py example --validate
         """
     )
     
-    parser.add_argument("csv_file", help="Input CSV file path")
+    parser.add_argument("csv_file", help="Input CSV file (stem name or full path)")
     parser.add_argument("json_file", nargs='?', help="Output JSON file path (optional)")
     parser.add_argument("--validate", action="store_true", help="Validate the generated JSON")
     parser.add_argument("--test", action="store_true", help="Test with LCA analysis system")

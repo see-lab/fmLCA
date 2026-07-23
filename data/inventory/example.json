@@ -1,21 +1,21 @@
 {
-  "name": "Demo Inventory Production System",
+  "name": "Example Production System",
   "unit": "unit",
   "location": "GLO",
   "categories": [
     "technosphere",
-    "demo inventory production"
+    "example production"
   ],
   "type": "process",
   "exchanges": [
     {
-      "name": "Demo Inventory Production System",
+      "name": "Example Production System",
       "amount": 1.0,
       "unit": "unit",
       "type": "production",
       "input": [
-        "Demo Inventory_System_DB",
-        "Demo Inventory_1unit"
+        "Example_System_DB",
+        "Example_1unit"
       ]
     },
     {
