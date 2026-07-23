@@ -21,7 +21,11 @@ import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 
-from .lca_utils import get_inventory_dir, load_json_file
+# Handle both relative and absolute imports
+try:
+    from .lca_utils import get_inventory_dir, load_json_file
+except ImportError:
+    from lca_utils import get_inventory_dir, load_json_file
 
 
 # ── Inventory Loading ────────────────────────────────────────────────────────

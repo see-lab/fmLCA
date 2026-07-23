@@ -29,7 +29,11 @@ import zipfile
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
 
-from .lca_utils import safe_classname, ensure_dir_exists
+# Handle both relative and absolute imports
+try:
+    from .lca_utils import safe_classname, ensure_dir_exists
+except ImportError:
+    from lca_utils import safe_classname, ensure_dir_exists
 
 
 # ── Factor Extraction ────────────────────────────────────────────────────────
