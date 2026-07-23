@@ -54,8 +54,13 @@ data/downloads/
 data/*.h5
 data/*.hdf5
 
-# Testing & development
-docs/reports/
+# Archive files
+data/archive/
+docs/archive/
+fmu/archive/
+notebooks/archive/
+scripts/archive/
+src/archive/
 
 # Brightway2 data directories
 brightway2/
