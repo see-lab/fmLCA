@@ -58,6 +58,7 @@ data/*.hdf5
 archive/
 **/archive/
 fmu/archive/
+docs/archive/
 
 
 # Brightway2 data directories
