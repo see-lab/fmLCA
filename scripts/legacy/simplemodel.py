@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+File: simplemodel.py
+Author: Fitz Kurtz
+"""
+
 from pythonfmu import Fmi2Slave
 
 class SimpleModel(Fmi2Slave):
