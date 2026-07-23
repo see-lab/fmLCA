@@ -55,12 +55,9 @@ data/*.h5
 data/*.hdf5
 
 # Archive files
-data/archive/
-docs/archive/
-fmu/archive/
-notebooks/archive/
-scripts/archive/
-src/archive/
+**/archive/
+**/archive/**
+
 
 # Brightway2 data directories
 brightway2/
