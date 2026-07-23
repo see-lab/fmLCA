@@ -5,10 +5,16 @@ Direct unit test of the cumulative impact FMU Python class.
 This test validates the FMU logic without requiring FMI binary compilation.
 Tests the same scenarios as test_cumulative_fmu.py but by directly instantiating
 and calling the Python class.
+
+Usage:
+    python tests/test_cumulative_fmu_direct.py [fmu_file]
+    python tests/test_cumulative_fmu_direct.py  # Uses Example_Ipcc_v1.0.fmu by default
+    python tests/test_cumulative_fmu_direct.py fmu/Example_Ipcc_v1.0.fmu
 """
 
 import sys
 import zipfile
+import argparse
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,12 +22,45 @@ import matplotlib.pyplot as plt
 print("🧪 Cumulative Impact FMU Direct Unit Test")
 print("=" * 80)
 
-# Extract the FMU Python class
-fmu_path = Path("fmu/Grid_Ipcc_v1.0.fmu")
+# Parse command line arguments
+parser = argparse.ArgumentParser(
+    description='Test FMU logic directly without FMI binary',
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog="""
+Examples:
+  python tests/test_cumulative_fmu_direct.py
+  python tests/test_cumulative_fmu_direct.py fmu/Example_Ipcc_v1.0.fmu
+  python tests/test_cumulative_fmu_direct.py fmu/Grid_Ipcc_v1.0.fmu
+    """
+)
+parser.add_argument(
+    'fmu_file',
+    nargs='?',
+    default=None,
+    help='Path to FMU file (default: searches for Example_*.fmu in fmu/ directory)'
+)
+args = parser.parse_args()
+
+# Resolve FMU path
+if args.fmu_file:
+    fmu_path = Path(args.fmu_file)
+else:
+    # Search for Example*.fmu files
+    fmu_dir = Path("fmu")
+    example_fmus = list(fmu_dir.glob("Example*.fmu"))
+    
+    if not example_fmus:
+        print(f"❌ No Example*.fmu files found in {fmu_dir}/")
+        print("   Create one with: python scripts/create_fmu.py example")
+        sys.exit(1)
+    
+    # Use the first match (alphabetically)
+    fmu_path = sorted(example_fmus)[0]
+    print(f"📦 Auto-detected FMU: {fmu_path}")
 
 if not fmu_path.exists():
     print(f"❌ FMU not found: {fmu_path}")
-    print("   Create it with: python scripts/create_fmu.py grid")
+    print("   Create it with: python scripts/create_fmu.py example")
     sys.exit(1)
 
 print(f"✅ FMU found: {fmu_path}")
@@ -29,8 +68,19 @@ print(f"✅ FMU found: {fmu_path}")
 # Extract and load the Python class
 try:
     with zipfile.ZipFile(fmu_path) as z:
+        # Find the Python file in resources/
+        py_files = [name for name in z.namelist() if name.startswith('resources/') and name.endswith('.py')]
+        
+        if not py_files:
+            print("❌ No Python file found in FMU resources/")
+            print(f"   Available files: {z.namelist()}")
+            sys.exit(1)
+        
+        py_file = py_files[0]
+        print(f"📄 Found Python file: {py_file}")
+        
         # Extract the Python file
-        py_code = z.read('resources/Grid_Ipcc_v1_0.py').decode('utf-8')
+        py_code = z.read(py_file).decode('utf-8')
         
         # Parse class name
         class_name = None
