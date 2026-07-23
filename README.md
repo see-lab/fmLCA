@@ -4,6 +4,10 @@ Life Cycle Assessment platform with Functional Mock-up Unit generation for energ
 
 Built with Brightway 2.5 and ecoinvent integration.
 
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
+[![Brightway](https://img.shields.io/badge/brightway-2.5-green)](https://brightway.dev/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 ## Contributors
 
 **Kathryn Hinkelman** & **Fitz Koch** - [SEE Lab](http://www.theseelab.org/), University of Vermont
