@@ -1154,6 +1154,15 @@ Examples:
     # Run LCA (energy amount is determined by inventory file)
     results = run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=1.0)
     
+    # Generate output filenames based on inventory and method
+    inventory_name = Path(lci_file).stem  # e.g., "example", "grid"
+    method_name = args.methods  # e.g., "ipcc", "midpoints"
+    
+    results_basename = f"{inventory_name}_{method_name}_result"
+    results_json = f"results/{results_basename}.json"
+    results_png = f"results/{results_basename}.png"
+    results_csv = f"results/{results_basename}.csv"
+    
     print("\n=== LCA RESULTS SUMMARY ===")
     
     # Print concise impact results
@@ -1197,16 +1206,16 @@ Examples:
     
     # Save results to JSON
     try:
-        with open("results/lca_results.json", "w") as f:
+        with open(results_json, "w") as f:
             json.dump(results, f, indent=2)
-        print("Results saved to results/lca_results.json")
+        print(f"Results saved to {results_json}")
     except Exception as e:
         print(f"Error saving JSON results: {e}")
     
     # Create visualizations and CSV if we have impact results
     if "impact_results" in results and results["impact_results"]:
         print("\nGenerating stacked bar chart and CSV...")
-        create_visualization(results, "results/lca_results.png")
-        save_results_csv(results, "results/lca_results.csv")
+        create_visualization(results, results_png)
+        save_results_csv(results, results_csv)
     
     print("LCA analysis complete!")
