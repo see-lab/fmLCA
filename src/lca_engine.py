@@ -1068,15 +1068,15 @@ if __name__ == "__main__":
         epilog="""
 Examples:
   # Using inventory file stem (looks in data/inventory/)
-  python src/lca_engine.py grid
-  python src/lca_engine.py coolingtower --methods iw_damages
+  python src/lca_engine.py example
+  python src/lca_engine.py example --methods ipcc
   
   # Using full or relative paths
-  python src/lca_engine.py --lci-file data/inventory/grid.json
-  python src/lca_engine.py --lci-file data/inventory/bess.json --methods ipcc
+  python src/lca_engine.py --lci-file data/inventory/example.json
+  python src/lca_engine.py --lci-file data/inventory/example.json --methods ipcc
   
   # Specifying both positional and named arguments
-  python src/lca_engine.py grid --methods midpoints
+  python src/lca_engine.py example --methods midpoints
         """
     )
     

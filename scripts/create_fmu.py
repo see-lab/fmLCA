@@ -37,10 +37,10 @@ LCIA Methods  (--method)
 
 Examples
 --------
-    python scripts/create_fmu.py propane
-    python scripts/create_fmu.py propane --method ipcc
-    python scripts/create_fmu.py propane --method recipe_endpoint
-    python scripts/create_fmu.py propane --name "Propane_Climate" --version 2.0
+    python scripts/create_fmu.py example
+    python scripts/create_fmu.py example --method ipcc
+    python scripts/create_fmu.py example --method recipe_endpoint
+    python scripts/create_fmu.py example --name "Example_Climate" --version 2.0
 
 Output
 ------
@@ -177,15 +177,15 @@ def main():
                                → output: single_score_pt_cumulative  [Pt]
 
             Examples:
-              python scripts/create_fmu.py propane
-              python scripts/create_fmu.py propane --method ipcc
-              python scripts/create_fmu.py propane --method recipe_endpoint
-              python scripts/create_fmu.py propane --name "Propane_Climate" --version 2.0
+              python scripts/create_fmu.py example
+              python scripts/create_fmu.py example --method ipcc
+              python scripts/create_fmu.py example --method recipe_endpoint
+              python scripts/create_fmu.py example --name "Example_Climate" --version 2.0
         """),
     )
     parser.add_argument(
         "lci_stem",
-        help="Stem of the LCI JSON file in data/inventory/ (e.g. 'propane' for propane.json), "
+        help="Stem of the LCI JSON file in data/inventory/ (e.g. 'example' for example.json), "
              "or a full path to any .json file."
     )
     parser.add_argument(

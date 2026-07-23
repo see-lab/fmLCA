@@ -12,12 +12,12 @@ Features:
   • No conversion factors needed - handled by LCA engine
 
 Usage:
-    python scripts/csv_to_lci_json.py input.csv [output.json]
-    python scripts/csv_to_lci_json.py sandbattery.csv  # Creates sandbattery.json
+    python scripts/csv_to_json_translator.py input.csv [output.json]
+    python scripts/csv_to_json_translator.py example.csv  # Creates example.json
 
 Energy Process Conversion:
   • CSV: "Water pump, 540, MJ" → JSON: "amount_ref": "energy_metadata.primary_input.value"
-  • CSV: "Grid electricity, 100, kWh" → Metadata: "value": 360.0 (converted to MJ)
+  • CSV: "Electricity, 25, kWh" → Metadata: "value": 90.0 (converted to MJ)
   • All non-energy processes keep direct amounts
 
 Supports flexible CSV formats through configuration-driven field mapping.
@@ -140,7 +140,7 @@ Examples:
   python scripts/csv_to_json_translator.py example.csv
   
   # Using full path
-  python scripts/csv_to_json_translator.py data/inventory/sandbattery.csv
+  python scripts/csv_to_json_translator.py data/inventory/example.csv
   python scripts/csv_to_json_translator.py my_product.csv my_product.json
   
   # With validation
