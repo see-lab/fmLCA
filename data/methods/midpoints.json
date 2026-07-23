@@ -1,0 +1,130 @@
+{
+  "lcia_methods": [
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) climate change GWP100",
+      "description": "Global warming potential from greenhouse gas emissions over 100 years",
+      "category": "climate_change",
+      "unit": "kg CO2-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) acidification terrestrial",
+      "description": "Acidification of terrestrial ecosystems from acidifying emissions",
+      "category": "acidification",
+      "unit": "kg SO2-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) eutrophication freshwater",
+      "description": "Nutrient enrichment of freshwater ecosystems from phosphorus emissions",
+      "category": "eutrophication",
+      "unit": "kg P-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) eutrophication marine",
+      "description": "Nutrient enrichment of marine ecosystems from nitrogen emissions",
+      "category": "eutrophication",
+      "unit": "kg N-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) ozone depletion",
+      "description": "Depletion of stratospheric ozone layer from ozone-depleting substances",
+      "category": "ozone_depletion",
+      "unit": "kg CFC11-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) ecotoxicity freshwater",
+      "description": "Toxic impacts on freshwater ecosystems from chemical emissions",
+      "category": "ecotoxicity",
+      "unit": "kg 1,4-DCB-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) ecotoxicity marine",
+      "description": "Toxic impacts on marine ecosystems from chemical emissions",
+      "category": "ecotoxicity",
+      "unit": "kg 1,4-DCB-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) ecotoxicity terrestrial",
+      "description": "Toxic impacts on terrestrial ecosystems from chemical emissions",
+      "category": "ecotoxicity",
+      "unit": "kg 1,4-DCB-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) human toxicity carcinogenic",
+      "description": "Human health impacts from exposure to carcinogenic substances",
+      "category": "human_toxicity",
+      "unit": "kg 1,4-DCB-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) human toxicity non-carcinogenic",
+      "description": "Human health impacts from exposure to non-carcinogenic substances",
+      "category": "human_toxicity",
+      "unit": "kg 1,4-DCB-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) particulate matter formation",
+      "description": "Human health impacts from fine particulate matter (PM2.5) formation",
+      "category": "particulate_matter",
+      "unit": "kg PM2.5-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) photochemical oxidant formation human health",
+      "description": "Human health impacts from photochemical smog formation",
+      "category": "photochemical_oxidation",
+      "unit": "kg NOx-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) photochemical oxidant formation terrestrial ecosystems",
+      "description": "Ecosystem impacts from photochemical smog formation",
+      "category": "photochemical_oxidation",
+      "unit": "kg NOx-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) ionising radiation",
+      "description": "Human health impacts from ionizing radiation exposure",
+      "category": "ionising_radiation",
+      "unit": "kBq Co-60-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) land use",
+      "description": "Impacts from land occupation and transformation",
+      "category": "land_use",
+      "unit": "m2*year crop-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) material resources metals/minerals",
+      "description": "Depletion of metal and mineral resources",
+      "category": "resource_depletion",
+      "unit": "kg Cu-eq",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) energy resources non-renewable fossil",
+      "description": "Depletion of non-renewable fossil energy resources",
+      "category": "resource_depletion",
+      "unit": "MJ",
+      "midpoint": true
+    },
+    {
+      "name": "ReCiPe 2016 v1.03, midpoint (H) water use",
+      "description": "Water consumption and scarcity impacts",
+      "category": "water_use",
+      "unit": "m3",
+      "midpoint": true
+    }
+  ]
+}
