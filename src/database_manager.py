@@ -137,6 +137,23 @@ class DatabaseManager:
             # Return first ecoinvent if version matching fails
             return list(ecoinvent_dbs.keys())[0]
         
+        # No ecoinvent database found - provide helpful guidance
+        print("\n⚠️  No ecoinvent database found!")
+        print("=" * 60)
+        print("To download and set up ecoinvent:")
+        print()
+        print("1. Check what's available:")
+        print("   python scripts/setup_ecoinvent.py --list-available")
+        print()
+        print("2. Get import instructions:")
+        print("   python scripts/setup_ecoinvent.py --version 3.12 --system-model cutoff")
+        print()
+        print("3. Your credentials are stored in:")
+        print("   config/secrets/passwords.json")
+        print()
+        print("Recommended: ecoinvent 3.12 cutoff")
+        print("=" * 60)
+        
         # Fall back to other databases
         custom_dbs = {
             name: info for name, info in self.detected_databases.items()

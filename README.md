@@ -35,8 +35,20 @@ pip install -r requirements.txt
 **Requirements:**
 - Python 3.9-3.13
 - Brightway 2.5
-- Ecoinvent 3.8+ database
+- Ecoinvent 3.8+ database (see [setup guide](docs/ECOINVENT_SETUP.md))
 - 8GB+ RAM
+
+**Setting up Ecoinvent:**
+If you don't have an ecoinvent database:
+```bash
+# Check what's available
+python scripts/setup_ecoinvent.py --check
+
+# Get setup instructions
+python scripts/setup_ecoinvent.py --version 3.12 --system-model cutoff
+```
+
+See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 
 ### Run LCA Analysis
 
