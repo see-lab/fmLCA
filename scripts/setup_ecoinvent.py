@@ -24,6 +24,25 @@ import json
 import argparse
 from pathlib import Path
 import getpass
+import textwrap
+
+
+def configure_console_encoding() -> None:
+    """Configure console streams to avoid UnicodeEncodeError on Windows."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        if stream is None:
+            continue
+        # Python 3.7+ text streams support reconfigure.
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                # Keep default stream configuration if reconfigure fails.
+                pass
+
+
+configure_console_encoding()
 
 # Add src to path
 project_root = Path(__file__).parent.parent
@@ -50,7 +69,7 @@ class EcoinventSetup:
             return False
         
         try:
-            with open(self.secrets_file, 'r') as f:
+            with open(self.secrets_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
             username = data.get('ecoinvent_username')
@@ -85,7 +104,7 @@ class EcoinventSetup:
             "ecoinvent_password": "your_password_here"
         }
         
-        with open(self.secrets_file, 'w') as f:
+        with open(self.secrets_file, 'w', encoding='utf-8') as f:
             json.dump(template, f, indent=4)
         
         print(f"📝 Created template: {self.secrets_file}")
@@ -109,7 +128,7 @@ class EcoinventSetup:
             existing_data = {}
             if self.secrets_file.exists():
                 try:
-                    with open(self.secrets_file, 'r') as f:
+                    with open(self.secrets_file, 'r', encoding='utf-8') as f:
                         existing_data = json.load(f)
                 except:
                     pass
@@ -118,7 +137,7 @@ class EcoinventSetup:
             existing_data['ecoinvent_username'] = username
             existing_data['ecoinvent_password'] = password
             
-            with open(self.secrets_file, 'w') as f:
+            with open(self.secrets_file, 'w', encoding='utf-8') as f:
                 json.dump(existing_data, f, indent=4)
             
             print(f"✅ Credentials saved to {self.secrets_file}")
@@ -271,60 +290,59 @@ Recommended: ecoinvent 3.12 cutoff
         print("=" * 60)
         
         guide = f"""
-STEP 1: Download Ecoinvent Database
-------------------------------------
-1. Visit: https://ecoinvent.org/login/
-2. Log in with your credentials
-3. Navigate to: Files > Download
-4. Select: ecoinvent {version}
-5. Choose: {system_model} system model
-6. Format: ecospold2
-7. Download the .7z file
+STEP 1: Add Ecoinvent Credentials
+----------------------------------
+Create or update:
 
-STEP 2: Extract the Database
------------------------------
-1. Install 7-Zip if needed: brew install p7zip
-2. Extract: 7z x ecoinvent_{version}_{system_model}.7z
-3. You should see a 'datasets' folder
+config/secrets/passwords.json
 
-STEP 3: Import into Brightway
-------------------------------
+With keys:
+
+{{
+  "ecoinvent_username": "your_email@example.com",
+  "ecoinvent_password": "your_password"
+}}
+
+STEP 2: Import into Brightway (recommended)
+--------------------------------------------
 Run this Python code:
 
 ```python
+import json
+from pathlib import Path
 import bw2io as bi
 import bw2data as bd
 
 # Set project
 bd.projects.set_current('{project_name}')
 
-# Import biosphere if needed
-if 'biosphere3' not in bd.databases:
-    bi.bw2setup()
+# Load ecoinvent credentials
+root = Path.cwd()
+with open(root / 'config' / 'secrets' / 'passwords.json', 'r', encoding='utf-8') as f:
+    secrets = json.load(f)
 
-# Import ecoinvent (replace with your actual path)
-datasets_path = '/path/to/ecoinvent_{version}_{system_model}/datasets'
-ei = bi.SingleOutputEcospold2Importer(datasets_path, '{db_name}')
-
-# Apply matching strategies
-ei.apply_strategies()
-
-# Check statistics
-print(ei.statistics())
-
-# Write to database (this takes 10-30 minutes)
-ei.write_database()
+# IMPORTANT: Do not run bi.bw2setup() before this call.
+# import_ecoinvent_release handles biosphere setup/migrations correctly.
+bi.import_ecoinvent_release(
+    version='{version}',
+    system_model='{system_model}',
+    username=secrets['ecoinvent_username'],
+    password=secrets['ecoinvent_password'],
+    lci=True,
+    lcia=False,
+    use_mp=False,
+)
 
 print("✅ Import complete!")
 ```
 
-STEP 4: Verify Import
+STEP 3: Verify Import
 ----------------------
 ```python
 import bw2data as bd
 bd.projects.set_current('{project_name}')
 print(list(bd.databases))
-# Should see: ['{db_name}', 'biosphere3']
+# Should include: '{db_name}'
 ```
 
 Save this script as: scripts/import_ecoinvent_{version}_{system_model}.py
@@ -335,12 +353,16 @@ Save this script as: scripts/import_ecoinvent_{version}_{system_model}.py
         # Save to file
         script_file = self.project_root / "scripts" / f"import_ecoinvent_{version}_{system_model}.py"
         
-        script_content = f'''#!/usr/bin/env python3
+        script_content = textwrap.dedent(f'''\
+#!/usr/bin/env python3
 """
 Import ecoinvent {version} {system_model} into Brightway
 
 Auto-generated import script
 """
+
+import json
+from pathlib import Path
 
 import bw2io as bi
 import bw2data as bd
@@ -351,35 +373,44 @@ print("🚀 Importing ecoinvent {version} {system_model}")
 bd.projects.set_current('{project_name}')
 print(f"✅ Using project: {project_name}")
 
-# Import biosphere if needed
-if 'biosphere3' not in bd.databases:
-    print("📦 Installing biosphere...")
-    bi.bw2setup()
+# Load credentials from project config
+project_root = Path(__file__).parent.parent
+secrets_file = project_root / "config" / "secrets" / "passwords.json"
 
-# Import ecoinvent
-datasets_path = input("Path to ecoinvent datasets folder: ").strip()
+with open(secrets_file, 'r', encoding='utf-8') as f:
+    secrets = json.load(f)
 
-print(f"⬇️  Importing from: {{datasets_path}}")
-ei = bi.SingleOutputEcospold2Importer(datasets_path, '{db_name}')
+username = secrets.get('ecoinvent_username', '').strip()
+password = secrets.get('ecoinvent_password', '').strip()
+if not username or not password:
+    raise ValueError(
+        f"Missing credentials in {{secrets_file}}. "
+        "Set ecoinvent_username and ecoinvent_password."
+    )
 
-print("🔄 Applying strategies...")
-ei.apply_strategies()
+print(f"✅ Loaded credentials for: {{username}}")
+print("⬇️  Running import_ecoinvent_release (this can take a while)...")
 
-print("📊 Statistics:")
-print(ei.statistics())
+# IMPORTANT: Do not run bi.bw2setup() before this call.
+bi.import_ecoinvent_release(
+    version='{version}',
+    system_model='{system_model}',
+    username=username,
+    password=password,
+    lci=True,
+    lcia=False,
+    use_mp=False,
+)
 
-confirm = input("\\nProceed with import? This takes 10-30 minutes (y/n): ").strip().lower()
-if confirm == 'y':
-    print("💾 Writing database... (this will take a while)")
-    ei.write_database()
+if '{db_name}' in bd.databases:
     print("✅ Import complete!")
     print(f"   Database: {db_name}")
     print(f"   Activities: {{len(bd.Database('{db_name}'))}}")
 else:
-    print("❌ Import cancelled")
-'''
+    print("⚠️  Import finished but database was not found. Check logs above.")
+''')
         
-        with open(script_file, 'w') as f:
+        with open(script_file, 'w', encoding='utf-8') as f:
             f.write(script_content)
         
         script_file.chmod(0o755)  # Make executable
