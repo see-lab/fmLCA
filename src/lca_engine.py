@@ -181,8 +181,6 @@ def switch_to_project_with_database(target_db_name):
     Returns:
         bool – True if the current project now contains the target DB.
     """
-    import uuid as _uuid
-
     # 1. Already in the right place?
     if target_db_name in list(databases.keys()):
         print(f"✅ Current project already has {target_db_name}")
@@ -211,38 +209,19 @@ def switch_to_project_with_database(target_db_name):
 
     print(f"📦 Found source project '{source_project}' with {target_db_name}")
 
-    temp_project_name = f"LCA_tmp_{_uuid.uuid4().hex[:8]}"
+    # Copying full ecoinvent projects is expensive and can fill local disk.
+    # Prefer switching directly to the source project.
     try:
         projects.set_current(source_project)
-        projects.copy_project(temp_project_name)
-        projects.set_current(temp_project_name)
-
-        # Migrate if needed
-        try:
-            projects.migrate_project_25()
-        except Exception:
-            pass
-
-        # Remove corrupt databases from the copy
-        for db in [d for d in databases.keys() if "PVC_Pipe" in d]:
-            try:
-                del databases[db]
-                print(f"🧹 Removed corrupt database '{db}'")
-            except Exception:
-                pass
-
-        print(f"✅ Created temporary project '{temp_project_name}' "
-              f"(copied from '{source_project}')")
-        return True
-    except Exception as e:
-        print(f"❌ Failed to create temporary project: {e}")
-        try:
-            projects.set_current(source_project)
-            print(f"⚠️ Falling back to source project '{source_project}'")
+        if target_db_name in list(databases.keys()):
+            print(f"✅ Switched to source project '{source_project}' "
+                  f"(has {target_db_name})")
             return True
-        except Exception as e2:
-            print(f"❌ Could not switch to source project either: {e2}")
-            return False
+        print(f"❌ Project '{source_project}' does not contain '{target_db_name}' after switch")
+        return False
+    except Exception as e:
+        print(f"❌ Failed to switch to source project: {e}")
+        return False
 
 
 def _find_source_project_for_db(target_db_name):
@@ -284,6 +263,7 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
     Returns:
         dict: LCIA results
     """
+    temp_db_name = None
     try:
         # Pre-load LCI file to detect required database
         with open(lci_file, 'r') as f:
@@ -447,6 +427,24 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
         print(f"❌ Error in run_lca_energy: {str(e)}")
         print("Traceback:")
         traceback.print_exc()
+
+        # Best-effort cleanup even on failure.
+        try:
+            if temp_db_name and temp_db_name in databases:
+                del databases[temp_db_name]
+                print(f"🧹 Cleaned up temporary database after error: {temp_db_name}")
+        except Exception as cleanup_err:
+            print(f"⚠️ Cleanup warning (database): {cleanup_err}")
+
+        try:
+            current_project = str(projects.current)
+            if current_project.startswith("LCA_tmp_"):
+                projects.set_current("default")
+                projects.delete_project(current_project, delete_dir=True)
+                print(f"🧹 Cleaned up temporary project after error: {current_project}")
+        except Exception as cleanup_err:
+            print(f"⚠️ Cleanup warning (project): {cleanup_err}")
+
         return {"error": str(e), "traceback": traceback.format_exc()}
 
 
