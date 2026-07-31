@@ -13,8 +13,9 @@ bw_processing>=1.0.0
 bw-migrations>=0.2.0
 
 # FMU development and simulation
-pythonfmu>=0.7.0        # Latest stable version (0.7.0)
-fmpy>=0.3.29            # Latest stable version (0.3.29)
+# Latest stable versions
+pythonfmu>=0.7.0
+fmpy>=0.3.29
 
 # Scientific computing (2026 compatible versions)  
 numpy>=1.24.0,<3.0.0     # Allow NumPy 2.x for 2026 compatibility
