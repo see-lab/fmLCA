@@ -94,7 +94,10 @@
 ### Other Open Items/Bugs
 - [ ] Temp cache files not deleted. See error:
       C:\Users\khinkelm\git\lca-fmu\.venv\Lib\site-packages\ecoinvent_interface\release.py:238: UserWarning: Can't automatically delete C:\Users\khinkelm\AppData\Local\pylca\EcoinventInterface\cache\ecoinvent 3.12_cutoff_ecoSpold02.7z
-      
+- [ ] scripts\create_fmu.py -h
+      UserWarning: No fast sparse solver found
+      warnings.warn("No fast sparse solver found")
+       
 ### Final Testing (20 minutes)
 - [ ] **Run test suite** - Verify all tests pass
   ```bash
