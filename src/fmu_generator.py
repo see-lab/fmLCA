@@ -246,6 +246,14 @@ def generate_fmu_class_code(class_name: str,
             def __init__(self, **kwargs):
                 super().__init__(**kwargs)
 
+                # State variables (must exist before register_variable so
+                # pythonfmu auto-binds getters/setters).
+                self.u = 0.0
+                self.y = 0.0
+                self._prev_u = 0.0
+                self.use_phase_impact = 0.0
+                self.eol_added = False
+
                 # u — power input in MW (maps to: power_input_mw)
                 self.register_variable(Real(
                     "u",
@@ -272,17 +280,10 @@ def generate_fmu_class_code(class_name: str,
                 # Use phase rate: impact per MWh
                 self.use_rate_per_mwh = {factors["energy_factor"]:.8e} * 3600.0  # {out_unit}/MWh
 
-                # State variables
-                self.u = 0.0
-                self.y = 0.0
-                self.use_phase_impact = 0.0
-                self.eol_added = False
-
             def do_step(self, current_time: float, step_size: float) -> bool:
                 try:
-                    # Get current power input
-                    power_prev = self.u
-                    self.u = self.get_real(["u"])[0]
+                    # Input 'u' is already updated by FMI setReal.
+                    power_prev = self._prev_u
                     power_curr = self.u
                     
                     # Trapezoidal integration
@@ -297,8 +298,8 @@ def generate_fmu_class_code(class_name: str,
                              self.transport_impact + 
                              self.use_phase_impact +
                              (self.eol_impact if self.eol_added else 0.0))
-                    
-                    self.set_real(["y"], [self.y])
+
+                    self._prev_u = power_curr
                     return True
                     
                 except Exception as exc:
@@ -310,7 +311,7 @@ def generate_fmu_class_code(class_name: str,
                 self.y = self.production_impact + self.transport_impact
                 self.use_phase_impact = 0.0
                 self.eol_added = False
-                self.set_real(["y"], [self.y])
+                self._prev_u = self.u
                 return True
 
             def terminate(self):
