@@ -50,6 +50,12 @@ python scripts/setup_ecoinvent.py --version 3.12 --system-model cutoff
 
 See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 
+### Brightway Setup Helper
+
+```bash
+python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
+```
+
 ### Run LCA Analysis
 
 ```bash
@@ -66,7 +72,7 @@ python scripts/create_fmu.py --inventory data/inventory/grid.json \
   --name "Grid_Cumulative" --method climate_change
 ```
 
-### Convert CSV to LCA
+### Convert CSV to JSON for LCI inport
 
 ```bash
 # Auto-detect energy processes and convert CSV
