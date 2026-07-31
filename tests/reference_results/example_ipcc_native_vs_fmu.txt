@@ -1,0 +1,11 @@
+last-generated=2026-07-31
+statistics-simulation={"tool": "brightway+fmpy", "case": "example_ipcc_native_vs_fmu"}
+inventory=data/inventory/example.json
+method_keyword=IPCC 2021 climate change total excl biogenic GWP100
+baseline_energy_mj=180.0
+simulation_start_s=0.0
+simulation_stop_s=3600.0
+simulation_step_s=60.0
+expected_total_score_kg_co2_eq=299.7215465556144
+abs_tolerance=1e-3
+rel_tolerance=1e-6

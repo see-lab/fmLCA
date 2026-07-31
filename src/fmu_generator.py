@@ -121,9 +121,31 @@ def extract_emission_factors(lca_results: Dict[str, Any],
         
         total = matched["total_score"]
         unit = matched.get("unit", out_unit)
-        factor = total / energy_mj if energy_mj else 0.0
-        
-        print(f"  ✅ Extracted: total = {total:.4e} {unit}, factor/MJ = {factor:.4e}")
+
+        # If stage breakdown contains a Use stage, derive the dynamic factor from
+        # use-phase impact only. This avoids double counting because production /
+        # transport / EOL are already added separately in the FMU state equation.
+        use_score = None
+        stage_breakdown = lca_results.get("stage_breakdown", {})
+        if isinstance(stage_breakdown, dict) and stage_breakdown:
+            first_method_stages = next(iter(stage_breakdown.values()), {})
+            if isinstance(first_method_stages, dict):
+                use_stage = first_method_stages.get("Use")
+                if isinstance(use_stage, dict):
+                    use_score = use_stage.get("score")
+
+        if isinstance(use_score, (int, float)):
+            factor = float(use_score) / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Extracted: total = {total:.4e} {unit}, "
+                f"use = {float(use_score):.4e} {unit}, factor/MJ = {factor:.4e}"
+            )
+        else:
+            factor = total / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Extracted: total = {total:.4e} {unit}, "
+                f"factor/MJ = {factor:.4e} (fallback: total-based)"
+            )
         
         return {
             "base_impact": total,

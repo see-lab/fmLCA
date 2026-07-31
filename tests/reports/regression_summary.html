@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Regression Summary</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 24px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #cccccc; padding: 6px 8px; font-size: 13px; }
+    th { background: #f3f3f3; text-align: left; }
+    .legend { display: flex; gap: 12px; margin: 10px 0 18px 0; }
+    .badge { padding: 4px 10px; border: 1px solid #bbb; border-radius: 4px; font-size: 12px; }
+    .green { background: #d8f5d0; }
+    .orange { background: #ffe5bf; }
+    .red { background: #ffd2d2; }
+  </style>
+</head>
+<body>
+  <h1>Regression Summary</h1>
+  <p>Generated: 2026-07-31</p>
+
+  <div class='legend'>
+    <span class='badge green'>green: pass</span>
+    <span class='badge orange'>orange: warning (within 10x tolerance)</span>
+    <span class='badge red'>red: fail</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Case</th>
+        <th>Reference File</th>
+        <th>Metric</th>
+        <th>Reference</th>
+        <th>Simulated</th>
+        <th>Abs Diff</th>
+        <th>Rel Diff</th>
+        <th>Abs Tol</th>
+        <th>Rel Tol</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style='background:#d8f5d0'><td>case.constant_100_mw</td><td>example_fmu_profiles.txt</td><td>max(y_diff)</td><td>2711.449815</td><td>2711.449815</td><td>2.274e-13</td><td>8.386e-17</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr><tr style='background:#d8f5d0'><td>case.step_50_150_mw</td><td>example_fmu_profiles.txt</td><td>max(y_diff)</td><td>1498.306823</td><td>1498.306823</td><td>0.000e+00</td><td>0.000e+00</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr><tr style='background:#d8f5d0'><td>case.zero_middle</td><td>example_fmu_profiles.txt</td><td>max(y_diff)</td><td>2711.449815</td><td>2711.449815</td><td>2.274e-13</td><td>8.386e-17</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr><tr style='background:#d8f5d0'><td>native_total</td><td>example_ipcc_native_vs_fmu.txt</td><td>total_score</td><td>299.7215466</td><td>299.7215466</td><td>0.000e+00</td><td>0.000e+00</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr><tr style='background:#d8f5d0'><td>fmu_total</td><td>example_ipcc_native_vs_fmu.txt</td><td>total_score</td><td>299.7215466</td><td>299.7215459</td><td>6.456e-07</td><td>2.154e-09</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr><tr style='background:#d8f5d0'><td>native_vs_fmu</td><td>example_ipcc_native_vs_fmu.txt</td><td>pair_diff</td><td>299.7215466</td><td>299.7215459</td><td>6.456e-07</td><td>2.154e-09</td><td>1.000e-03</td><td>1.000e-06</td><td>green</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Difference Plots</h2>
+  <div><img src='plots/case.constant_100_mw_diff.png' style='max-width:100%; border:1px solid #ddd;'/><p>plots/case.constant_100_mw_diff.png</p></div>
+<div><img src='plots/case.step_50_150_mw_diff.png' style='max-width:100%; border:1px solid #ddd;'/><p>plots/case.step_50_150_mw_diff.png</p></div>
+<div><img src='plots/case.zero_middle_diff.png' style='max-width:100%; border:1px solid #ddd;'/><p>plots/case.zero_middle_diff.png</p></div>
+<div><img src='plots/native_vs_fmu_diff.png' style='max-width:100%; border:1px solid #ddd;'/><p>plots/native_vs_fmu_diff.png</p></div>
+</body>
+</html>
