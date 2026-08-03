@@ -67,13 +67,8 @@ setup(
             "ipykernel>=5.0.0",
         ],
     },
-    entry_points={
-        "console_scripts": [
-            "lca-analysis=src.runBW:main",
-            "create-lca-fmu=scripts.create_lca_fmu:main",
-            "validate-fmu=scripts.validate_fmu:test_lca_fmu_simple",
-        ],
-    },
+    entry_points={},
+    # TODO: Re-add console_scripts once modules are packaged and the CLI callables exist.
     include_package_data=True,
     package_data={
         "": ["data/inventory/*.json", "data/inventory/*.csv", "data/methods/*.json", "config/secrets/*.json"],
