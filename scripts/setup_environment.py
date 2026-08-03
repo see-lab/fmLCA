@@ -283,7 +283,9 @@ def main():
         print("   python scripts/setup_environment.py --install-all")
     
     print(f"\n2. Current environment: {'Conda' if info['is_conda'] else 'venv' if info['is_venv'] else 'system'}")
-    print(f"3. Python version: {info['python_version']} ({'✅ Compatible' if 3.9 <= float(info['python_version'][:3]) <= 3.12 else '⚠️ May have issues'})")
+    major_minor = tuple(int(x) for x in info["python_version"].split(".")[:2])
+    compatible = (3, 9) <= major_minor <= (3, 12)
+    print(f"3. Python version: {info['python_version']} ({'✅ Compatible' if compatible else '⚠️ May have issues'})")
     
     print("\n💡 Quick commands:")
     print("  --fix-numpy     Fix NumPy BLAS issues (macOS)")
