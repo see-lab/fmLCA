@@ -1,0 +1,76 @@
+# LCA-FMU Production Platform Requirements
+# Updated for modernized energy propagation system (2026)
+# Compatible with Python 3.9-3.13 and Apple Silicon Macs
+
+# Brightway2.5 LCA framework (production stable versions)
+brightway25>=1.1.1
+bw2data>=4.6.0
+bw2calc>=2.4.0  
+bw2io>=0.9.14
+bw2analyzer>=0.11.8
+bw2parameters>=1.1.0
+bw_processing>=1.0.0
+bw-migrations>=0.2.0
+
+# FMU development and simulation
+# Latest stable versions
+pythonfmu>=0.7.0
+fmpy>=0.3.29
+
+# Scientific computing (2026 compatible versions)  
+numpy>=1.24.0,<3.0.0     # Allow NumPy 2.x for 2026 compatibility
+scipy>=1.10.0,<2.0.0
+pandas>=2.1.0,<4.0.0     # Allow Pandas 3.x for 2026 compatibility
+matplotlib>=3.8.0,<4.0.0
+
+# Data processing and I/O
+openpyxl>=3.0.9
+xlrd>=2.0.1
+
+# Configuration management and CLI
+pydantic>=1.10.0,<3.0.0  # Broad compatibility
+click>=8.0.0
+tqdm>=4.64.0
+
+# JSON and XML processing (for FMU generation)
+lxml>=4.6.0
+
+# Testing and validation
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Development tools (optional but recommended)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Network and API support
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Performance and compatibility notes
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ARM Mac compatibility (Apple Silicon M1/M2/M3)
+# Some packages may require additional system dependencies on ARM Macs:
+#
+# scikit-umfpack (optional performance boost for sparse matrix operations):
+#   macOS: brew install suite-sparse && pip install scikit-umfpack
+#   Linux: sudo apt-get install libsuitesparse-dev && pip install scikit-umfpack
+#   Note: Not critical for basic functionality, can be omitted if installation fails
+
+# Platform-specific optimizations
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Uncomment for enhanced performance (if compatible with your system):
+# scikit-umfpack>=0.3.3  # Sparse matrix optimization
+# numexpr>=2.8.0          # Fast numerical expression evaluation  
+# bottleneck>=1.3.0       # Fast NumPy array functions
+
+# Production deployment notes
+# ─────────────────────────────────────────────────────────────────────────────
+# For production servers, consider pinning exact versions:
+#   pip freeze > requirements-lock.txt
+#   pip install -r requirements-lock.txt
+#
+# For Docker containers, use multi-stage builds to reduce image size
+# For conda environments: conda env export > environment.yml

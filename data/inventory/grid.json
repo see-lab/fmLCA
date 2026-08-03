@@ -1,0 +1,52 @@
+{
+  "name": "Grid Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "grid production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Grid Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Grid_System_DB",
+        "Grid_1unit"
+      ]
+    },
+    {
+      "name": "market for electricity, low voltage",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "unit": "kWh",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "location": "Northeast Power Coordinating Council, US part only (US-NPCC)",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f1aca55f8d85f86399d3016d3f4b1b2a"
+      ]
+    }
+  ],
+  "life_cycle_stages": {
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "market for electricity, low voltage"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}
