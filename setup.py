@@ -74,8 +74,7 @@ setup(
         "": ["data/inventory/*.json", "data/inventory/*.csv", "data/methods/*.json", "config/secrets/*.json"],
     },
     project_urls={
-        "Bug Reports": "https://github.com/yourusername/lca-analysis-system/issues",
-        "Source": "https://github.com/yourusername/lca-analysis-system",
-        "Documentation": "https://lca-analysis-system.readthedocs.io/",
+        "Bug Reports": "https://github.com/see-lab/lca-fmu/issues",
+        "Source": "https://github.com/see-lab/lca-fmu",
     },
 )
