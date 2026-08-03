@@ -11,9 +11,11 @@ import argparse
 import tempfile
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 from fmpy import read_model_description, simulate_fmu
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -163,3 +165,75 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def test_resolve_path_handles_relative_and_absolute(tmp_path: Path) -> None:
+    rel = Path("results/out.png")
+    assert resolve_path(rel) == ROOT / rel
+
+    abs_path = tmp_path / "out.png"
+    assert resolve_path(abs_path) == abs_path
+
+
+def test_real_outputs_filters_only_real_outputs() -> None:
+    md = SimpleNamespace(
+        modelVariables=[
+            SimpleNamespace(name="real_out", type="Real", causality="output"),
+            SimpleNamespace(name="real_in", type="Real", causality="input"),
+            SimpleNamespace(name="int_out", type="Integer", causality="output"),
+        ]
+    )
+    assert real_outputs(md) == ["real_out"]
+
+
+def test_validate_outputs_accepts_real_outputs() -> None:
+    md = SimpleNamespace(
+        modelVariables=[
+            SimpleNamespace(name="CPUtime", type="Real", causality="output"),
+            SimpleNamespace(name="gri.P.real", type="Real", causality="output"),
+        ]
+    )
+    validate_outputs(md, ["CPUtime", "gri.P.real"])
+
+
+def test_validate_outputs_rejects_non_real_or_unknown_output() -> None:
+    md = SimpleNamespace(
+        modelVariables=[
+            SimpleNamespace(name="CPUtime", type="Real", causality="output"),
+            SimpleNamespace(name="status", type="Integer", causality="output"),
+        ]
+    )
+
+    with pytest.raises(ValueError, match="Invalid output"):
+        validate_outputs(md, ["CPUtime", "status", "missing"])
+
+
+def test_build_temp_fmu_with_weather_injects_resource_files(tmp_path: Path) -> None:
+    fmu_path = tmp_path / "dummy.fmu"
+    with zipfile.ZipFile(fmu_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("modelDescription.xml", "<fmiModelDescription />")
+        zf.writestr("binaries/win64/model.dll", "binary")
+
+    weather_dir = tmp_path / "weather"
+    weather_dir.mkdir()
+    (weather_dir / "USA_CA_San.Francisco.epw").write_text("epw data", encoding="utf-8")
+    (weather_dir / "USA_CA_San.Francisco.mos").write_text("mos data", encoding="utf-8")
+
+    patched_fmu = build_temp_fmu_with_weather(fmu_path, weather_dir)
+
+    with zipfile.ZipFile(patched_fmu, "r") as zf:
+        names = set(zf.namelist())
+
+    assert "modelDescription.xml" in names
+    assert "binaries/win64/model.dll" in names
+    assert "resources/USA_CA_San.Francisco.epw" in names
+    assert "resources/USA_CA_San.Francisco.mos" in names
+
+
+def test_build_temp_fmu_with_weather_requires_existing_weather_dir(tmp_path: Path) -> None:
+    fmu_path = tmp_path / "dummy.fmu"
+    with zipfile.ZipFile(fmu_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("modelDescription.xml", "<fmiModelDescription />")
+
+    with pytest.raises(FileNotFoundError, match="Weather directory not found"):
+        build_temp_fmu_with_weather(fmu_path, tmp_path / "missing-weather")

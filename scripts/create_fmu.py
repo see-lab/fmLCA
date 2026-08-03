@@ -170,6 +170,7 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
                 or "low disk space" in err.lower()
             )
 
+            if disk_full:
                 raise RuntimeError(
                     "LCA analysis failed due to low disk space in Brightway storage. "
                     "Free disk space and/or delete unused Brightway projects in your Brightway data directory, then retry."
