@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-run_fmu.py - Simulate a PythonFMU-generated FMU and plot u, y over time.
+run_fmu.py - Simulate a PythonFMU-generated FMU and plot {u,y} over time.
+
+** This is for LCA generated FMUs only with input 'u' and output 'y' variables. **
 
 This script follows the project CLI style used in scripts/create_fmu.py:
 - Clear parameter declaration

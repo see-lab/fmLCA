@@ -1,23 +1,26 @@
 # Tests Directory
 
-This directory will contain unit tests and integration tests for LCA-FMU.
+Pytest-based unit and integration tests for LCA-FMU.
 
-## Planned Test Structure
+## Structure
 
-- `test_{src-name}.py` - Tests for core module functionality
-- `reference_results/` - Shared baseline files for regression and parity checks
+- `test_*.py`: Collected pytest modules only.
+- `reference_results/`: Text baselines used by regression/parity tests.
+- `resources/`: Test data assets (not collected as tests).
+- `archive/`: Historical scripts kept for reference (excluded from pytest collection).
 
 ## Running Tests
 
 ```bash
-# Install test dependencies
-pip install -e ".[dev]"
+# Run the full suite (same command used in CI)
+python -m pytest tests/
+```
 
-# Run all tests
-make test
+Optional marker filters:
 
-# Or directly with pytest
-pytest tests/ -v
+```bash
+# Run integration tests only
+python -m pytest tests/ -m integration
 ```
 
 ## Regression Summary Report

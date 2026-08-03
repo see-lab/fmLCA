@@ -36,7 +36,6 @@ pip install -r requirements.txt
 - Python 3.9-3.13
 - Brightway 2.5
 - Ecoinvent 3.8+ database (see [setup guide](docs/ECOINVENT_SETUP.md))
-- 8GB+ RAM
 
 **Setting up Ecoinvent:**
 If you don't have an ecoinvent database:
@@ -56,22 +55,28 @@ See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
 ```
 
+### Convert CSV to JSON for LCI inport
+
+```bash
+# Auto-detect energy processes and convert CSV
+python scripts/csv_to_json_translator.py example.csv
+```
+
 ### Run LCA Analysis
 
 ```bash
-# Analyze cooling systems with IMPACT World+ methods
-python src/lca_engine.py coolingtower --methods iw_damages
-python src/lca_engine.py oncethroughcooling --methods iw_damages
+python src/lca_engine.py example --methods ipcc
 ```
 
 ### Generate FMU
 
 ```bash
 # Create FMU for co-simulation
-python scripts/create_fmu.py grid --method ipcc --name "Grid_Cumulative"
+python scripts/create_fmu.py example --method ipcc
 
 # Create FMU with bytecode-only resources and strict black-box enforcement
-python scripts/create_fmu.py grid --method ipcc --export-mode bytecode --blackbox-policy enforce
+# This is for sharing LCA-FMUs with proprietary and confidential data (e.g., ecoinvent EULA)
+python scripts/create_fmu.py example --method ipcc --export-mode bytecode --blackbox-policy enforce
 ```
 
 Black-box compliance policy:
@@ -79,12 +84,8 @@ Black-box compliance policy:
 - By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
 - For local debugging only, use --blackbox-policy warn or --blackbox-policy off.
 
-### Convert CSV to JSON for LCI inport
-
-```bash
-# Auto-detect energy processes and convert CSV
-python scripts/csv_to_json_translator.py input_inventory.csv
-```
+### Simulate (& co-simulate) FMUs (FUTURE ADDITION, nomenclature TBD)
+python scripts/co-simulate.py --fmu1 [name] --fmu2 [name]
 
 ## Project Structure
 
@@ -103,14 +104,14 @@ python scripts/csv_to_json_translator.py input_inventory.csv
 ## Testing
 
 ```bash
-# Test FMU logic (macOS compatible)
-python tests/test_cumulative_fmu_direct.py
+# Test FMU logic
+python tests/test_cumulative_fmu.py
 
 # Run all tests
 python -m pytest tests/
 ```
 
-**Note:** FMU binaries require Linux/Windows. macOS users can test via direct Python execution.
+**Note:** FMU binaries require Linux/Windows.
 
 ## Documentation
 

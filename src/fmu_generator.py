@@ -582,8 +582,18 @@ def package_fmu_as_bytecode(fmu_path: Path,
         impl_py.unlink()
 
         # Keep a tiny source stub for pythonfmu entry loading behavior.
+        # A wrapper class is resilient to repeated imports/instantiations.
         model_py.write_text(
-            f"from {impl_module_name} import {class_name} as {class_name}\n",
+            textwrap.dedent(
+                f'''\
+                from pythonfmu import Fmi2Slave
+
+                class {class_name}(Fmi2Slave):
+                    def __new__(cls, *args, **kwargs):
+                        from {impl_module_name} import {class_name} as _Impl
+                        return _Impl(*args, **kwargs)
+                '''
+            ),
             encoding="utf-8",
         )
 
@@ -635,12 +645,25 @@ def _is_allowed_loader_stub(path_name: str, content: bytes, module_name: str) ->
         return False
 
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    if len(lines) != 1:
+    # Allowed minimal wrapper stub pattern.
+    if len(lines) != 5:
         return False
 
-    # Expected pattern: from <module>_impl import <Class> as <Class>
-    pattern = re.compile(rf"^from\s+{re.escape(module_name)}_impl\s+import\s+\w+\s+as\s+\w+$")
-    return bool(pattern.match(lines[0]))
+    base_pat = re.compile(r"^from\s+pythonfmu\s+import\s+Fmi2Slave$")
+    class_pat = re.compile(r"^class\s+\w+\(Fmi2Slave\):\s*$")
+    new_pat = re.compile(r"^def\s+__new__\(cls,\s*\*args,\s*\*\*kwargs\):\s*$")
+    import_pat = re.compile(
+        rf"^from\s+{re.escape(module_name)}_impl\s+import\s+\w+\s+as\s+_Impl$"
+    )
+    return_pat = re.compile(r"^return\s+_Impl\(\*args,\s*\*\*kwargs\)$")
+
+    return bool(
+        base_pat.match(lines[0])
+        and class_pat.match(lines[1])
+        and new_pat.match(lines[2])
+        and import_pat.match(lines[3])
+        and return_pat.match(lines[4])
+    )
 
 
 # ── Compliance Audit ─────────────────────────────────────────────────────────

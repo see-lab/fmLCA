@@ -11,6 +11,10 @@ import numpy as np
 import pytest
 from fmpy import simulate_fmu
 
+TESTS_DIR = Path(__file__).resolve().parent
+if str(TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(TESTS_DIR))
+
 from reference_parser import parse_reference_file
 
 
