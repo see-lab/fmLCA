@@ -4,10 +4,7 @@ Life Cycle Assessment platform with Functional Mock-up Unit generation for energ
 
 Built with Brightway 2.5 and ecoinvent integration.
 
-[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
-[![Brightway](https://img.shields.io/badge/brightway-2.5-green)](https://brightway.dev/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
 ## Contributors
 
 **Kathryn Hinkelman** & **Fitz Koch** - [SEE Lab](http://www.theseelab.org/), University of Vermont
@@ -55,7 +52,8 @@ See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
 ```
 
-### Convert CSV to JSON for LCI import
+### Convert CSV to JSON for LCI import
+
 
 ```bash
 # Auto-detect energy processes and convert CSV
