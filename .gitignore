@@ -47,6 +47,7 @@ config/secrets/
 secrets/
 config/temp/
 temp/
+fmu/experimental
 
 # Data directory (user data, external datasets)
 data/external/
