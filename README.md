@@ -55,7 +55,7 @@ See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
 ```
 
-### Convert CSV to JSON for LCI inport
+### Convert CSV to JSON for LCI import
 
 ```bash
 # Auto-detect energy processes and convert CSV
