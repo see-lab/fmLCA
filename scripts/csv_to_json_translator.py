@@ -34,11 +34,6 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.config_manager import get_config
-from src.lci_data_manager import LCIDataManager
-from src.inventory_processor import validate_inventory_format
-
-
 def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     """
     Convert CSV inventory data to LCI JSON format using flexible configuration
@@ -79,6 +74,9 @@ def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     print(f"   📁 Output: {output_file}")
     
     # Initialize managers
+    from config_manager import get_config
+    from lci_data_manager import LCIDataManager
+
     config = get_config()
     lci_manager = LCIDataManager()
     
@@ -108,7 +106,7 @@ def test_with_lca_analysis(json_file, product_name):
     """Test the generated JSON with the LCA system"""
     try:
         # Import LCA system components
-        from src.lca_engine import run_lca_energy
+        from lca_engine import run_lca_energy
         
         # Test with default methods
         methods = ["IPCC 2021 climate change total excl biogenic GWP100"]
@@ -181,6 +179,8 @@ Examples:
         
         # Validation
         if args.validate:
+            from inventory_processor import validate_inventory_format
+
             print("   🔍 Validating JSON structure...")
             is_valid = validate_inventory_format(lci_data)
             if not is_valid:

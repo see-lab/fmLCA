@@ -5,6 +5,7 @@ Life Cycle Assessment platform with Functional Mock-up Unit generation for energ
 Built with Brightway 2.5 and ecoinvent integration.
 
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
+[![CI Tests](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml)
 
 ## Contributors
 
@@ -32,7 +33,8 @@ pip install -r requirements.txt
 
 **Requirements:**
 - Python 3.9-3.13
-- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py` and `scripts/setup_ecoinvent.py`)
+- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py` and `scripts/setup_ecoinvent.py`)
+
 
 **Setting up Ecoinvent:**
 If you don't have an ecoinvent database:

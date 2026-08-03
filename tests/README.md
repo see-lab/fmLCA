@@ -12,7 +12,7 @@ Pytest-based unit and integration tests for LCA-FMU.
 ## Running Tests
 
 ```bash
-# Run the full suite (same command used in CI)
+# Run the full suite locally
 python -m pytest tests/
 ```
 
@@ -27,7 +27,11 @@ python -m pytest tests/ -m ecoinvent
 ```
 
 CI note:
-- The default GitHub Actions test run excludes `ecoinvent` tests because those require private dataset credentials and local Brightway project setup.
+- GitHub Actions runs three required jobs:
+	- unit tests: `python -m pytest tests/ -m "not integration and not ecoinvent"`
+	- integration tests: `python -m pytest tests/ -m integration`
+	- CLI smoke tests: install package, run CLI help for setup/build tools, and run `lca-fmu-validate`
+- `ecoinvent` tests run only in optional manual/scheduled CI because they require private dataset credentials and Brightway project setup.
 
 ## Regression Summary Report
 

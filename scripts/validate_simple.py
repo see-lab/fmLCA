@@ -45,7 +45,7 @@ def main():
     
     # Check Python version
     if not check_python_version():
-        return False
+        return 1
     
     print("\n📦 Critical packages:")
     critical_packages = [
@@ -74,7 +74,7 @@ def main():
     if missing_critical:
         print(f"❌ Missing critical: {', '.join(missing_critical)}")
         print("💡 Install with: pip install -r requirements.txt")
-        return False
+        return 1
     else:
         print("✅ All critical packages installed")
     
@@ -89,18 +89,17 @@ def main():
         print("✅ Brightway2.5 imports successful")
     except Exception as e:
         print(f"❌ Brightway2.5 import failed: {e}")
-        return False
+        return 1
     
     try:
         from pythonfmu import Fmi2Slave
         print("✅ PythonFMU imports successful")
     except Exception as e:
         print(f"❌ PythonFMU import failed: {e}")
-        return False
+        return 1
     
     print("\n🚀 System validation successful!")
-    return True
+    return 0
 
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
+    sys.exit(main())
