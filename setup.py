@@ -37,7 +37,8 @@ setup(
         "inventory_processor",
         "methods_manager",
     ],
-    package_dir={"": "src"},
+    package_dir={"": "src", "scripts": "scripts"},
+    packages=find_packages(include=["scripts", "scripts.*"]),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
@@ -67,8 +68,16 @@ setup(
             "ipykernel>=5.0.0",
         ],
     },
-    entry_points={},
-    # TODO: Re-add console_scripts once modules are packaged and the CLI callables exist.
+    entry_points={
+        "console_scripts": [
+            "lca-fmu-create=scripts.create_fmu:main",
+            "lca-fmu-csv2json=scripts.csv_to_json_translator:main",
+            "lca-fmu-setup-brightway=scripts.setup_brightway:main",
+            "lca-fmu-setup-ecoinvent=scripts.setup_ecoinvent:main",
+            "lca-fmu-setup-env=scripts.setup_environment:main",
+            "lca-fmu-validate=scripts.validate_simple:main",
+        ],
+    },
     include_package_data=True,
     package_data={
         "": ["data/inventory/*.json", "data/inventory/*.csv", "data/methods/*.json", "config/secrets/*.json"],
