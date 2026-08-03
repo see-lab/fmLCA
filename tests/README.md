@@ -21,7 +21,13 @@ Optional marker filters:
 ```bash
 # Run integration tests only
 python -m pytest tests/ -m integration
+
+# Run ecoinvent-dependent tests (requires private Brightway/ecoinvent setup)
+python -m pytest tests/ -m ecoinvent
 ```
+
+CI note:
+- The default GitHub Actions test run excludes `ecoinvent` tests because those require private dataset credentials and local Brightway project setup.
 
 ## Regression Summary Report
 

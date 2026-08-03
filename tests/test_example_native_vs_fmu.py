@@ -29,10 +29,25 @@ from lca_engine import run_lca_energy  # noqa: E402
 REFERENCE_FILE = ROOT / "tests" / "reference_results" / "example_ipcc_native_vs_fmu.txt"
 
 
+def _should_skip_for_missing_ecoinvent(error_text: str) -> bool:
+    text = error_text.lower()
+    return (
+        "no brightway project found" in text
+        or "ecoinvent" in text
+        or "database" in text and "not found" in text
+    )
+
+
 def _extract_first_total_score(results: dict) -> float:
     """Extract first total_score from run_lca_energy output."""
     if "error" in results:
-        raise AssertionError(f"run_lca_energy failed: {results['error']}")
+        err = str(results["error"])
+        if _should_skip_for_missing_ecoinvent(err):
+            pytest.skip(
+                "Skipping ecoinvent parity test: required private Brightway/ecoinvent "
+                f"database is not available in this environment ({err})."
+            )
+        raise AssertionError(f"run_lca_energy failed: {err}")
 
     impact_results = results.get("impact_results", {})
     for data in impact_results.values():
@@ -74,6 +89,7 @@ def _build_example_fmu() -> Path:
     return fmu_path
 
 
+@pytest.mark.ecoinvent
 def test_example_native_matches_fmu_reference() -> None:
     """Validate native and FMU paths against a shared text reference baseline."""
     ref = parse_reference_file(REFERENCE_FILE)
