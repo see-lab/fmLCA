@@ -27,7 +27,16 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/see-lab/lca-fmu",
-    packages=find_packages(where="src"),
+    py_modules=[
+        "config_manager",
+        "database_manager",
+        "fmu_generator",
+        "lca_engine",
+        "lca_utils",
+        "lci_data_manager",
+        "inventory_processor",
+        "methods_manager",
+    ],
     package_dir={"": "src"},
     classifiers=[
         "Development Status :: 4 - Beta",
