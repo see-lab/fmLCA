@@ -178,10 +178,7 @@ For feature requests, please provide:
 - Review closed issues and PRs for similar problems
 - Contact maintainers through the SEE Lab
 
-## 📄 License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
+By contributing, you agree that your contributions will be licensed under the BSD 3-Clause License.
 ---
 
 Thank you for contributing to LCA-FMU! Your efforts help advance sustainable energy systems research. 🌱
