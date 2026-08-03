@@ -10,8 +10,10 @@ Workflow
 2. Generate a PythonFMU secondary class from those factors.
 3. Build the FMU with `pythonfmu build` (produces *_Simulatable.fmu).
 4. Fix ModelDescription/InitialUnknowns (produces final FMU).
-5. Validate the final FMU with fmpy.
-6. Delete the intermediate *_Simulatable.fmu so only the final FMU remains.
+5. Optionally convert resource Python source into bytecode-only payload.
+6. Run black-box compliance audit (enforce/warn/off policy).
+7. Validate the final FMU with fmpy.
+8. Delete the intermediate *_Simulatable.fmu so only the final FMU remains.
 
 FMU Architecture
 ----------------
@@ -65,6 +67,8 @@ from fmu_generator import (
     generate_fmu_class_code,
     build_fmu_with_pythonfmu,
     fix_fmu_metadata,
+    package_fmu_as_bytecode,
+    audit_fmu_blackbox,
     validate_fmu
 )
 
@@ -158,7 +162,22 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
         )
         
         if "error" in results:
-            raise RuntimeError(f"LCA analysis failed: {results['error']}")
+            err = str(results.get("error", "Unknown LCA error"))
+            tb = str(results.get("traceback", ""))
+            disk_full = (
+                "database or disk is full" in err.lower()
+                or "database or disk is full" in tb.lower()
+                or "low disk space" in err.lower()
+            )
+
+            if disk_full:
+                raise RuntimeError(
+                    "LCA analysis failed due to low disk space in Brightway storage. "
+                    "Free disk space and/or delete unused Brightway projects under "
+                    "C:/Users/khinkelm/AppData/Local/pylca/Brightway3, then retry."
+                )
+
+            raise RuntimeError(f"LCA analysis failed: {err}")
         
         print(f"  ✅ LCA analysis completed successfully")
         return results
@@ -225,6 +244,25 @@ def main():
         "--dry-run",
         action="store_true",
         help="Test configuration and file access without creating FMU"
+    )
+    parser.add_argument(
+        "--blackbox-policy",
+        choices=["enforce", "warn", "off"],
+        default="enforce",
+        help=(
+            "Black-box compliance handling: "
+            "enforce=fail build if readable source/data is packaged (default), "
+            "warn=report but keep FMU, off=skip audit"
+        )
+    )
+    parser.add_argument(
+        "--export-mode",
+        choices=["source", "bytecode"],
+        default="bytecode",
+        help=(
+            "FMU packaging mode: source=keep Python resources/*.py, "
+            "bytecode=compile implementation modules to .pyc and keep only a minimal loader stub (default)"
+        )
     )
 
     args = parser.parse_args()
@@ -324,10 +362,38 @@ def main():
             output_description=f"Cumulative {method_cfg['output_label']}"
         )
 
-        # ── Step 5: Validate FMU ─────────────────────────────────────────────
+        # ── Step 5: Optional bytecode packaging ──────────────────────────────
+        if args.export_mode == "bytecode":
+            package_fmu_as_bytecode(final_path)
+
+        # ── Step 6: Black-box compliance audit ──────────────────────────────
+        blackbox_ok = True
+        blackbox_msg = "Black-box audit skipped"
+        if args.blackbox_policy != "off":
+            blackbox_ok, blackbox_msg = audit_fmu_blackbox(final_path)
+            if blackbox_ok:
+                print(f"\n  ✅ {blackbox_msg}")
+            else:
+                level = "❌" if args.blackbox_policy == "enforce" else "⚠️"
+                print(f"\n  {level} {blackbox_msg}")
+
+            if not blackbox_ok and args.blackbox_policy == "enforce":
+                # Prevent accidental distribution of non-compliant FMUs.
+                try:
+                    final_path.unlink()
+                    print(f"  🧹 Removed non-compliant FMU: {final_path.name}")
+                except Exception as exc:
+                    print(f"  ⚠️  Could not remove non-compliant FMU: {exc}")
+
+                raise RuntimeError(
+                    "Black-box compliance check failed. "
+                    "Use --blackbox-policy warn/off only for local testing."
+                )
+
+        # ── Step 7: Validate FMU ─────────────────────────────────────────────
         is_valid, msg = validate_fmu(final_path)
 
-        # ── Step 6: Clean up intermediate file ───────────────────────────────
+        # ── Step 8: Clean up intermediate file ───────────────────────────────
         try:
             simulatable_path.unlink()
             print(f"\n  🧹 Removed intermediate: {simulatable_path.name}")
@@ -342,6 +408,9 @@ def main():
             print(f"  ⚠️   FMU created but validation had issues: {msg}")
         print(f"  📁  Output : {final_path}")
         print(f"  🖥️   Platform: Windows 64-bit, Linux 64-bit")
+        print(f"  📦  Export mode     : {args.export_mode}")
+        print(f"  🔐  Black-box policy: {args.blackbox_policy}")
+        print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")
         print(f"")
         print(f"  🔄  Cumulative Impact Tracking:")
         print(f"     • Input  : u [MW]  (power_input_mw)")

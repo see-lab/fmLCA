@@ -24,10 +24,13 @@ Part of the LCA-FMU core library.
 import subprocess
 import sys
 import textwrap
+import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+import py_compile
+import re
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple
 
 # Handle both relative and absolute imports
 try:
@@ -504,6 +507,218 @@ def fix_fmu_metadata(fmu_path: Path,
         
     except Exception as e:
         raise RuntimeError(f"Failed to fix FMU metadata: {e}")
+
+
+def package_fmu_as_bytecode(fmu_path: Path,
+                            output_path: Optional[Path] = None) -> Path:
+    """
+    Repackage an FMU by compiling resource Python sources to bytecode.
+
+    This removes readable .py files under resources/ and replaces them with
+    .pyc files, preserving FMU archive structure for distribution use cases.
+
+    Args:
+        fmu_path: Input FMU path
+        output_path: Optional output FMU path (in-place if None)
+
+    Returns:
+        Path to repackaged FMU
+    """
+    if not fmu_path.exists():
+        raise FileNotFoundError(f"FMU not found for bytecode packaging: {fmu_path}")
+
+    if output_path is None:
+        output_path = fmu_path
+
+    print(f"\n{'='*60}")
+    print("  Packaging FMU resources as bytecode...")
+    print(f"{'='*60}")
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_dir_path = Path(tmp_dir)
+        extracted = tmp_dir_path / "fmu_extract"
+        extracted.mkdir(parents=True, exist_ok=True)
+
+        with zipfile.ZipFile(fmu_path, "r") as zin:
+            zin.extractall(extracted)
+
+        resources_dir = extracted / "resources"
+        if not resources_dir.exists():
+            raise RuntimeError("FMU has no resources/ directory to package")
+
+        slavemodule_file = resources_dir / "slavemodule.txt"
+        if not slavemodule_file.exists():
+            raise RuntimeError("FMU resources/slavemodule.txt is missing")
+
+        module_name = slavemodule_file.read_text(encoding="utf-8", errors="replace").strip()
+        if not module_name:
+            raise RuntimeError("FMU resources/slavemodule.txt is empty")
+
+        model_py = resources_dir / f"{module_name}.py"
+        if not model_py.exists():
+            raise RuntimeError(
+                f"Expected model source file is missing: resources/{module_name}.py"
+            )
+
+        model_source = model_py.read_text(encoding="utf-8", errors="replace")
+        class_match = re.search(r"^\s*class\s+(\w+)\s*\(", model_source, re.MULTILINE)
+        if not class_match:
+            raise RuntimeError(
+                f"Could not detect model class declaration in resources/{module_name}.py"
+            )
+
+        class_name = class_match.group(1)
+        impl_module_name = f"{module_name}_impl"
+        impl_py = resources_dir / f"{impl_module_name}.py"
+
+        # Move full implementation to a separate module, then compile it.
+        model_py.replace(impl_py)
+        py_compile.compile(
+            str(impl_py),
+            cfile=str(resources_dir / f"{impl_module_name}.pyc"),
+            doraise=True,
+            optimize=2,
+        )
+        impl_py.unlink()
+
+        # Keep a tiny source stub for pythonfmu entry loading behavior.
+        model_py.write_text(
+            f"from {impl_module_name} import {class_name} as {class_name}\n",
+            encoding="utf-8",
+        )
+
+        py_files = [
+            p for p in resources_dir.rglob("*.py")
+            if p.is_file() and p != model_py
+        ]
+
+        compiled_count = 0
+        for py_file in py_files:
+            pyc_file = Path(str(py_file) + "c")
+            try:
+                py_compile.compile(
+                    str(py_file),
+                    cfile=str(pyc_file),
+                    doraise=True,
+                    optimize=2,
+                )
+                py_file.unlink()
+                compiled_count += 1
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Failed to compile FMU resource {py_file}: {exc}"
+                )
+
+        compiled_count += 1  # Count compiled model implementation module.
+
+        with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zout:
+            for file_path in extracted.rglob("*"):
+                if not file_path.is_file():
+                    continue
+                arcname = file_path.relative_to(extracted).as_posix()
+                zout.write(file_path, arcname)
+
+    print(f"  ✅ Bytecode packaging complete ({compiled_count} modules + loader stub)")
+    print(f"  ✅ Repackaged FMU → {output_path}")
+    return output_path
+
+
+def _is_allowed_loader_stub(path_name: str, content: bytes, module_name: str) -> bool:
+    """Return True if file is the minimal allowed loader stub."""
+    expected = f"resources/{module_name}.py"
+    if path_name != expected:
+        return False
+
+    try:
+        text = content.decode("utf-8", errors="strict")
+    except Exception:
+        return False
+
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    if len(lines) != 1:
+        return False
+
+    # Expected pattern: from <module>_impl import <Class> as <Class>
+    pattern = re.compile(rf"^from\s+{re.escape(module_name)}_impl\s+import\s+\w+\s+as\s+\w+$")
+    return bool(pattern.match(lines[0]))
+
+
+# ── Compliance Audit ─────────────────────────────────────────────────────────
+
+def audit_fmu_blackbox(fmu_path: Path) -> Tuple[bool, str]:
+    """
+    Audit FMU archive for black-box compliance.
+
+        Compliance rule in this project:
+        - Export FMUs must not contain readable implementation or data artifacts
+            under resources/ (e.g., .json, .csv, .txt payloads).
+        - A single minimal loader stub is allowed at resources/<slavemodule>.py if
+            it only imports the compiled implementation module.
+        - resources/slavemodule.txt is allowed for pythonfmu runtime wiring.
+
+    Args:
+        fmu_path: Path to FMU file
+
+    Returns:
+        (is_compliant, message)
+    """
+    if not fmu_path.exists():
+        return False, f"FMU file not found: {fmu_path}"
+
+    disallowed_exts = {
+        ".py", ".pyi", ".json", ".csv", ".yaml", ".yml", ".toml", ".ini", ".txt"
+    }
+    allowed_text_files = {"resources/slavemodule.txt"}
+    violations: List[str] = []
+
+    try:
+        with zipfile.ZipFile(fmu_path, "r") as zf:
+            module_name = ""
+            try:
+                module_name = zf.read("resources/slavemodule.txt").decode("utf-8", errors="replace").strip()
+            except Exception:
+                module_name = ""
+
+            for entry in zf.infolist():
+                name = entry.filename.replace("\\", "/")
+                lower_name = name.lower()
+
+                # Skip directories
+                if lower_name.endswith("/"):
+                    continue
+
+                # We only audit payload exposure here; modelDescription.xml is expected.
+                if not lower_name.startswith("resources/"):
+                    continue
+
+                ext = Path(lower_name).suffix
+                if ext in disallowed_exts:
+                    if lower_name in allowed_text_files:
+                        continue
+
+                    if ext == ".py" and module_name:
+                        try:
+                            raw = zf.read(entry.filename)
+                        except Exception:
+                            raw = b""
+                        if _is_allowed_loader_stub(name, raw, module_name):
+                            continue
+
+                    violations.append(name)
+
+    except Exception as exc:
+        return False, f"Compliance audit failed: {exc}"
+
+    if violations:
+        preview = ", ".join(violations[:8])
+        more = "" if len(violations) <= 8 else f" (+{len(violations) - 8} more)"
+        return (
+            False,
+            "Non-black-box FMU: readable resources detected: "
+            f"{preview}{more}"
+        )
+
+    return True, "Black-box audit passed: no readable resource payloads detected"
 
 
 # ── FMU Validation ───────────────────────────────────────────────────────────

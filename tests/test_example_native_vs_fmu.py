@@ -46,6 +46,8 @@ def _build_example_fmu() -> Path:
         "example",
         "--method",
         "ipcc",
+        "--blackbox-policy",
+        "off",
     ]
     completed = subprocess.run(
         cmd,

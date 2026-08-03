@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import argparse
 import traceback
+import shutil
 from pathlib import Path
 
 # Import Brightway components
@@ -328,9 +329,9 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
         if not process_data:
             return {"error": "Failed to create process inventory"}
         
-        # Write database
+        # Write database (with low-disk fallback for SQLite VACUUM failures)
         db = Database(temp_db_name)
-        db.write(process_data)
+        _write_temp_database(db, process_data)
         print(f"✅ Created temporary database: {temp_db_name}")
         
         # Get main process for calculation - simplified approach
@@ -446,6 +447,58 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
             print(f"⚠️ Cleanup warning (project): {cleanup_err}")
 
         return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+def _write_temp_database(db, process_data):
+    """Write a temporary Brightway DB and retry once without VACUUM on low-disk errors."""
+    try:
+        db.write(process_data)
+        return
+    except Exception as exc:
+        err_text = str(exc).lower()
+        tb_text = traceback.format_exc().lower()
+        disk_full = (
+            "database or disk is full" in err_text
+            or "database or disk is full" in tb_text
+            or "no space left" in err_text
+            or "no space left" in tb_text
+        )
+
+        if not disk_full:
+            raise
+
+        print("⚠️ Disk-space issue detected during temporary DB write")
+        print("   Retrying once with VACUUM temporarily disabled...")
+
+        import bw2data.sqlite as bw_sqlite
+
+        original_vacuum = bw_sqlite.SubstitutableDatabase.vacuum
+
+        def _noop_vacuum(self):
+            return None
+
+        try:
+            bw_sqlite.SubstitutableDatabase.vacuum = _noop_vacuum
+            db.write(process_data)
+            print("✅ Temporary DB write succeeded with low-disk fallback")
+            return
+        except Exception as retry_exc:
+            free_gb, total_gb = _get_workspace_drive_space_gb()
+            raise RuntimeError(
+                "Brightway DB write failed due to low disk space even after fallback. "
+                f"Drive free space: {free_gb:.2f} GB / {total_gb:.2f} GB. "
+                "Free space or remove unused Brightway projects under "
+                "C:/Users/khinkelm/AppData/Local/pylca/Brightway3, then retry."
+            ) from retry_exc
+        finally:
+            bw_sqlite.SubstitutableDatabase.vacuum = original_vacuum
+
+
+def _get_workspace_drive_space_gb():
+    """Return (free_gb, total_gb) for the workspace drive."""
+    usage = shutil.disk_usage(str(Path.cwd()))
+    gib = 1024 ** 3
+    return usage.free / gib, usage.total / gib
 
 
 def _resolve_exchange_input(exchange, primary_db):

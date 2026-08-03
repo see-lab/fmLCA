@@ -68,9 +68,16 @@ python src/lca_engine.py oncethroughcooling --methods iw_damages
 
 ```bash
 # Create FMU for co-simulation
-python scripts/create_fmu.py --inventory data/inventory/grid.json \
-  --name "Grid_Cumulative" --method climate_change
+python scripts/create_fmu.py grid --method ipcc --name "Grid_Cumulative"
+
+# Create FMU with bytecode-only resources and strict black-box enforcement
+python scripts/create_fmu.py grid --method ipcc --export-mode bytecode --blackbox-policy enforce
 ```
+
+Black-box compliance policy:
+- By default, create_fmu enforces black-box auditing and fails export if readable source/data payloads are present in resources/.
+- By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
+- For local debugging only, use --blackbox-policy warn or --blackbox-policy off.
 
 ### Convert CSV to JSON for LCI inport
 
