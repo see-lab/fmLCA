@@ -3,7 +3,7 @@
 **Project:** LCA-FMU - Life Cycle Assessment with Functional Mock-up Units  
 **Target:** https://github.com/see-lab/lca-fmu  
 **Status:** 🟡 IN PREPARATION
-**Last Updated:** July 23, 2026
+**Last Updated:** August 3, 2026
 **Responsible Author:** Kathryn Hinkelman
 **AI Assists:** Claude Sonnet 4.5
 **Development Path:** AI auto generated with author checking.
@@ -73,7 +73,7 @@
 ## 🟡 Recommended Before Publication
 
 ### Code Cleanup (15 minutes)
-- [ ] **Delete `run_lca_cli.py`** - Redundant, non-functional
+- [X] **Delete `run_lca_cli.py`** - Redundant, non-functional
   - **Reason:** `src/lca_engine.py` already has complete CLI
   - **Impact:** Eliminates confusion, cleaner structure
   - **Command:** `git rm run_lca_cli.py`
@@ -84,13 +84,14 @@
   - **Check:** `git status --ignored | grep secrets`
   
 - [ ] **Check for hardcoded paths** - Search for username
-  - **Reason:** Paths like `/Users/khinkelm/` shouldn't be committed
-  - **Command:** `grep -r "/Users/khinkelm" --exclude-dir=.git .`
+  - **Reason:** User-specific home paths should not be committed
+  - **Command (macOS/Linux):** `grep -r "$(whoami)" --exclude-dir=.git --exclude-dir=venv --exclude-dir=.venv .`
+  - **Command (Windows PowerShell):** `Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch "\\.git\\" -and $_.FullName -notmatch "\\venv\\" -and $_.FullName -notmatch "\\.venv\\" } | Select-String -SimpleMatch -Pattern $env:USERNAME`
 
 
 ### Other Open Items/Bugs
 - [ ] Temp cache files not deleted. See error:
-      C:\Users\khinkelm\git\lca-fmu\.venv\Lib\site-packages\ecoinvent_interface\release.py:238: UserWarning: Can't automatically delete C:\Users\khinkelm\AppData\Local\pylca\EcoinventInterface\cache\ecoinvent 3.12_cutoff_ecoSpold02.7z
+  <repo>/.venv/Lib/site-packages/ecoinvent_interface/release.py:238: UserWarning: Can't automatically delete <user-home>/pylca/EcoinventInterface/cache/ecoinvent 3.12_cutoff_ecoSpold02.7z
 - [ ] scripts\create_fmu.py -h
       UserWarning: No fast sparse solver found
       warnings.warn("No fast sparse solver found")
@@ -124,7 +125,7 @@
   - Add topics: `lca`, `brightway`, `fmu`, `energy-systems`
   - Enable Issues and Discussions
   
-- [ ] **Add GitHub Actions** - CI/CD pipeline
+- [X] **Add GitHub Actions** - CI/CD pipeline
   - Automated testing on push
   - Python version matrix (3.9-3.13)
 
@@ -169,7 +170,7 @@
 git rm run_lca_cli.py
 
 # 2. Security check (5 min)
-grep -r "/Users/khinkelm" --exclude-dir=.git --exclude-dir=venv . || echo "OK"
+grep -r "$(whoami)" --exclude-dir=.git --exclude-dir=venv --exclude-dir=.venv . || echo "OK"
 git status --ignored | grep secrets || echo "OK"
 
 # 3. Quick test (5 min)

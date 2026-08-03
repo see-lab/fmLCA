@@ -16,10 +16,7 @@
             }
         ],
         "project_search_names": [
-            "LCA-FMU",
-            "Class 1", 
-            "default",
-            "simapro-ecoinvent-import"
+            "LCA-FMU"
         ]
     },
     "energy_applications": {

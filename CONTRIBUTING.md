@@ -58,15 +58,9 @@ Thank you for your interest in contributing to LCA-FMU! This project is maintain
 Before submitting a pull request, run all tests:
 
 ```bash
-# Test FMU functionality (works on all platforms)
-python tests/test_cumulative_fmu_direct.py
+# Run all tests 
+python -m pytest tests/
 
-# Test LCIA methods
-python tests/test_methods_format.py
-python tests/test_methods_loader.py
-
-# Test argument parsing
-python tests/test_arg_parsing.py
 ```
 
 ### Commit Messages
@@ -81,8 +75,7 @@ Use clear, descriptive commit messages:
 
 ### High Priority
 
-- **Additional cooling technologies**: Dry cooling towers, hybrid wet-dry systems
-- **More energy storage systems**: Hydrogen storage, compressed air
+- **Additional energy technologies**: HVAC systems, storages, power generation
 - **Performance optimizations**: Faster method loading, caching strategies
 - **Test coverage**: Unit tests for edge cases
 - **Documentation improvements**: Tutorials, use case examples

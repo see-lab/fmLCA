@@ -488,7 +488,7 @@ def _write_temp_database(db, process_data):
                 "Brightway DB write failed due to low disk space even after fallback. "
                 f"Drive free space: {free_gb:.2f} GB / {total_gb:.2f} GB. "
                 "Free space or remove unused Brightway projects under "
-                "C:/Users/khinkelm/AppData/Local/pylca/Brightway3, then retry."
+                "your Brightway data directory (for example, user-local pylca/Brightway storage), then retry."
             ) from retry_exc
         finally:
             bw_sqlite.SubstitutableDatabase.vacuum = original_vacuum
