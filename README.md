@@ -130,14 +130,8 @@ MIT License - see [LICENSE](LICENSE) file.
 
 ## Citation
 
-```bibtex
-@software{lca_fmu_2026,
-  title = {LCA-FMU: Life Cycle Assessment with Functional Mock-up Units},
-  author = {Hinkelman, Kathryn and Koch, Fitz},
-  year = {2026},
-  url = {https://github.com/see-lab/lca-fmu},
-  organization = {SEE Lab, University of Vermont}
-}
+```
+Will be listed here when available. 
 ```
 
 ## Links
