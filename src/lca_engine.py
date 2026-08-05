@@ -9,6 +9,7 @@ import pandas as pd
 import argparse
 import traceback
 import shutil
+import re
 from pathlib import Path
 
 # Import Brightway components
@@ -251,6 +252,58 @@ def _find_source_project_for_db(target_db_name):
     return None
 
 
+def switch_to_preferred_projects(target_db_name=None):
+    """
+    Try configured Brightway projects (default + project_search_names) in order.
+
+    Args:
+        target_db_name (str | None): If provided, require this DB in target project.
+
+    Returns:
+        bool: True if a suitable project was selected.
+    """
+    all_projects = [str(p).replace("Project: ", "") for p in projects]
+
+    system_cfg = config.system_config.get("system", {})
+    configured_candidates = [
+        system_cfg.get("default_project"),
+        *config.get_project_search_names(),
+        LCA_FMU_PROJECT,
+    ]
+
+    # Keep order stable while removing empty entries and duplicates.
+    seen = set()
+    candidates = []
+    for name in configured_candidates:
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        candidates.append(name)
+
+    for project_name in candidates:
+        if project_name not in all_projects:
+            continue
+
+        try:
+            projects.set_current(project_name)
+            available = list(databases.keys())
+
+            if target_db_name:
+                if target_db_name in available:
+                    print(f"✅ Switched to configured project '{project_name}' (has {target_db_name})")
+                    return True
+                continue
+
+            # No explicit DB required: prefer any project that has an ecoinvent DB.
+            if find_and_setup_project():
+                print(f"✅ Switched to configured project '{project_name}' (ecoinvent detected)")
+                return True
+        except Exception as e:
+            print(f"⚠️ Could not switch to configured project '{project_name}': {e}")
+
+    return False
+
+
 def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180.0):
     """
     Run LCA analysis with energy-based inputs using the new modular architecture
@@ -282,6 +335,10 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
             print(f"🔍 LCI file requires database: {required_db}")
             if not switch_to_project_with_database(required_db):
                 return {"error": f"No Brightway project found with database '{required_db}'"}
+        else:
+            print("🔍 No explicit database input links found in LCI file; trying configured Brightway projects...")
+            if not switch_to_preferred_projects():
+                print("⚠️ Could not auto-switch to a configured project with ecoinvent; continuing with current project")
         
         # Initialize managers
         db_manager = DatabaseManager()
@@ -683,35 +740,26 @@ def calculate_stage_breakdown_with_lca(lci_data, lca_obj, method_unit, temp_db_n
         stage_breakdown[stage_name] = {"score": 0.0, "unit": method_unit}
     
     try:
-        # Build a mapping: exchange name -> life_cycle_stage
-        exchange_to_stage = {}
+        # Build stage list in the same order as technosphere exchanges are created.
+        # This avoids collisions when the same exchange name appears in multiple stages.
+        ordered_stages = []
         for exc in lci_data.get('exchanges', []):
-            stage = exc.get('life_cycle_stage')
-            if stage:
-                exchange_to_stage[exc.get('name', '')] = stage
-        
+            if exc.get('type') == 'technosphere':
+                ordered_stages.append(exc.get('life_cycle_stage', 'Unassigned'))
+
         # Get the main process activity
         from bw2data import get_activity
         main_act = get_activity((temp_db_name, lci_data.get('code', 'main_process')))
-        
+
         # Iterate over technosphere exchanges and get their contribution
-        for exc in main_act.technosphere():
+        for idx, exc in enumerate(main_act.technosphere()):
             inp_act = exc.input
-            inp_name = inp_act.get('name', '')
-            
-            # Find which stage this exchange belongs to
-            matched_stage = None
-            for exc_name, stage_name in exchange_to_stage.items():
-                if exc_name.lower() in inp_name.lower() or inp_name.lower() in exc_name.lower():
-                    matched_stage = stage_name
-                    break
-            
-            if not matched_stage:
-                matched_stage = 'Unassigned'
-            
+
+            matched_stage = ordered_stages[idx] if idx < len(ordered_stages) else 'Unassigned'
+
             if matched_stage not in stage_breakdown:
                 stage_breakdown[matched_stage] = {"score": 0.0, "unit": method_unit}
-            
+
             # Calculate contribution of this exchange
             try:
                 # Create a new LCA for just this input
@@ -916,6 +964,56 @@ def simplify_method_name(method_str):
     except:
         return method_str[:30] + "..." if len(method_str) > 30 else method_str
 
+
+def normalize_stage_label(stage_name):
+    """Normalize stage labels to short EN 15978 style codes (A0..D)."""
+    if not stage_name:
+        return "Unassigned"
+
+    label = str(stage_name).strip()
+    if not label:
+        return "Unassigned"
+
+    label_upper = label.upper()
+
+    # Accept full-text labels like "A1: Raw material extraction..."
+    m = re.match(r"^([ABCD]\d?(?:-[ABCD]?\d+)?)\b", label_upper)
+    if m:
+        token = m.group(1)
+        # Normalize mixed-format ranges such as C2-4 -> C2-C4.
+        m_range = re.match(r"^([ABCD])(\d)-([ABCD]?)(\d)$", token)
+        if m_range:
+            left_letter, left_num, right_letter, right_num = m_range.groups()
+            right_letter = right_letter if right_letter else left_letter
+            if left_letter == right_letter:
+                return f"{left_letter}{left_num}-{right_letter}{right_num}" if left_num != right_num else f"{left_letter}{left_num}"
+        return token
+
+    return label
+
+
+def stage_sort_key(stage_label):
+    """Sort stage labels in lifecycle order: A -> B -> C -> D -> others."""
+    label = normalize_stage_label(stage_label)
+
+    if label == "Unassigned":
+        return (5, 99, 99, label)
+
+    m = re.match(r"^([ABCD])(\d)(?:-([ABCD]?)(\d))?$", label)
+    if not m:
+        return (6, 99, 99, label)
+
+    phase, start_num, end_phase, end_num = m.groups()
+    phase_order = {"A": 1, "B": 2, "C": 3, "D": 4}
+    end_phase = end_phase if end_phase else phase
+
+    return (
+        phase_order.get(phase, 6),
+        int(start_num),
+        int(end_num) if end_num else int(start_num),
+        label,
+    )
+
 def create_visualization(results, output_file="lca_results.png"):
     """
     Create a stacked bar chart visualization showing life cycle stage breakdown for each impact method
@@ -941,12 +1039,20 @@ def create_visualization(results, output_file="lca_results.png"):
         methods = []
         units = []
         stage_names = []
-        
-        # Get all unique stage names
-        for method_stages in stage_data.values():
+
+        # Normalize and aggregate stage names across methods.
+        normalized_stage_data = {}
+        for method_name, method_stages in stage_data.items():
+            normalized_stage_data[method_name] = {}
             for stage_name, stage_info in method_stages.items():
-                if stage_info["score"] > 0 and stage_name not in stage_names:
-                    stage_names.append(stage_name)
+                short_stage = normalize_stage_label(stage_name)
+                existing = normalized_stage_data[method_name].get(short_stage, {"score": 0.0, "unit": stage_info.get("unit")})
+                existing["score"] += float(stage_info.get("score", 0.0))
+                normalized_stage_data[method_name][short_stage] = existing
+                if existing["score"] > 0 and short_stage not in stage_names:
+                    stage_names.append(short_stage)
+
+        stage_names = sorted(stage_names, key=stage_sort_key)
         
         # If no stages found, exit
         if not stage_names:
@@ -964,7 +1070,7 @@ def create_visualization(results, output_file="lca_results.png"):
                 units.append(unit)
                 
                 # Get stage values for this method
-                method_stages = stage_data.get(method, {})
+                method_stages = normalized_stage_data.get(method, {})
                 for stage in stage_names:
                     stage_info = method_stages.get(stage, {"score": 0.0})
                     stage_values[stage].append(stage_info["score"])
