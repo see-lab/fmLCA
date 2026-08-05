@@ -1,0 +1,2999 @@
+{
+  "name": "Building59 Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "building59 production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Building59 Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Building59_System_DB",
+        "Building59_1unit"
+      ]
+    },
+    {
+      "name": "Acoustic ceiling tile fiber",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 6082.363261,
+      "location": "United States",
+      "process_match": "Acoustic ceiling tile fiber",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "94d28cb7518244233ce4c524f4ed31b9"
+      ]
+    },
+    {
+      "name": "Suspension assembly",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 1292.646461,
+      "location": "United States",
+      "process_match": "Suspension assembly",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d6418d3ed7ed3b7e7f5f809823204e52"
+      ]
+    },
+    {
+      "name": "Adhesives and sealants",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 733.755125,
+      "location": "United States",
+      "process_match": "Adhesives and sealants",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a4ec8071e006ee25b9f8e9082cb09dc3"
+      ]
+    },
+    {
+      "name": "Air and vapor barriers",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 559.08795,
+      "location": "United States",
+      "process_match": "Air and vapor barriers",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ec2c8a687ca0a75644b4b09569b99d87"
+      ]
+    },
+    {
+      "name": "Extrusion",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 3102.103489,
+      "location": "United States",
+      "process_match": "Extrusion",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0f4a29836737c959f23373b5dc59d6d9"
+      ]
+    },
+    {
+      "name": "Roll formed metal panel steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 3578.088752,
+      "location": "United States",
+      "process_match": "Roll formed metal panel steel",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Stucco finish",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 1859.292822,
+      "location": "United States",
+      "process_match": "Stucco finish",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "62b61f40fecd0b445617b16f24cd6be5"
+      ]
+    },
+    {
+      "name": "Coatings - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 161.879601,
+      "location": "United States",
+      "process_match": "Coatings - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Paint",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 311.411762,
+      "location": "United States",
+      "process_match": "Paint",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b3252a77c4dce9e3f8fedbde431c7b81"
+      ]
+    },
+    {
+      "name": "GFRC general",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 1755.106044,
+      "location": "United States",
+      "process_match": "GFRC general",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f40a6d016d02c4406339fb51095c11d2"
+      ]
+    },
+    {
+      "name": "Precast",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 424436.741822,
+      "location": "United States",
+      "process_match": "Precast",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9d5f671f91d687a958b4a1943aa3d3b9"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 1036903.25195,
+      "location": "United States",
+      "process_match": "Ready mix NW 3000",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ]
+    },
+    {
+      "name": "Aluminum door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 178.901458,
+      "location": "United States",
+      "process_match": "Aluminum door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Aluminum door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 97.725595,
+      "location": "United States",
+      "process_match": "Aluminum door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 167.225472,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 436.05436,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Steel door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 746.735126,
+      "location": "United States",
+      "process_match": "Steel door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 75.410934,
+      "location": "United States",
+      "process_match": "Steel door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Wood or composite door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 820.61441,
+      "location": "United States",
+      "process_match": "Wood or composite door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b9788e7d42c3eb3c6a0cc42c9c8fab6a"
+      ]
+    },
+    {
+      "name": "Glazing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 448.890672,
+      "location": "United States",
+      "process_match": "Glazing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3d664a5b7b62e92dee3835b2c8af38dd"
+      ]
+    },
+    {
+      "name": "Insulated glass unit IGU",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 5928.257124,
+      "location": "United States",
+      "process_match": "Insulated glass unit IGU",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b898e4b675d9ea79d9d7308e1bd7b80"
+      ]
+    },
+    {
+      "name": "Glass mat gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 6315.090047,
+      "location": "United States",
+      "process_match": "Glass mat gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a66d7df5b24e0c76c2fa4873be4c06b4"
+      ]
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 95235.360394,
+      "location": "United States",
+      "process_match": "Gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1b3c38e902bbf524e6597f71aee4cda2"
+      ]
+    },
+    {
+      "name": "Extruded polystyrene XPS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 12947.108937,
+      "location": "United States",
+      "process_match": "Extruded polystyrene XPS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "065350adceb46205fbaa931c057ba534"
+      ]
+    },
+    {
+      "name": "Fiberglass blanket",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 2267.968248,
+      "location": "United States",
+      "process_match": "Fiberglass blanket",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9299ec7c27a6c841a110c7d61a48aa8f"
+      ]
+    },
+    {
+      "name": "Other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 90.10798,
+      "location": "United States",
+      "process_match": "Other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Fasteners",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 498.80357,
+      "location": "United States",
+      "process_match": "Fasteners",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9df8c1cd1bb8ed544886078e8a063b65"
+      ]
+    },
+    {
+      "name": "Roofing and waterproofing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 1530.236226,
+      "location": "United States",
+      "process_match": "Roofing and waterproofing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "TPO",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 3394.9864,
+      "location": "United States",
+      "process_match": "TPO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "7c97486978bf8a18d3410a4387dde7fa"
+      ]
+    },
+    {
+      "name": "Cold formed steel framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 8862.837351,
+      "location": "United States",
+      "process_match": "Cold formed steel framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d946184d3ac739a06d3569c72215c006"
+      ]
+    },
+    {
+      "name": "Decking",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 30046.739979,
+      "location": "United States",
+      "process_match": "Decking",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b05e130f9528f7bc801722ad81d580c"
+      ]
+    },
+    {
+      "name": "Hollow structural sections HSS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 6609.570383,
+      "location": "United States",
+      "process_match": "Hollow structural sections HSS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2ee13f6617aecabf154337a5789fd1b5"
+      ]
+    },
+    {
+      "name": "Hot-rolled sections",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 97543.517416,
+      "location": "United States",
+      "process_match": "Hot-rolled sections",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f8a3b1045a035181828b02f82b4e139"
+      ]
+    },
+    {
+      "name": "Plate",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 912.46822,
+      "location": "United States",
+      "process_match": "Plate",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "23e9c18e787efa0cb9e54d1bae4381ce"
+      ]
+    },
+    {
+      "name": "Rebar and reinforcement",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 22542.87622,
+      "location": "United States",
+      "process_match": "Rebar and reinforcement",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 801.157572,
+      "location": "United States",
+      "process_match": "Steel - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d2a421d9e55aabc0489d5745b056ae68"
+      ]
+    },
+    {
+      "name": "Wall coverings",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 9.075161,
+      "location": "United States",
+      "process_match": "Wall coverings",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "475c0bef26cb472c618b8f7be59aa64a"
+      ]
+    },
+    {
+      "name": "Aluminum framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 16.130016,
+      "location": "United States",
+      "process_match": "Aluminum framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ae450266a237681f18ec5a4e35a5dd49"
+      ]
+    },
+    {
+      "name": "Steel framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 5.574182,
+      "location": "United States",
+      "process_match": "Steel framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Softwood framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 783.360469,
+      "location": "United States",
+      "process_match": "Softwood framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "800d9d5c9b202beac263c956ffe0ec3e"
+      ]
+    },
+    {
+      "name": "Softwood plywood",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 6268.152242,
+      "location": "United States",
+      "process_match": "Softwood plywood",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "10996c05033da28835d36bb60d005a08"
+      ]
+    },
+    {
+      "name": "Wood and composites - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 2496.513437,
+      "location": "United States",
+      "process_match": "Wood and composites - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6d0ddf0ae3c8812e3edf2e2f9ff2d2de"
+      ]
+    },
+    {
+      "name": "Acoustic ceiling tile fiber",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Acoustic ceiling tile fiber",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "94d28cb7518244233ce4c524f4ed31b9"
+      ]
+    },
+    {
+      "name": "Suspension assembly",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Suspension assembly",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d6418d3ed7ed3b7e7f5f809823204e52"
+      ]
+    },
+    {
+      "name": "Adhesives and sealants",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Adhesives and sealants",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a4ec8071e006ee25b9f8e9082cb09dc3"
+      ]
+    },
+    {
+      "name": "Air and vapor barriers",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Air and vapor barriers",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ec2c8a687ca0a75644b4b09569b99d87"
+      ]
+    },
+    {
+      "name": "Extrusion",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extrusion",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0f4a29836737c959f23373b5dc59d6d9"
+      ]
+    },
+    {
+      "name": "Roll formed metal panel steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roll formed metal panel steel",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Stucco finish",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Stucco finish",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "62b61f40fecd0b445617b16f24cd6be5"
+      ]
+    },
+    {
+      "name": "Coatings - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Coatings - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Paint",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Paint",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b3252a77c4dce9e3f8fedbde431c7b81"
+      ]
+    },
+    {
+      "name": "GFRC general",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "GFRC general",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f40a6d016d02c4406339fb51095c11d2"
+      ]
+    },
+    {
+      "name": "Precast",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Precast",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9d5f671f91d687a958b4a1943aa3d3b9"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Ready mix NW 3000",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ]
+    },
+    {
+      "name": "Aluminum door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Aluminum door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Steel door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Wood or composite door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood or composite door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b9788e7d42c3eb3c6a0cc42c9c8fab6a"
+      ]
+    },
+    {
+      "name": "Glazing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glazing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3d664a5b7b62e92dee3835b2c8af38dd"
+      ]
+    },
+    {
+      "name": "Insulated glass unit IGU",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Insulated glass unit IGU",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b898e4b675d9ea79d9d7308e1bd7b80"
+      ]
+    },
+    {
+      "name": "Glass mat gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glass mat gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a66d7df5b24e0c76c2fa4873be4c06b4"
+      ]
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1b3c38e902bbf524e6597f71aee4cda2"
+      ]
+    },
+    {
+      "name": "Extruded polystyrene XPS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extruded polystyrene XPS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "065350adceb46205fbaa931c057ba534"
+      ]
+    },
+    {
+      "name": "Fiberglass blanket",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fiberglass blanket",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9299ec7c27a6c841a110c7d61a48aa8f"
+      ]
+    },
+    {
+      "name": "Other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Fasteners",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fasteners",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9df8c1cd1bb8ed544886078e8a063b65"
+      ]
+    },
+    {
+      "name": "Roofing and waterproofing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roofing and waterproofing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "TPO",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "TPO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "7c97486978bf8a18d3410a4387dde7fa"
+      ]
+    },
+    {
+      "name": "Cold formed steel framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Cold formed steel framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d946184d3ac739a06d3569c72215c006"
+      ]
+    },
+    {
+      "name": "Decking",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Decking",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b05e130f9528f7bc801722ad81d580c"
+      ]
+    },
+    {
+      "name": "Hollow structural sections HSS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hollow structural sections HSS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2ee13f6617aecabf154337a5789fd1b5"
+      ]
+    },
+    {
+      "name": "Hot-rolled sections",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hot-rolled sections",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f8a3b1045a035181828b02f82b4e139"
+      ]
+    },
+    {
+      "name": "Plate",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Plate",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "23e9c18e787efa0cb9e54d1bae4381ce"
+      ]
+    },
+    {
+      "name": "Rebar and reinforcement",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Rebar and reinforcement",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d2a421d9e55aabc0489d5745b056ae68"
+      ]
+    },
+    {
+      "name": "Wall coverings",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wall coverings",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "475c0bef26cb472c618b8f7be59aa64a"
+      ]
+    },
+    {
+      "name": "Aluminum framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ae450266a237681f18ec5a4e35a5dd49"
+      ]
+    },
+    {
+      "name": "Steel framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Softwood framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "800d9d5c9b202beac263c956ffe0ec3e"
+      ]
+    },
+    {
+      "name": "Softwood plywood",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood plywood",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "10996c05033da28835d36bb60d005a08"
+      ]
+    },
+    {
+      "name": "Wood and composites - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood and composites - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6d0ddf0ae3c8812e3edf2e2f9ff2d2de"
+      ]
+    },
+    {
+      "name": "Acoustic ceiling tile fiber",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 6082.363261,
+      "location": "United States",
+      "process_match": "Acoustic ceiling tile fiber",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "94d28cb7518244233ce4c524f4ed31b9"
+      ]
+    },
+    {
+      "name": "Suspension assembly",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 1292.646461,
+      "location": "United States",
+      "process_match": "Suspension assembly",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d6418d3ed7ed3b7e7f5f809823204e52"
+      ]
+    },
+    {
+      "name": "Adhesives and sealants",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 1467.51025,
+      "location": "United States",
+      "process_match": "Adhesives and sealants",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a4ec8071e006ee25b9f8e9082cb09dc3"
+      ]
+    },
+    {
+      "name": "Air and vapor barriers",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 559.08795,
+      "location": "United States",
+      "process_match": "Air and vapor barriers",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ec2c8a687ca0a75644b4b09569b99d87"
+      ]
+    },
+    {
+      "name": "Extrusion",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extrusion",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0f4a29836737c959f23373b5dc59d6d9"
+      ]
+    },
+    {
+      "name": "Roll formed metal panel steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roll formed metal panel steel",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Stucco finish",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Stucco finish",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "62b61f40fecd0b445617b16f24cd6be5"
+      ]
+    },
+    {
+      "name": "Coatings - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Coatings - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Paint",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 2491.294098,
+      "location": "United States",
+      "process_match": "Paint",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b3252a77c4dce9e3f8fedbde431c7b81"
+      ]
+    },
+    {
+      "name": "GFRC general",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "GFRC general",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f40a6d016d02c4406339fb51095c11d2"
+      ]
+    },
+    {
+      "name": "Precast",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Precast",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9d5f671f91d687a958b4a1943aa3d3b9"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Ready mix NW 3000",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ]
+    },
+    {
+      "name": "Aluminum door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 178.901458,
+      "location": "United States",
+      "process_match": "Aluminum door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Aluminum door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 97.725595,
+      "location": "United States",
+      "process_match": "Aluminum door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 167.225472,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 171.924157,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Steel door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 746.735126,
+      "location": "United States",
+      "process_match": "Steel door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 75.410934,
+      "location": "United States",
+      "process_match": "Steel door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Wood or composite door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 820.61441,
+      "location": "United States",
+      "process_match": "Wood or composite door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b9788e7d42c3eb3c6a0cc42c9c8fab6a"
+      ]
+    },
+    {
+      "name": "Glazing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 448.890672,
+      "location": "United States",
+      "process_match": "Glazing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3d664a5b7b62e92dee3835b2c8af38dd"
+      ]
+    },
+    {
+      "name": "Insulated glass unit IGU",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 5928.257124,
+      "location": "United States",
+      "process_match": "Insulated glass unit IGU",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b898e4b675d9ea79d9d7308e1bd7b80"
+      ]
+    },
+    {
+      "name": "Glass mat gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glass mat gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a66d7df5b24e0c76c2fa4873be4c06b4"
+      ]
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 95235.360394,
+      "location": "United States",
+      "process_match": "Gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1b3c38e902bbf524e6597f71aee4cda2"
+      ]
+    },
+    {
+      "name": "Extruded polystyrene XPS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 12947.108937,
+      "location": "United States",
+      "process_match": "Extruded polystyrene XPS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "065350adceb46205fbaa931c057ba534"
+      ]
+    },
+    {
+      "name": "Fiberglass blanket",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fiberglass blanket",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9299ec7c27a6c841a110c7d61a48aa8f"
+      ]
+    },
+    {
+      "name": "Other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Fasteners",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 498.80357,
+      "location": "United States",
+      "process_match": "Fasteners",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9df8c1cd1bb8ed544886078e8a063b65"
+      ]
+    },
+    {
+      "name": "Roofing and waterproofing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roofing and waterproofing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "TPO",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 3394.9864,
+      "location": "United States",
+      "process_match": "TPO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "7c97486978bf8a18d3410a4387dde7fa"
+      ]
+    },
+    {
+      "name": "Cold formed steel framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Cold formed steel framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d946184d3ac739a06d3569c72215c006"
+      ]
+    },
+    {
+      "name": "Decking",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Decking",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b05e130f9528f7bc801722ad81d580c"
+      ]
+    },
+    {
+      "name": "Hollow structural sections HSS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hollow structural sections HSS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2ee13f6617aecabf154337a5789fd1b5"
+      ]
+    },
+    {
+      "name": "Hot-rolled sections",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hot-rolled sections",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f8a3b1045a035181828b02f82b4e139"
+      ]
+    },
+    {
+      "name": "Plate",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 912.46822,
+      "location": "United States",
+      "process_match": "Plate",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "23e9c18e787efa0cb9e54d1bae4381ce"
+      ]
+    },
+    {
+      "name": "Rebar and reinforcement",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 69.298236,
+      "location": "United States",
+      "process_match": "Rebar and reinforcement",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d2a421d9e55aabc0489d5745b056ae68"
+      ]
+    },
+    {
+      "name": "Wall coverings",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 18.150322,
+      "location": "United States",
+      "process_match": "Wall coverings",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "475c0bef26cb472c618b8f7be59aa64a"
+      ]
+    },
+    {
+      "name": "Aluminum framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 16.130016,
+      "location": "United States",
+      "process_match": "Aluminum framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ae450266a237681f18ec5a4e35a5dd49"
+      ]
+    },
+    {
+      "name": "Steel framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Softwood framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 783.360469,
+      "location": "United States",
+      "process_match": "Softwood framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "800d9d5c9b202beac263c956ffe0ec3e"
+      ]
+    },
+    {
+      "name": "Softwood plywood",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 6268.152242,
+      "location": "United States",
+      "process_match": "Softwood plywood",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "10996c05033da28835d36bb60d005a08"
+      ]
+    },
+    {
+      "name": "Wood and composites - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "B4-B5",
+      "amount": 2496.513437,
+      "location": "United States",
+      "process_match": "Wood and composites - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6d0ddf0ae3c8812e3edf2e2f9ff2d2de"
+      ]
+    },
+    {
+      "name": "Acoustic ceiling tile fiber",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Acoustic ceiling tile fiber",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "94d28cb7518244233ce4c524f4ed31b9"
+      ]
+    },
+    {
+      "name": "Suspension assembly",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Suspension assembly",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d6418d3ed7ed3b7e7f5f809823204e52"
+      ]
+    },
+    {
+      "name": "Adhesives and sealants",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Adhesives and sealants",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a4ec8071e006ee25b9f8e9082cb09dc3"
+      ]
+    },
+    {
+      "name": "Air and vapor barriers",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Air and vapor barriers",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ec2c8a687ca0a75644b4b09569b99d87"
+      ]
+    },
+    {
+      "name": "Extrusion",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extrusion",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0f4a29836737c959f23373b5dc59d6d9"
+      ]
+    },
+    {
+      "name": "Roll formed metal panel steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roll formed metal panel steel",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Stucco finish",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Stucco finish",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "62b61f40fecd0b445617b16f24cd6be5"
+      ]
+    },
+    {
+      "name": "Coatings - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Coatings - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Paint",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Paint",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b3252a77c4dce9e3f8fedbde431c7b81"
+      ]
+    },
+    {
+      "name": "GFRC general",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "GFRC general",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f40a6d016d02c4406339fb51095c11d2"
+      ]
+    },
+    {
+      "name": "Precast",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Precast",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9d5f671f91d687a958b4a1943aa3d3b9"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Ready mix NW 3000",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ]
+    },
+    {
+      "name": "Aluminum door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Aluminum door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Steel door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Wood or composite door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood or composite door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b9788e7d42c3eb3c6a0cc42c9c8fab6a"
+      ]
+    },
+    {
+      "name": "Glazing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glazing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3d664a5b7b62e92dee3835b2c8af38dd"
+      ]
+    },
+    {
+      "name": "Insulated glass unit IGU",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Insulated glass unit IGU",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b898e4b675d9ea79d9d7308e1bd7b80"
+      ]
+    },
+    {
+      "name": "Glass mat gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glass mat gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a66d7df5b24e0c76c2fa4873be4c06b4"
+      ]
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1b3c38e902bbf524e6597f71aee4cda2"
+      ]
+    },
+    {
+      "name": "Extruded polystyrene XPS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extruded polystyrene XPS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "065350adceb46205fbaa931c057ba534"
+      ]
+    },
+    {
+      "name": "Fiberglass blanket",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fiberglass blanket",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9299ec7c27a6c841a110c7d61a48aa8f"
+      ]
+    },
+    {
+      "name": "Other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Fasteners",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fasteners",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9df8c1cd1bb8ed544886078e8a063b65"
+      ]
+    },
+    {
+      "name": "Roofing and waterproofing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roofing and waterproofing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "TPO",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "TPO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "7c97486978bf8a18d3410a4387dde7fa"
+      ]
+    },
+    {
+      "name": "Cold formed steel framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Cold formed steel framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d946184d3ac739a06d3569c72215c006"
+      ]
+    },
+    {
+      "name": "Decking",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Decking",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b05e130f9528f7bc801722ad81d580c"
+      ]
+    },
+    {
+      "name": "Hollow structural sections HSS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hollow structural sections HSS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2ee13f6617aecabf154337a5789fd1b5"
+      ]
+    },
+    {
+      "name": "Hot-rolled sections",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hot-rolled sections",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f8a3b1045a035181828b02f82b4e139"
+      ]
+    },
+    {
+      "name": "Plate",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Plate",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "23e9c18e787efa0cb9e54d1bae4381ce"
+      ]
+    },
+    {
+      "name": "Rebar and reinforcement",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Rebar and reinforcement",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d2a421d9e55aabc0489d5745b056ae68"
+      ]
+    },
+    {
+      "name": "Wall coverings",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wall coverings",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "475c0bef26cb472c618b8f7be59aa64a"
+      ]
+    },
+    {
+      "name": "Aluminum framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ae450266a237681f18ec5a4e35a5dd49"
+      ]
+    },
+    {
+      "name": "Steel framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Softwood framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "800d9d5c9b202beac263c956ffe0ec3e"
+      ]
+    },
+    {
+      "name": "Softwood plywood",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood plywood",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "10996c05033da28835d36bb60d005a08"
+      ]
+    },
+    {
+      "name": "Wood and composites - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "C2-C4",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood and composites - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6d0ddf0ae3c8812e3edf2e2f9ff2d2de"
+      ]
+    },
+    {
+      "name": "Acoustic ceiling tile fiber",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Acoustic ceiling tile fiber",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "94d28cb7518244233ce4c524f4ed31b9"
+      ]
+    },
+    {
+      "name": "Suspension assembly",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Suspension assembly",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d6418d3ed7ed3b7e7f5f809823204e52"
+      ]
+    },
+    {
+      "name": "Adhesives and sealants",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Adhesives and sealants",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a4ec8071e006ee25b9f8e9082cb09dc3"
+      ]
+    },
+    {
+      "name": "Air and vapor barriers",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Air and vapor barriers",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ec2c8a687ca0a75644b4b09569b99d87"
+      ]
+    },
+    {
+      "name": "Extrusion",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extrusion",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0f4a29836737c959f23373b5dc59d6d9"
+      ]
+    },
+    {
+      "name": "Roll formed metal panel steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roll formed metal panel steel",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Stucco finish",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Stucco finish",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "62b61f40fecd0b445617b16f24cd6be5"
+      ]
+    },
+    {
+      "name": "Coatings - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Coatings - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Paint",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Paint",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b3252a77c4dce9e3f8fedbde431c7b81"
+      ]
+    },
+    {
+      "name": "GFRC general",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "GFRC general",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f40a6d016d02c4406339fb51095c11d2"
+      ]
+    },
+    {
+      "name": "Precast",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Precast",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9d5f671f91d687a958b4a1943aa3d3b9"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Ready mix NW 3000",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ]
+    },
+    {
+      "name": "Aluminum door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Aluminum door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6f5cf8c1a9792d83c896986c05a1560d"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Doors and frames - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Doors and frames - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "Steel door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel door frame",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel door frame",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Wood or composite door",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood or composite door",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "b9788e7d42c3eb3c6a0cc42c9c8fab6a"
+      ]
+    },
+    {
+      "name": "Glazing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glazing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3d664a5b7b62e92dee3835b2c8af38dd"
+      ]
+    },
+    {
+      "name": "Insulated glass unit IGU",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Insulated glass unit IGU",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b898e4b675d9ea79d9d7308e1bd7b80"
+      ]
+    },
+    {
+      "name": "Glass mat gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Glass mat gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a66d7df5b24e0c76c2fa4873be4c06b4"
+      ]
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Gypsum board",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1b3c38e902bbf524e6597f71aee4cda2"
+      ]
+    },
+    {
+      "name": "Extruded polystyrene XPS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Extruded polystyrene XPS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "065350adceb46205fbaa931c057ba534"
+      ]
+    },
+    {
+      "name": "Fiberglass blanket",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fiberglass blanket",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9299ec7c27a6c841a110c7d61a48aa8f"
+      ]
+    },
+    {
+      "name": "Other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "1a837ee3849f066588a38aba19d15a60"
+      ]
+    },
+    {
+      "name": "Fasteners",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Fasteners",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9df8c1cd1bb8ed544886078e8a063b65"
+      ]
+    },
+    {
+      "name": "Roofing and waterproofing - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Roofing and waterproofing - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6075bf87888355533444f10c70614b2e"
+      ]
+    },
+    {
+      "name": "TPO",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "TPO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "7c97486978bf8a18d3410a4387dde7fa"
+      ]
+    },
+    {
+      "name": "Cold formed steel framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Cold formed steel framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d946184d3ac739a06d3569c72215c006"
+      ]
+    },
+    {
+      "name": "Decking",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Decking",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2b05e130f9528f7bc801722ad81d580c"
+      ]
+    },
+    {
+      "name": "Hollow structural sections HSS",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hollow structural sections HSS",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "2ee13f6617aecabf154337a5789fd1b5"
+      ]
+    },
+    {
+      "name": "Hot-rolled sections",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Hot-rolled sections",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f8a3b1045a035181828b02f82b4e139"
+      ]
+    },
+    {
+      "name": "Plate",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Plate",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "23e9c18e787efa0cb9e54d1bae4381ce"
+      ]
+    },
+    {
+      "name": "Rebar and reinforcement",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Rebar and reinforcement",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Steel - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "d2a421d9e55aabc0489d5745b056ae68"
+      ]
+    },
+    {
+      "name": "Wall coverings",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wall coverings",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "475c0bef26cb472c618b8f7be59aa64a"
+      ]
+    },
+    {
+      "name": "Aluminum framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Aluminum framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ae450266a237681f18ec5a4e35a5dd49"
+      ]
+    },
+    {
+      "name": "Steel framed window",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Steel framed window",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9f0b0e654079fbac0e2c476547c62d6e"
+      ]
+    },
+    {
+      "name": "Softwood framing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood framing",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "800d9d5c9b202beac263c956ffe0ec3e"
+      ]
+    },
+    {
+      "name": "Softwood plywood",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Softwood plywood",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "10996c05033da28835d36bb60d005a08"
+      ]
+    },
+    {
+      "name": "Wood and composites - other",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "D",
+      "amount": 0.0,
+      "location": "United States",
+      "process_match": "Wood and composites - other",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "6d0ddf0ae3c8812e3edf2e2f9ff2d2de"
+      ]
+    }
+  ],
+  "life_cycle_stages": {
+    "A1-A3": {
+      "description": "A1-A3 stage processes",
+      "exchanges": [
+        "Acoustic ceiling tile fiber",
+        "Suspension assembly",
+        "Adhesives and sealants",
+        "Air and vapor barriers",
+        "Extrusion",
+        "Roll formed metal panel steel",
+        "Stucco finish",
+        "Coatings - other",
+        "Paint",
+        "GFRC general",
+        "Precast",
+        "Ready mix NW 3000",
+        "Aluminum door",
+        "Aluminum door frame",
+        "Doors and frames - other",
+        "Doors and frames - other",
+        "Steel door",
+        "Steel door frame",
+        "Wood or composite door",
+        "Glazing - other",
+        "Insulated glass unit IGU",
+        "Glass mat gypsum board",
+        "Gypsum board",
+        "Extruded polystyrene XPS",
+        "Fiberglass blanket",
+        "Other",
+        "Fasteners",
+        "Roofing and waterproofing - other",
+        "TPO",
+        "Cold formed steel framing",
+        "Decking",
+        "Hollow structural sections HSS",
+        "Hot-rolled sections",
+        "Plate",
+        "Rebar and reinforcement",
+        "Steel - other",
+        "Wall coverings",
+        "Aluminum framed window",
+        "Steel framed window",
+        "Softwood framing",
+        "Softwood plywood",
+        "Wood and composites - other"
+      ]
+    },
+    "A4": {
+      "description": "A4 stage processes",
+      "exchanges": [
+        "Acoustic ceiling tile fiber",
+        "Suspension assembly",
+        "Adhesives and sealants",
+        "Air and vapor barriers",
+        "Extrusion",
+        "Roll formed metal panel steel",
+        "Stucco finish",
+        "Coatings - other",
+        "Paint",
+        "GFRC general",
+        "Precast",
+        "Ready mix NW 3000",
+        "Aluminum door",
+        "Aluminum door frame",
+        "Doors and frames - other",
+        "Doors and frames - other",
+        "Steel door",
+        "Steel door frame",
+        "Wood or composite door",
+        "Glazing - other",
+        "Insulated glass unit IGU",
+        "Glass mat gypsum board",
+        "Gypsum board",
+        "Extruded polystyrene XPS",
+        "Fiberglass blanket",
+        "Other",
+        "Fasteners",
+        "Roofing and waterproofing - other",
+        "TPO",
+        "Cold formed steel framing",
+        "Decking",
+        "Hollow structural sections HSS",
+        "Hot-rolled sections",
+        "Plate",
+        "Rebar and reinforcement",
+        "Steel - other",
+        "Wall coverings",
+        "Aluminum framed window",
+        "Steel framed window",
+        "Softwood framing",
+        "Softwood plywood",
+        "Wood and composites - other"
+      ]
+    },
+    "B4-B5": {
+      "description": "B4-B5 stage processes",
+      "exchanges": [
+        "Acoustic ceiling tile fiber",
+        "Suspension assembly",
+        "Adhesives and sealants",
+        "Air and vapor barriers",
+        "Extrusion",
+        "Roll formed metal panel steel",
+        "Stucco finish",
+        "Coatings - other",
+        "Paint",
+        "GFRC general",
+        "Precast",
+        "Ready mix NW 3000",
+        "Aluminum door",
+        "Aluminum door frame",
+        "Doors and frames - other",
+        "Doors and frames - other",
+        "Steel door",
+        "Steel door frame",
+        "Wood or composite door",
+        "Glazing - other",
+        "Insulated glass unit IGU",
+        "Glass mat gypsum board",
+        "Gypsum board",
+        "Extruded polystyrene XPS",
+        "Fiberglass blanket",
+        "Other",
+        "Fasteners",
+        "Roofing and waterproofing - other",
+        "TPO",
+        "Cold formed steel framing",
+        "Decking",
+        "Hollow structural sections HSS",
+        "Hot-rolled sections",
+        "Plate",
+        "Rebar and reinforcement",
+        "Steel - other",
+        "Wall coverings",
+        "Aluminum framed window",
+        "Steel framed window",
+        "Softwood framing",
+        "Softwood plywood",
+        "Wood and composites - other"
+      ]
+    },
+    "C2-C4": {
+      "description": "C2-C4 stage processes",
+      "exchanges": [
+        "Acoustic ceiling tile fiber",
+        "Suspension assembly",
+        "Adhesives and sealants",
+        "Air and vapor barriers",
+        "Extrusion",
+        "Roll formed metal panel steel",
+        "Stucco finish",
+        "Coatings - other",
+        "Paint",
+        "GFRC general",
+        "Precast",
+        "Ready mix NW 3000",
+        "Aluminum door",
+        "Aluminum door frame",
+        "Doors and frames - other",
+        "Doors and frames - other",
+        "Steel door",
+        "Steel door frame",
+        "Wood or composite door",
+        "Glazing - other",
+        "Insulated glass unit IGU",
+        "Glass mat gypsum board",
+        "Gypsum board",
+        "Extruded polystyrene XPS",
+        "Fiberglass blanket",
+        "Other",
+        "Fasteners",
+        "Roofing and waterproofing - other",
+        "TPO",
+        "Cold formed steel framing",
+        "Decking",
+        "Hollow structural sections HSS",
+        "Hot-rolled sections",
+        "Plate",
+        "Rebar and reinforcement",
+        "Steel - other",
+        "Wall coverings",
+        "Aluminum framed window",
+        "Steel framed window",
+        "Softwood framing",
+        "Softwood plywood",
+        "Wood and composites - other"
+      ]
+    },
+    "D": {
+      "description": "D stage processes",
+      "exchanges": [
+        "Acoustic ceiling tile fiber",
+        "Suspension assembly",
+        "Adhesives and sealants",
+        "Air and vapor barriers",
+        "Extrusion",
+        "Roll formed metal panel steel",
+        "Stucco finish",
+        "Coatings - other",
+        "Paint",
+        "GFRC general",
+        "Precast",
+        "Ready mix NW 3000",
+        "Aluminum door",
+        "Aluminum door frame",
+        "Doors and frames - other",
+        "Doors and frames - other",
+        "Steel door",
+        "Steel door frame",
+        "Wood or composite door",
+        "Glazing - other",
+        "Insulated glass unit IGU",
+        "Glass mat gypsum board",
+        "Gypsum board",
+        "Extruded polystyrene XPS",
+        "Fiberglass blanket",
+        "Other",
+        "Fasteners",
+        "Roofing and waterproofing - other",
+        "TPO",
+        "Cold formed steel framing",
+        "Decking",
+        "Hollow structural sections HSS",
+        "Hot-rolled sections",
+        "Plate",
+        "Rebar and reinforcement",
+        "Steel - other",
+        "Wall coverings",
+        "Aluminum framed window",
+        "Steel framed window",
+        "Softwood framing",
+        "Softwood plywood",
+        "Wood and composites - other"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 0,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}
