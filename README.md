@@ -33,17 +33,17 @@ pip install -r requirements.txt
 
 **Requirements:**
 - Python 3.9-3.13
-- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py` and `scripts/setup_ecoinvent.py`)
+- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py`)
 
 
 **Setting up Ecoinvent:**
 If you don't have an ecoinvent database:
 ```bash
-# Check what's available
-python scripts/setup_ecoinvent.py --check
+# Show current project status only
+python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --check
 
-# Get setup instructions
-python scripts/setup_ecoinvent.py --version 3.12 --system-model cutoff
+# Import ecoinvent (LCI + LCIA)
+python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --system-model cutoff
 ```
 
 See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
