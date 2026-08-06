@@ -1,0 +1,123 @@
+{
+  "name": "Bess Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "bess production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Bess Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Bess_System_DB",
+        "Bess_1unit"
+      ]
+    },
+    {
+      "name": "Battery",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 900.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "17b8810b-980e-553b-bc36-2b618d60de7e"
+      ]
+    },
+    {
+      "name": "Inverter",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 1.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "96e974e5-313a-5edb-827e-546233ed055a"
+      ]
+    },
+    {
+      "name": "Electronics housing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "04212d2d-b271-54c1-96d3-e5f0f89ce20e"
+      ]
+    },
+    {
+      "name": "Wiring",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 20.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "848c507a-bf63-55fe-806c-cce2ec49e197"
+      ]
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "b88ece4b-cff4-5bc6-871b-632757248445"
+      ]
+    },
+    {
+      "name": "Injection molding",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "17b8810b-980e-553b-bc36-2b618d60de7e"
+      ]
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 20.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "14ba74a0-11f1-54c2-a187-5eb6f3d7eea1"
+      ]
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Battery",
+        "Inverter",
+        "Electronics housing",
+        "Wiring",
+        "Electronics",
+        "Injection molding",
+        "Wire drawing"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 0,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}

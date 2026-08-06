@@ -1,0 +1,137 @@
+{
+  "name": "Bess-Populated Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "bess-populated production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Bess-Populated Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Bess-Populated_System_DB",
+        "Bess-Populated_1unit"
+      ]
+    },
+    {
+      "name": "Battery",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 900.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "46c7a294d0b06ed3004c0158f2387073"
+      ],
+      "location": "RoW",
+      "process_match": "battery cell production, Li-ion, NMC811"
+    },
+    {
+      "name": "Inverter",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 1.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "f85d93ed99a8631a2dfda3be7dd8194c"
+      ],
+      "location": "RoW",
+      "process_match": "inverter production, 0.5kW"
+    },
+    {
+      "name": "Electronics housing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "3c187b384218a3c75c961bc3556576de"
+      ],
+      "location": "RoW",
+      "process_match": "polypropylene production, granulate"
+    },
+    {
+      "name": "Wiring",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 20.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "cbeb81298985f02ca088bddbb987d820"
+      ],
+      "location": "US",
+      "process_match": "copper mine operation and beneficiation, sulfide ore"
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "632eadaaaba7cdf5119d0368e930a53a"
+      ],
+      "location": "RoW",
+      "process_match": "electronics production, for control units"
+    },
+    {
+      "name": "Injection molding",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "c033968cb16f64462f0f128aeb00a484"
+      ],
+      "location": "CA-QC",
+      "process_match": "injection moulding"
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 20.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "4e6d4f0f9f56b770580da017e61dcbc6"
+      ],
+      "location": "RoW",
+      "process_match": "wire drawing, copper"
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Battery",
+        "Inverter",
+        "Electronics housing",
+        "Wiring",
+        "Electronics",
+        "Injection molding",
+        "Wire drawing"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 0,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}

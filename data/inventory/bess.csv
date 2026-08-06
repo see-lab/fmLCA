@@ -1,0 +1,12 @@
+# Version: 1.0,,,,,,,,,,,
+# Date: August 6 2026,,,,,,,,,,,
+# Description: Battery energy storage system inventory.,,,,,,,,,,,
+# Functional unit: 200 kWh energy discharged from storage during use over a 15-year lifetime,,,,,,,,,,,
+Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,UUID-Source,Brightway Match Code,Brightway Match Key,Description
+Production,Battery,"Battery cell, Li-ion, NMC811 {RoW}| battery cell production, Li-ion, NMC811 | Cut-off, U",,900,kg,ecoinvent-3.10-cutoff,17b8810b-980e-553b-bc36-2b618d60de7e,SimaPro,,,NMC type
+Production,Inverter,"Inverter, 0.5kW {RoW}| inverter production, 0.5kW | Cut-off, U",,1,p,ecoinvent-3.10-cutoff,96e974e5-313a-5edb-827e-546233ed055a,SimaPro,,,"Power electronics, magnetics, heat sinks, casing"
+Production,Electronics housing,"Polypropylene, granulate {RoW}| polypropylene production, granulate | Cut-off, U",,10,kg,ecoinvent-3.10-cutoff,04212d2d-b271-54c1-96d3-e5f0f89ce20e,SimaPro,,,Assumed PP
+Production,Wiring,"Copper concentrate, sulfide ore {US}| copper mine operation and beneficiation, sulfide ore | Cut-off, U",,20,kg,ecoinvent-3.10-cutoff,848c507a-bf63-55fe-806c-cce2ec49e197,SimaPro,,,Copper for wire drawing
+Production,Electronics,"Electronics, for control units {RoW}| electronics production, for control units | Cut-off, U",,10,kg,ecoinvent-3.10-cutoff,b88ece4b-cff4-5bc6-871b-632757248445,SimaPro,,,General estimate
+Production,Injection molding,"Injection moulding {CA-QC}| injection moulding | Cut-off, U",,10,kg,ecoinvent-3.10-cutoff,17b8810b-980e-553b-bc36-2b618d60de7e,SimaPro,,,Injection molding
+Production,Wire drawing,"Wire drawing, copper {RoW}| wire drawing, copper | Cut-off, U",,20,kg,ecoinvent-3.10-cutoff,14ba74a0-11f1-54c2-a187-5eb6f3d7eea1,SimaPro,,,
