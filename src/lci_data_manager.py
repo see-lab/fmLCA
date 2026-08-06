@@ -11,6 +11,7 @@ Supports CSV, JSON, and other formats with configurable mappings
 """
 
 import csv
+import io
 import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
@@ -73,14 +74,23 @@ class LCIDataManager:
     def import_from_csv(self, csv_file: Path) -> Dict[str, Any]:
         """Import from CSV with flexible column mapping"""
         with open(csv_file, 'r', encoding='utf-8') as f:
-            # Detect delimiter
-            sample = f.read(1024)
-            f.seek(0)
-            
-            delimiter = ',' if ',' in sample else '\t' if '\t' in sample else ';'
-            
-            reader = csv.DictReader(f, delimiter=delimiter)
-            rows = list(reader)
+            raw_lines = f.readlines()
+
+        # Skip metadata/comment lines (starting with '#') and blank lines.
+        data_lines = [
+            line for line in raw_lines
+            if line.strip() and not line.lstrip().startswith('#')
+        ]
+
+        if not data_lines:
+            raise ValueError(f"No CSV data lines found in file: {csv_file}")
+
+        # Detect delimiter from non-comment content.
+        sample = ''.join(data_lines[:20])
+        delimiter = ',' if ',' in sample else '\t' if '\t' in sample else ';'
+
+        reader = csv.DictReader(io.StringIO(''.join(data_lines)), delimiter=delimiter)
+        rows = [row for row in reader if any((v or '').strip() for v in row.values())]
         
         if not rows:
             raise ValueError(f"No data found in CSV file: {csv_file}")
