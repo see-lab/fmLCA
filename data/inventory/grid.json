@@ -19,11 +19,11 @@
       ]
     },
     {
-      "name": "market for electricity, low voltage",
-      "amount_ref": "energy_metadata.primary_input.value",
+      "name": "Grid energy",
       "unit": "kWh",
       "type": "technosphere",
       "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
       "location": "Northeast Power Coordinating Council, US part only (US-NPCC)",
       "input": [
         "ecoinvent-3.12-cutoff",
@@ -35,7 +35,7 @@
     "Use": {
       "description": "Use stage processes",
       "exchanges": [
-        "market for electricity, low voltage"
+        "Grid energy"
       ]
     }
   },
@@ -45,7 +45,7 @@
       "name": "energy_input",
       "unit": "MJ",
       "description": "Energy input to the system",
-      "value": 100.0
+      "value": 3.6
     }
   },
   "unlinked_exchanges": []
