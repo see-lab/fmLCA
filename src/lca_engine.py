@@ -76,7 +76,7 @@ def load_lcia_methods(methods_file):
             elif isinstance(item, dict):
                 # Enhanced format: method with metadata
                 name = item.get("name")
-                brightway_tuple = item.get("brightway_tuple")
+                brightway_tuple = item.get("brightway_tuple") or item.get("brightway_tuple_hint")
                 
                 # Use brightway_tuple if available, otherwise use name
                 method_key = tuple(brightway_tuple) if brightway_tuple else name
@@ -636,10 +636,23 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
 def resolve_lcia_methods(method_names):
     """Resolve LCIA method names to actual method objects"""
     available_methods = list(methods)
+    available_set = set(available_methods)
     resolved = []
     
     for method_name in method_names:
-        keywords = method_name.lower().split()
+        # 1) Exact tuple/list methods (preferred when provided)
+        if isinstance(method_name, (tuple, list)):
+            candidate = tuple(method_name)
+            if candidate in available_set:
+                resolved.append(candidate)
+                print(f"   ✅ Resolved (exact tuple): {simplify_method_name(str(candidate))}")
+                continue
+
+            # Fallback: tuple component search if exact tuple is unavailable
+            keywords = [str(part).lower() for part in candidate if str(part).strip()]
+        else:
+            # 2) String keyword matching (legacy behavior)
+            keywords = str(method_name).lower().split()
         
         # Find methods containing all keywords
         matching_methods = []
@@ -650,7 +663,7 @@ def resolve_lcia_methods(method_names):
         
         if matching_methods:
             # Prefer methods without "no LT"
-            preferred = [m for m in matching_methods if 'no LT' not in str(m)]
+            preferred = [m for m in matching_methods if 'no lt' not in str(m).lower()]
             selected = preferred[0] if preferred else matching_methods[0]
             resolved.append(selected)
             print(f"   ✅ Resolved: {simplify_method_name(str(selected))}")
