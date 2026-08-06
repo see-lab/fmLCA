@@ -696,12 +696,32 @@ def calculate_stage_breakdown_with_lca(lci_data, lca_obj, method_unit, temp_db_n
         stage_breakdown[stage_name] = {"score": 0.0, "unit": method_unit}
     
     try:
-        # Build a mapping: exchange name -> life_cycle_stage
-        exchange_to_stage = {}
+        def _norm(text):
+            return " ".join(str(text or "").lower().split())
+
+        # Build robust mappings from original LCI exchanges.
+        input_to_stage = {}
+        process_match_to_stage = {}
+        name_to_stage = {}
         for exc in lci_data.get('exchanges', []):
+            if exc.get('type') != 'technosphere':
+                continue
+
             stage = exc.get('life_cycle_stage')
-            if stage:
-                exchange_to_stage[exc.get('name', '')] = stage
+            if not stage:
+                continue
+
+            inp = exc.get('input') or []
+            if len(inp) >= 2 and inp[0] and inp[1]:
+                input_to_stage[(inp[0], inp[1])] = stage
+
+            process_match = _norm(exc.get('process_match'))
+            if process_match:
+                process_match_to_stage[process_match] = stage
+
+            exc_name = _norm(exc.get('name'))
+            if exc_name:
+                name_to_stage[exc_name] = stage
         
         # Get the main process activity
         from bw2data import get_activity
@@ -711,13 +731,38 @@ def calculate_stage_breakdown_with_lca(lci_data, lca_obj, method_unit, temp_db_n
         for exc in main_act.technosphere():
             inp_act = exc.input
             inp_name = inp_act.get('name', '')
-            
+
             # Find which stage this exchange belongs to
             matched_stage = None
-            for exc_name, stage_name in exchange_to_stage.items():
-                if exc_name.lower() in inp_name.lower() or inp_name.lower() in exc_name.lower():
-                    matched_stage = stage_name
-                    break
+
+            # 1) Preferred: exact input (database, code) match
+            inp_key = None
+            try:
+                inp_key = tuple(inp_act.key)
+            except Exception:
+                try:
+                    inp_key = (inp_act.get('database'), inp_act.get('code'))
+                except Exception:
+                    inp_key = None
+
+            if inp_key and inp_key in input_to_stage:
+                matched_stage = input_to_stage[inp_key]
+
+            # 2) Fallback: process_match name against Brightway activity name
+            if not matched_stage:
+                norm_inp_name = _norm(inp_name)
+                for pm_name, stage_name in process_match_to_stage.items():
+                    if pm_name and (pm_name in norm_inp_name or norm_inp_name in pm_name):
+                        matched_stage = stage_name
+                        break
+
+            # 3) Last fallback: item/display name matching
+            if not matched_stage:
+                norm_inp_name = _norm(inp_name)
+                for exc_name, stage_name in name_to_stage.items():
+                    if exc_name and (exc_name in norm_inp_name or norm_inp_name in exc_name):
+                        matched_stage = stage_name
+                        break
             
             if not matched_stage:
                 matched_stage = 'Unassigned'
