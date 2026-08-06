@@ -1,0 +1,53 @@
+{
+  "name": "Building59-Oat Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "building59-oat production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Building59-Oat Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Building59-Oat_System_DB",
+        "Building59-Oat_1unit"
+      ]
+    },
+    {
+      "name": "Ready mix NW 3000",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "A1-A3",
+      "amount": 238710.2,
+      "location": "United States",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ff1cf2621f46e527d86a91f791410eff"
+      ],
+      "process_match": "Ready mix NW 3000"
+    }
+  ],
+  "life_cycle_stages": {
+    "A1-A3": {
+      "description": "A1-A3 stage processes",
+      "exchanges": [
+        "Ready mix NW 3000"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 0,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}
