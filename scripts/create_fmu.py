@@ -263,6 +263,15 @@ def main():
             "bytecode=compile implementation modules to .pyc and keep only a minimal loader stub (default)"
         )
     )
+    parser.add_argument(
+        "--default-step-size",
+        type=float,
+        default=60.0,
+        help=(
+            "FMI DefaultExperiment stepSize in seconds embedded in modelDescription.xml "
+            "(used by some importers as a default communication step; default: 60.0)"
+        )
+    )
 
     args = parser.parse_args()
 
@@ -358,7 +367,8 @@ def main():
             output_path=final_path,
             output_var="y",
             output_unit=method_cfg["output_unit"],
-            output_description=f"Cumulative {method_cfg['output_label']}"
+            output_description=f"Cumulative {method_cfg['output_label']}",
+            default_step_size=args.default_step_size,
         )
 
         # ── Step 5: Optional bytecode packaging ──────────────────────────────

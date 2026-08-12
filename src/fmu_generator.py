@@ -421,11 +421,26 @@ def _indent_xml(elem, level=0):
             elem.tail = pad
 
 
+def _deduplicate_unknown_indices(parent_elem) -> None:
+    """Remove duplicate <Unknown index="..."/> entries in-place."""
+    if parent_elem is None:
+        return
+
+    seen = set()
+    for unknown in list(parent_elem.findall("Unknown")):
+        idx = unknown.get("index")
+        if idx in seen:
+            parent_elem.remove(unknown)
+            continue
+        seen.add(idx)
+
+
 def fix_fmu_metadata(fmu_path: Path,
                     output_path: Path,
                     output_var: str,
                     output_unit: str,
-                    output_description: str) -> Path:
+                    output_description: str,
+                    default_step_size: Optional[float] = None) -> Path:
     """
     Fix FMU ModelDescription.xml metadata.
     
@@ -437,6 +452,7 @@ def fix_fmu_metadata(fmu_path: Path,
         output_var: Output variable name (e.g., "y")
         output_unit: Output unit (e.g., "kg CO2-eq")
         output_description: Output description
+        default_step_size: Optional FMI DefaultExperiment stepSize in seconds
         
     Returns:
         Path to fixed FMU
@@ -459,6 +475,24 @@ def fix_fmu_metadata(fmu_path: Path,
             ms = root.find("ModelStructure")
             if ms is None:
                 ms = ET.SubElement(root, "ModelStructure")
+
+            # Provide a practical communication-step hint for importing tools.
+            # This helps avoid extremely small default sample periods.
+            if default_step_size is not None and default_step_size > 0.0:
+                default_experiment = root.find("DefaultExperiment")
+                if default_experiment is not None:
+                    root.remove(default_experiment)
+                default_experiment = ET.Element("DefaultExperiment")
+                default_experiment.set("stepSize", f"{default_step_size:.12g}")
+
+                # FMI 2.0 element order requires DefaultExperiment before ModelVariables.
+                children = list(root)
+                insert_at = len(children)
+                for i, child in enumerate(children):
+                    if child.tag == "ModelVariables":
+                        insert_at = i
+                        break
+                root.insert(insert_at, default_experiment)
             
             # Ensure Outputs section exists
             outputs = ms.find("Outputs")
@@ -475,7 +509,7 @@ def fix_fmu_metadata(fmu_path: Path,
                         break
             
             # Add Unknown element for output
-            if output_ref and not outputs.find(f".//Unknown[@index='{output_ref}']"):
+            if output_ref and outputs.find(f"./Unknown[@index='{output_ref}']") is None:
                 unknown = ET.SubElement(outputs, "Unknown")
                 unknown.set("index", output_ref)
             
@@ -485,6 +519,10 @@ def fix_fmu_metadata(fmu_path: Path,
                 init_unknowns = ET.SubElement(ms, "InitialUnknowns")
                 unknown = ET.SubElement(init_unknowns, "Unknown")
                 unknown.set("index", output_ref)
+
+            # De-duplicate Unknown entries to avoid duplicated equations in importers.
+            _deduplicate_unknown_indices(outputs)
+            _deduplicate_unknown_indices(init_unknowns)
             
             # Pretty print
             _indent_xml(root)
