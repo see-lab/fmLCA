@@ -398,37 +398,29 @@ class LCIDataManager:
         return unit_is_energy
     
     def determine_energy_value(self, energy_processes: List[Dict[str, Any]]) -> float:
-        """Determine the energy value from energy processes in the CSV"""
+        """Determine energy metadata value while preserving inventory base quantity."""
         if not energy_processes:
             return 100.0  # Default energy value if no energy processes found
         
-        # Use the amount from the first energy process as the baseline
+        # Use the first detected energy process as the inventory baseline.
         first_energy = energy_processes[0]
         original_amount = first_energy.get("original_amount", first_energy.get("amount", 100.0))
-        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ")).upper()
-        
-        # Convert to MJ if needed (our standard energy unit)
-        if original_unit in ["KWH", "KILOWATT HOUR"]:
-            # Convert kWh to MJ: 1 kWh = 3.6 MJ
-            energy_value_mj = original_amount * 3.6
-            print(f"   🔄 Converted {original_amount} kWh → {energy_value_mj} MJ for energy metadata")
-        elif original_unit in ["MJ", "MEGAJOULE"]:
-            energy_value_mj = original_amount
-        elif original_unit in ["GJ", "GIGAJOULE"]:
-            # Convert GJ to MJ: 1 GJ = 1000 MJ
-            energy_value_mj = original_amount * 1000
-            print(f"   🔄 Converted {original_amount} GJ → {energy_value_mj} MJ for energy metadata")
-        else:
-            # Unknown unit, assume MJ
-            energy_value_mj = original_amount
-            print(f"   ⚠️ Unknown energy unit '{original_unit}', assuming MJ")
-        
-        print(f"   ⚡ Energy metadata value: {energy_value_mj} MJ (from {original_amount} {original_unit})")
-        return energy_value_mj
+        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ"))
+
+        print(
+            "   ⚡ Energy metadata retained from inventory base: "
+            f"{original_amount} {original_unit}"
+        )
+        return float(original_amount)
     
     def determine_energy_unit(self, energy_processes: List[Dict[str, Any]]) -> str:
-        """Determine the energy unit for metadata (standardize to MJ)"""
-        return "MJ"  # Always use MJ as the standard energy unit in metadata
+        """Determine energy metadata unit while preserving inventory base unit."""
+        if not energy_processes:
+            return "MJ"
+
+        first_energy = energy_processes[0]
+        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ"))
+        return str(original_unit).strip() or "MJ"
     
     def normalize_json_structure(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Normalize JSON structure for consistency"""
