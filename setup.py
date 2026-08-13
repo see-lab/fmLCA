@@ -34,8 +34,6 @@ setup(
         "lca_engine",
         "lca_utils",
         "lci_data_manager",
-        "inventory_processor",
-        "methods_manager",
     ],
     package_dir={"": "src", "scripts": "scripts"},
     packages=find_packages(include=["scripts", "scripts.*"]),
