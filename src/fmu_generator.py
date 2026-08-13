@@ -246,21 +246,21 @@ def generate_fmu_class_code(class_name: str,
     out_var = method_config["output_var"]
     out_label = method_config["output_label"]
     out_unit = factors["unit"]
-    use_rate_mwh = factors["energy_factor"] * 3600.0  # Convert MJ to MWh
+    use_rate_per_j = factors["energy_factor"] / 1.0e6  # Convert impact/MJ to impact/J
     
     code = textwrap.dedent(f'''\
         """
         Auto-generated LCA FMU: {fmu_name}
-        Input  u : Power [MW]  (power_input_mw)
+        Input  u : Power [W]  (power_input_w)
         Output y : Cumulative {out_label}  [{out_unit}]  ({out_var}_cumulative)
         
         This FMU tracks cumulative environmental impacts over time:
         - At t=start: Add production + transport embodied impacts
-        - During operation: Integrate use phase impacts from power × time
+        - During operation: Integrate use phase impacts from energy in joules (power × time)
         - At t=stop: Add end-of-life impacts
         
         Uses pre-computed factors for fast calculation.
-        Use rate: {use_rate_mwh:.4e} {out_unit}/MWh
+        Use rate: {use_rate_per_j:.4e} {out_unit}/J
         """
         from pythonfmu import Fmi2Slave, Fmi2Causality, Fmi2Variability, Fmi2Initial
         from pythonfmu.variables import Real
@@ -279,14 +279,14 @@ def generate_fmu_class_code(class_name: str,
                 self.use_phase_impact = 0.0
                 self.eol_added = False
 
-                # u — power input in MW (maps to: power_input_mw)
+                # u — power input in W (maps to: power_input_w)
                 self.register_variable(Real(
                     "u",
                     start=0.0,
                     causality=Fmi2Causality.input,
                     variability=Fmi2Variability.continuous,
                     initial=Fmi2Initial.exact,
-                    description="Power input [MW] (power_input_mw)",
+                    description="Power input [W] (power_input_w)",
                 ))
                 # y — cumulative impact output (maps to: {out_var}_cumulative)
                 self.register_variable(Real(
@@ -302,8 +302,8 @@ def generate_fmu_class_code(class_name: str,
                 self.transport_impact = {stage_impacts.get('transport', 0.0):.8e}
                 self.eol_impact = {stage_impacts.get('eol', 0.0):.8e}
                 
-                # Use phase rate: impact per MWh
-                self.use_rate_per_mwh = {factors["energy_factor"]:.8e} * 3600.0  # {out_unit}/MWh
+                # Use phase rate: impact per joule
+                self.use_rate_per_j = {factors["energy_factor"]:.8e} / 1.0e6  # {out_unit}/J
 
             def do_step(self, current_time: float, step_size: float) -> bool:
                 try:
@@ -311,10 +311,10 @@ def generate_fmu_class_code(class_name: str,
                     power_prev = self._prev_u
                     power_curr = self.u
                     
-                    # Trapezoidal integration
+                    # Trapezoidal integration where W*s = J.
                     avg_power = (power_prev + power_curr) / 2.0
-                    impact_rate = avg_power * self.use_rate_per_mwh
-                    step_impact = impact_rate * (step_size / 3600.0)  # step_size in seconds → hours
+                    step_energy_j = avg_power * step_size
+                    step_impact = step_energy_j * self.use_rate_per_j
                     
                     self.use_phase_impact += step_impact
                     
@@ -461,6 +461,17 @@ def _resolve_fmi_var_metadata(input_unit: str, output_unit: str) -> Dict[str, Di
                 "name": "W",
                 "base_unit": {"kg": "1", "m": "2", "s": "-3"},
                 "display_units": [{"name": "MW", "factor": "1e-6"}],
+            },
+        }
+    elif in_unit_raw.upper() == "W":
+        u_meta = {
+            "quantity": "Power",
+            "unit": "W",
+            "display_unit": "W",
+            "unit_def": {
+                "name": "W",
+                "base_unit": {"kg": "1", "m": "2", "s": "-3"},
+                "display_units": [{"name": "W", "factor": "1"}],
             },
         }
     else:

@@ -54,6 +54,7 @@ import json
 import sys
 import tempfile
 import textwrap
+from typing import Any
 from pathlib import Path
 
 # Add src to path for library imports
@@ -191,6 +192,49 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
         
     except Exception as e:
         raise RuntimeError(f"LCA analysis failed: {e}")
+
+
+def _resolve_lci_base_energy_mj(lci_data: dict[str, Any], default: float = 1.0) -> float:
+    """Resolve base energy quantity from LCI energy_metadata.primary_input.value."""
+    value = (
+        lci_data.get("energy_metadata", {})
+        .get("primary_input", {})
+        .get("value", default)
+    )
+    try:
+        base_energy_mj = float(value)
+    except (TypeError, ValueError):
+        base_energy_mj = default
+
+    if base_energy_mj <= 0.0:
+        return default
+    return base_energy_mj
+
+
+def _resolve_one_base_unit_mj(lci_data: dict[str, Any], default_mj: float = 1.0) -> tuple[float, str]:
+    """Return the MJ equivalent of 1 inventory base energy unit and the normalized base unit label."""
+    base_unit_raw = (
+        lci_data.get("energy_metadata", {})
+        .get("primary_input", {})
+        .get("unit", "MJ")
+    )
+    base_unit = str(base_unit_raw or "MJ").strip().upper()
+
+    unit_to_mj = {
+        "J": 1.0e-6,
+        "WH": 3.6e-3,
+        "KWH": 3.6,
+        "MWH": 3600.0,
+        "MJ": 1.0,
+        "GJ": 1000.0,
+        "TJ": 1.0e6,
+    }
+
+    if base_unit not in unit_to_mj:
+        print(f"⚠️ Unsupported base energy unit '{base_unit_raw}', defaulting basis to 1 MJ")
+        return default_mj, "MJ"
+
+    return unit_to_mj[base_unit], base_unit
 
 
 # ── Main CLI ─────────────────────────────────────────────────────────────────
@@ -377,16 +421,22 @@ def main():
     fmu_name = args.name or f"{safe_classname(stem)}_{method_label}_v{args.version}"
     class_name = safe_classname(fmu_name)
 
-    # Baseline energy for factor calculation (not user-configurable)
-    baseline_energy_mj = 180.0
+    # Resolve LCI once so we can derive unitary use-phase slope from the
+    # inventory's own energy reference quantity.
+    try:
+        with open(lci_path, "r", encoding="utf-8") as f:
+            lci_data = json.load(f)
+    except Exception as exc:
+        parser.error(f"Failed to read LCI JSON '{lci_path}': {exc}")
+
+    base_energy_mj = _resolve_lci_base_energy_mj(lci_data, default=1.0)
+    unitary_energy_mj, base_energy_unit = _resolve_one_base_unit_mj(lci_data, default_mj=1.0)
 
     # ── Dry run mode ─────────────────────────────────────────────────────────
     if args.dry_run:
         print("🧪 DRY RUN MODE - Testing configuration")
 
         try:
-            with open(lci_path, 'r') as f:
-                lci_data = json.load(f)
             print(f"✅ LCI file valid: {lci_data.get('name', 'Unknown process')}")
         except Exception as e:
             print(f"❌ LCI file error: {e}")
@@ -400,6 +450,8 @@ def main():
         print(f"✅ Black-box policy: {args.blackbox_policy}")
         print(f"✅ Default step size: {args.default_step_size} s")
         print(f"✅ Output variable: {method_cfg['output_var']} [{method_cfg['output_unit']}]")
+        print(f"✅ LCI base energy metadata: {base_energy_mj} {base_energy_unit}")
+        print(f"✅ FMU slope basis: 1 {base_energy_unit} ({unitary_energy_mj} MJ)")
         print("✅ Dry run completed successfully - ready for FMU creation")
         sys.exit(0)
 
@@ -414,14 +466,20 @@ def main():
 
     try:
         # ── Step 1: Run LCA analysis ─────────────────────────────────────────
-        lca_results = run_lca_analysis(lci_path, baseline_energy_mj, method_cfg["keywords"])
+        # Use exactly 1 inventory base energy unit as the dynamic basis so
+        # slope extraction is independent of absolute inventory magnitude.
+        lca_results = run_lca_analysis(
+            lci_path,
+            unitary_energy_mj,
+            method_cfg["keywords"],
+        )
 
         # ── Step 2: Extract factors and stage impacts ────────────────────────
         print(f"\n{'='*60}")
         print(f"  Step 2 – Extracting emission factors and stage impacts")
         print(f"{'='*60}")
 
-        factors = extract_emission_factors(lca_results, method_cfg, baseline_energy_mj)
+        factors = extract_emission_factors(lca_results, method_cfg, unitary_energy_mj)
         stage_impacts = extract_stage_impacts(lca_results, method_cfg)
 
         # ── Step 3: Generate and build FMU ───────────────────────────────────
@@ -458,7 +516,7 @@ def main():
             output_unit=method_cfg["output_unit"],
             output_description=f"Cumulative {method_cfg['output_label']}",
             input_var="u",
-            input_unit="MW",
+            input_unit="W",
             default_step_size=args.default_step_size,
         )
 
@@ -514,13 +572,15 @@ def main():
         print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")
         print(f"")
         print(f"  🔄  Cumulative Impact Tracking:")
-        print(f"     • Input  : u [MW]  (power_input_mw)")
+        print(f"     • Input  : u [W]  (power_input_w)")
         print(f"     • Output : y [{method_cfg['output_unit']}]  ({method_cfg['output_var']}_cumulative)")
         print(f"")
         print(f"  📊  Life Cycle Stages:")
         print(f"     • Production : {stage_impacts['production']:.4e} {method_cfg['output_unit']} (t=start)")
         print(f"     • Transport  : {stage_impacts['transport']:.4e} {method_cfg['output_unit']} (t=start)")
-        print(f"     • Use rate   : {factors['energy_factor']*3600:.4e} {method_cfg['output_unit']}/MWh (∫P dt)")
+        base_unit_rate = factors['energy_factor'] * unitary_energy_mj
+        print(f"     • Use rate   : {base_unit_rate:.4e} {method_cfg['output_unit']}/{base_energy_unit} (derived from 1 {base_energy_unit})")
+        print(f"                   {factors['energy_factor']/1.0e6:.4e} {method_cfg['output_unit']}/J (used in FMU u*dt)")
         print(f"     • End-of-Life: {stage_impacts['eol']:.4e} {method_cfg['output_unit']} (t=stop)")
         print(f"{'='*60}\n")
 
