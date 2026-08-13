@@ -140,6 +140,8 @@ def run_simulation(fmu_path: Path, cfg: SimulationConfig) -> np.ndarray:
     if not fmu_path.exists():
         raise FileNotFoundError(f"FMU file not found: {fmu_path}")
 
+    effective_u = cfg.input_u
+
     print("\n" + "=" * 70)
     print("FMU Simulation")
     print("=" * 70)
@@ -147,7 +149,7 @@ def run_simulation(fmu_path: Path, cfg: SimulationConfig) -> np.ndarray:
     print(f"start_time : {cfg.start_time}")
     print(f"stop_time  : {cfg.stop_time}")
     print(f"step_size  : {cfg.step_size}")
-    print(f"u0         : {cfg.input_u}")
+    print(f"u0         : {effective_u}")
     print("=" * 70)
 
     preflight_validate_fmu(fmu_path=fmu_path)
@@ -156,8 +158,8 @@ def run_simulation(fmu_path: Path, cfg: SimulationConfig) -> np.ndarray:
     # inputs as time-varying signals, not start values.
     input_signal = np.array(
         [
-            (cfg.start_time, cfg.input_u),
-            (cfg.stop_time, cfg.input_u),
+            (cfg.start_time, effective_u),
+            (cfg.stop_time, effective_u),
         ],
         dtype=[("time", np.float64), ("u", np.float64)],
     )
@@ -219,11 +221,19 @@ def main() -> int:
 
     try:
         validate_config(cfg)
+
         result = run_simulation(fmu_path=fmu_path, cfg=cfg)
+
+        # Report delivered energy to make power-vs-energy interpretation explicit.
+        time = np.array(result["time"], dtype=np.float64)
+        u = np.array(result["u"], dtype=np.float64)
+        energy_mwh = float(np.trapezoid(u, time) / 3600.0)
+
         print(
             f"✅ Simulation complete: {len(result['time'])} points, "
             f"y_final = {result['y'][-1]:.6g}"
         )
+        print(f"   Delivered energy: {energy_mwh:.6g} MWh")
         plot_results(result=result, save_plot=args.save_plot, no_show=args.no_show)
         return 0
 
