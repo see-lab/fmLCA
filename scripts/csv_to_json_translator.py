@@ -7,9 +7,9 @@ with energy propagation for dynamic consumption rates.
 Features:
   • Automatic energy process detection (by unit: MJ, kWh, GJ, etc.)
   • Energy processes use amount_ref instead of hardcoded amounts
-  • Automatic unit conversion for energy metadata (standardized to MJ)
+    • Energy metadata retains original inventory base value and unit (no normalization)
   • Modern energy_metadata format with "value" field
-  • No conversion factors needed - handled by LCA engine
+    • Conversion to required analysis units is handled by lca_engine before impacts
 
 Usage:
     python scripts/csv_to_json_translator.py input.csv [output.json]
@@ -17,7 +17,7 @@ Usage:
 
 Energy Process Conversion:
   • CSV: "Water pump, 540, MJ" → JSON: "amount_ref": "energy_metadata.primary_input.value"
-  • CSV: "Electricity, 25, kWh" → Metadata: "value": 90.0 (converted to MJ)
+    • CSV: "Electricity, 25, kWh" → Metadata: "value": 25, "unit": "kWh"
   • All non-energy processes keep direct amounts
 
 Supports flexible CSV formats through configuration-driven field mapping.
