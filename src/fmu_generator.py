@@ -435,11 +435,158 @@ def _deduplicate_unknown_indices(parent_elem) -> None:
         seen.add(idx)
 
 
+def _normalize_fmi_unit_name(unit_name: str) -> str:
+    """Convert a display unit string to an FMI-safe unit token."""
+    token = re.sub(r"[^A-Za-z0-9_]", "_", unit_name.strip())
+    token = re.sub(r"_+", "_", token).strip("_")
+    if not token:
+        return "unitless"
+    if token[0].isdigit():
+        token = f"u_{token}"
+    return token
+
+
+def _resolve_fmi_var_metadata(input_unit: str, output_unit: str) -> Dict[str, Dict[str, Any]]:
+    """Resolve FMI-compatible quantity/unit/displayUnit metadata for u and y."""
+    in_unit_raw = (input_unit or "").strip()
+    out_unit_raw = (output_unit or "").strip()
+
+    # Input: normalize power signal metadata for better importer behavior.
+    if in_unit_raw.upper() == "MW":
+        u_meta = {
+            "quantity": "Power",
+            "unit": "W",
+            "display_unit": "MW",
+            "unit_def": {
+                "name": "W",
+                "base_unit": {"kg": "1", "m": "2", "s": "-3"},
+                "display_units": [{"name": "MW", "factor": "1e-6"}],
+            },
+        }
+    else:
+        in_unit_name = _normalize_fmi_unit_name(in_unit_raw) if in_unit_raw else "1"
+        u_meta = {
+            "quantity": "Power",
+            "unit": in_unit_name,
+            "display_unit": in_unit_name,
+            "unit_def": {
+                "name": in_unit_name,
+                "base_unit": None,
+                "display_units": [],
+            },
+        }
+
+    # Output: map LCIA display units to importer-friendly FMI metadata.
+    out_lower = out_unit_raw.lower()
+    if out_lower.startswith("kg"):
+        y_meta = {
+            "quantity": "Mass",
+            "unit": "kg",
+            "display_unit": "kg",
+            "unit_def": {
+                "name": "kg",
+                "base_unit": {"kg": "1"},
+                "display_units": [{"name": "kg", "factor": "1"}],
+            },
+        }
+    elif out_lower == "pt":
+        y_meta = {
+            "quantity": "ImpactScore",
+            "unit": "1",
+            "display_unit": "Pt",
+            "unit_def": {
+                "name": "1",
+                "base_unit": None,
+                "display_units": [{"name": "Pt", "factor": "1"}],
+            },
+        }
+    else:
+        out_unit_name = _normalize_fmi_unit_name(out_unit_raw) if out_unit_raw else "1"
+        y_meta = {
+            "quantity": "ImpactScore",
+            "unit": out_unit_name,
+            "display_unit": out_unit_name,
+            "unit_def": {
+                "name": out_unit_name,
+                "base_unit": None,
+                "display_units": [{"name": out_unit_name, "factor": "1"}],
+            },
+        }
+
+    return {"u": u_meta, "y": y_meta}
+
+
+def _ensure_unit_definition(
+    root,
+    unit_name: str,
+    base_unit: Optional[Dict[str, str]] = None,
+    display_units: Optional[List[Dict[str, str]]] = None,
+) -> None:
+    """Ensure modelDescription contains a UnitDefinitions entry for unit_name."""
+    if not unit_name:
+        return
+
+    unit_defs = root.find("UnitDefinitions")
+    if unit_defs is None:
+        children = list(root)
+        insert_at = len(children)
+        order_after = {
+            "ModelExchange",
+            "CoSimulation",
+        }
+        order_before = {
+            "TypeDefinitions",
+            "LogCategories",
+            "DefaultExperiment",
+            "VendorAnnotations",
+            "ModelVariables",
+            "ModelStructure",
+        }
+        for i, child in enumerate(children):
+            if child.tag in order_before:
+                insert_at = i
+                break
+            if child.tag in order_after:
+                insert_at = i + 1
+        unit_defs = ET.Element("UnitDefinitions")
+        root.insert(insert_at, unit_defs)
+
+    for unit_elem in unit_defs.findall("Unit"):
+        if unit_elem.get("name") == unit_name:
+            target_unit = unit_elem
+            break
+    else:
+        target_unit = ET.SubElement(unit_defs, "Unit")
+        target_unit.set("name", unit_name)
+
+    if base_unit:
+        existing_base = target_unit.find("BaseUnit")
+        if existing_base is None:
+            existing_base = ET.SubElement(target_unit, "BaseUnit")
+        for key, val in base_unit.items():
+            existing_base.set(key, str(val))
+
+    if display_units:
+        existing_names = {d.get("name") for d in target_unit.findall("DisplayUnit")}
+        for disp in display_units:
+            name = str(disp.get("name", "")).strip()
+            if not name or name in existing_names:
+                continue
+            disp_elem = ET.SubElement(target_unit, "DisplayUnit")
+            disp_elem.set("name", name)
+            for attr in ("factor", "offset"):
+                if attr in disp and disp[attr] is not None:
+                    disp_elem.set(attr, str(disp[attr]))
+            existing_names.add(name)
+
+
 def fix_fmu_metadata(fmu_path: Path,
                     output_path: Path,
                     output_var: str,
                     output_unit: str,
                     output_description: str,
+                    input_var: str = "u",
+                    input_unit: str = "MW",
                     default_step_size: Optional[float] = None) -> Path:
     """
     Fix FMU ModelDescription.xml metadata.
@@ -452,6 +599,8 @@ def fix_fmu_metadata(fmu_path: Path,
         output_var: Output variable name (e.g., "y")
         output_unit: Output unit (e.g., "kg CO2-eq")
         output_description: Output description
+        input_var: Input variable name (e.g., "u")
+        input_unit: Input unit (e.g., "MW")
         default_step_size: Optional FMI DefaultExperiment stepSize in seconds
         
     Returns:
@@ -502,11 +651,46 @@ def fix_fmu_metadata(fmu_path: Path,
             # Find output variable reference
             model_vars = root.find("ModelVariables")
             output_ref = None
+            var_meta = _resolve_fmi_var_metadata(input_unit=input_unit, output_unit=output_unit)
+            assigned_units = set()
             if model_vars is not None:
                 for idx, var in enumerate(model_vars.findall("ScalarVariable"), start=1):
-                    if var.get("name") == output_var:
+                    name = var.get("name")
+                    real = var.find("Real")
+
+                    # Ensure explicit FMI unit fields for plotting/interoperability.
+                    if real is not None:
+                        if name == input_var:
+                            u_meta = var_meta["u"]
+                            real.set("unit", u_meta["unit"])
+                            real.set("displayUnit", u_meta["display_unit"])
+                            real.set("quantity", u_meta["quantity"])
+                            _ensure_unit_definition(
+                                root,
+                                unit_name=u_meta["unit_def"]["name"],
+                                base_unit=u_meta["unit_def"]["base_unit"],
+                                display_units=u_meta["unit_def"]["display_units"],
+                            )
+                            assigned_units.add(u_meta["unit"])
+                        if name == output_var:
+                            y_meta = var_meta["y"]
+                            real.set("unit", y_meta["unit"])
+                            real.set("displayUnit", y_meta["display_unit"])
+                            real.set("quantity", y_meta["quantity"])
+                            _ensure_unit_definition(
+                                root,
+                                unit_name=y_meta["unit_def"]["name"],
+                                base_unit=y_meta["unit_def"]["base_unit"],
+                                display_units=y_meta["unit_def"]["display_units"],
+                            )
+                            assigned_units.add(y_meta["unit"])
+
+                    if name == output_var:
                         output_ref = str(idx)
-                        break
+
+            # FMI requires unit references to be declared in UnitDefinitions.
+            for unit_name in sorted(assigned_units):
+                _ensure_unit_definition(root, unit_name)
             
             # Add Unknown element for output
             if output_ref and outputs.find(f"./Unknown[@index='{output_ref}']") is None:

@@ -85,6 +85,14 @@ def configure_console_encoding() -> None:
             except Exception:
                 pass
 
+
+def _arg_was_provided(option_name: str) -> bool:
+    """Return True when a CLI option was explicitly provided by the user."""
+    for arg in sys.argv[1:]:
+        if arg == option_name or arg.startswith(option_name + "="):
+            return True
+    return False
+
 # ── Configuration ────────────────────────────────────────────────────────────
 
 DIST_FMU = ROOT / "fmu"
@@ -215,7 +223,7 @@ def main():
               python scripts/create_fmu.py example
               python scripts/create_fmu.py example --method ipcc
               python scripts/create_fmu.py example --method recipe_endpoint
-              python scripts/create_fmu.py example --name "Example_Climate" --version 2.0
+              python scripts/create_fmu.py example --dymola --export-mode source --blackbox-policy warn
         """),
     )
     parser.add_argument(
@@ -228,6 +236,21 @@ def main():
         default="ipcc",
         choices=list(METHOD_CONFIG.keys()),
         help="LCIA method to use: 'ipcc' (GWP100, default) or 'recipe_endpoint' (single score Pt)"
+    )
+    parser.add_argument(
+        "--target-tool",
+        choices=["generic", "dymola"],
+        default="generic",
+        help=(
+            "Importer compatibility preset. "
+            "dymola selects source export defaults to avoid Python bytecode version lock-in "
+            "and prints runtime guidance."
+        )
+    )
+    parser.add_argument(
+        "--dymola",
+        action="store_true",
+        help="Shorthand for --target-tool dymola"
     )
     parser.add_argument(
         "--name",
@@ -272,8 +295,70 @@ def main():
             "(used by some importers as a default communication step; default: 60.0)"
         )
     )
+    parser.add_argument(
+        "--accept-ip-risk",
+        action="store_true",
+        help=(
+            "Acknowledge that readable source-mode exports are not black-box compliant "
+            "and may increase external disclosure risk if redistributed."
+        )
+    )
 
     args = parser.parse_args()
+
+    if args.dymola:
+        args.target_tool = "dymola"
+
+    export_mode_overridden = _arg_was_provided("--export-mode")
+    blackbox_policy_overridden = _arg_was_provided("--blackbox-policy")
+    step_size_overridden = _arg_was_provided("--default-step-size")
+
+    if args.target_tool == "dymola":
+        print("\n🔧 Target preset: dymola")
+        if not export_mode_overridden:
+            args.export_mode = "source"
+            print("   • export_mode set to source (improves runtime compatibility across Python versions)")
+        if not blackbox_policy_overridden:
+            args.blackbox_policy = "warn"
+            print("   • blackbox_policy set to warn (source mode is not black-box compliant)")
+        if not step_size_overridden:
+            args.default_step_size = 60.0
+            print("   • default_step_size set to 60.0 s")
+
+        print("   Runtime guidance:")
+        print("   • If InstantiateModel fails, align Dymola's Python runtime with FMU build environment.")
+        print("   • If simulation is event-heavy, increase communication step size in importer settings.")
+
+    if args.default_step_size <= 0.0:
+        parser.error("--default-step-size must be > 0")
+
+    if args.export_mode == "source" and args.blackbox_policy == "enforce":
+        parser.error(
+            "--export-mode source conflicts with --blackbox-policy enforce. "
+            "Use --blackbox-policy warn/off for source mode, or switch to --export-mode bytecode."
+        )
+
+    source_export_nonblackbox = (
+        args.export_mode == "source"
+        and args.blackbox_policy in {"warn", "off"}
+    )
+
+    if source_export_nonblackbox:
+        print("\n⚠️  IP / EULA risk notice")
+        print("   Source-mode FMUs include readable Python resources and are NOT black-box compliant.")
+        print("   Do not redistribute externally unless your license/compliance review allows it.")
+
+        if not args.accept_ip_risk:
+            if sys.stdin is not None and sys.stdin.isatty():
+                print("\nType 'I ACCEPT' to continue export with source-mode disclosure risk.")
+                response = input("> ").strip()
+                if response != "I ACCEPT":
+                    parser.error("Export cancelled: IP risk acknowledgment not provided.")
+            else:
+                parser.error(
+                    "Source-mode export requires explicit acknowledgment. "
+                    "Re-run with --accept-ip-risk to proceed."
+                )
 
     # ── Resolve LCI file ─────────────────────────────────────────────────────
     lci_path = Path(args.lci_stem)
@@ -308,8 +393,12 @@ def main():
             sys.exit(1)
 
         print(f"✅ Method configuration: {args.method} -> {method_cfg['output_label']}")
+        print(f"✅ Target tool: {args.target_tool}")
         print(f"✅ FMU name: {fmu_name}")
         print(f"✅ Class name: {class_name}")
+        print(f"✅ Export mode: {args.export_mode}")
+        print(f"✅ Black-box policy: {args.blackbox_policy}")
+        print(f"✅ Default step size: {args.default_step_size} s")
         print(f"✅ Output variable: {method_cfg['output_var']} [{method_cfg['output_unit']}]")
         print("✅ Dry run completed successfully - ready for FMU creation")
         sys.exit(0)
@@ -368,6 +457,8 @@ def main():
             output_var="y",
             output_unit=method_cfg["output_unit"],
             output_description=f"Cumulative {method_cfg['output_label']}",
+            input_var="u",
+            input_unit="MW",
             default_step_size=args.default_step_size,
         )
 
@@ -417,6 +508,7 @@ def main():
             print(f"  ⚠️   FMU created but validation had issues: {msg}")
         print(f"  📁  Output : {final_path}")
         print(f"  🖥️   Platform: Windows 64-bit, Linux 64-bit")
+        print(f"  🎯  Target tool     : {args.target_tool}")
         print(f"  📦  Export mode     : {args.export_mode}")
         print(f"  🔐  Black-box policy: {args.blackbox_policy}")
         print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")

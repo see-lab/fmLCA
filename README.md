@@ -84,6 +84,23 @@ Black-box compliance policy:
 - By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
 - For local debugging only, use --blackbox-policy warn or --blackbox-policy off.
 
+### Dymola Export Preset (Short Guide)
+
+Use the Dymola preset when importing FMUs into Dymola:
+
+```bash
+# Dymola-compatible defaults (source mode + runtime guidance)
+python scripts/create_fmu.py grid --method ipcc --target-tool dymola --accept-ip-risk
+
+# Preferred for external sharing / stronger IP protection
+python scripts/create_fmu.py grid --method ipcc --target-tool dymola --export-mode bytecode --blackbox-policy enforce
+```
+
+Notes:
+- `--target-tool dymola` sets compatibility-oriented defaults unless you override them.
+- Source mode is not black-box compliant; the CLI prints a risk warning and requires explicit acknowledgment.
+- For ecoinvent/IP-sensitive distribution, use bytecode + enforce and validate importer compatibility before sharing.
+
 ### Simulate (& co-simulate) FMUs (FUTURE ADDITION, nomenclature TBD)
 python scripts/co-simulate.py --fmu1 [name] --fmu2 [name]
 
