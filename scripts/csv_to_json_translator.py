@@ -183,7 +183,7 @@ Metadata/comments:
         
         # Validation
         if args.validate:
-            from src.inventory_processor import validate_inventory_format
+            from src.lci_data_manager import validate_inventory_format
 
             print("   🔍 Validating JSON structure...")
             is_valid = validate_inventory_format(lci_data)

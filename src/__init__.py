@@ -26,8 +26,6 @@ __description__ = "Energy-Based Life Cycle Assessment Analysis with Flexible FMU
 # - database_manager: Brightway database management
 # - lci_data_manager: Life cycle inventory data processing
 # - lca_utils: Utility functions (paths, units, file I/O)
-# - inventory_processor: Inventory loading and validation
 # - fmu_generator: FMU generation core logic
-# - methods_manager: LCIA methods management (NEW)
 
 __all__ = []

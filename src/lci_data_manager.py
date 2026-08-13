@@ -16,6 +16,35 @@ import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+
+def validate_inventory_format(data: Dict[str, Any]) -> bool:
+    """Validate core inventory structure for downstream LCA processing."""
+    required_fields = ["name", "unit", "exchanges"]
+    for field in required_fields:
+        if field not in data:
+            print(f"❌ Missing required field: {field}")
+            return False
+
+    if not isinstance(data["exchanges"], list):
+        print("❌ 'exchanges' must be a list")
+        return False
+
+    for i, exchange in enumerate(data["exchanges"]):
+        if not isinstance(exchange, dict):
+            print(f"❌ Exchange {i} is not a dictionary")
+            return False
+
+        if "type" not in exchange:
+            print(f"❌ Exchange {i} missing 'type' field")
+            return False
+
+        if exchange.get("type") == "production":
+            amount = exchange.get("amount")
+            if amount is not None and amount != 1.0:
+                print(f"⚠️  Production exchange should have amount=1.0, found {amount}")
+
+    return True
+
 # Handle both relative and absolute imports
 try:
     from .config_manager import get_config
