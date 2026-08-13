@@ -22,6 +22,7 @@ try:
     from .config_manager import get_config
     from .database_manager import DatabaseManager
     from .lci_data_manager import LCIDataManager
+    from .lca_utils import convert_energy_units
 except ImportError:
     # Fall back to absolute imports (when run directly)
     import sys
@@ -35,6 +36,7 @@ except ImportError:
     from config_manager import get_config
     from database_manager import DatabaseManager
     from lci_data_manager import LCIDataManager
+    from lca_utils import convert_energy_units
 
 # Initialize configuration
 config = get_config()
@@ -597,6 +599,22 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
         
         # Add technosphere exchanges
         exchanges = lci_data.get('exchanges', [])
+
+        def _normalize_energy_unit(unit: str) -> str:
+            u = str(unit or "").strip().lower()
+            aliases = {
+                "mj": "MJ",
+                "megajoule": "MJ",
+                "mwh": "MWH",
+                "megawatt hour": "MWH",
+                "kwh": "KWH",
+                "kilowatt hour": "KWH",
+                "wh": "WH",
+                "gj": "GJ",
+                "gigajoule": "GJ",
+                "tj": "TJ",
+            }
+            return aliases.get(u, str(unit or "").upper())
         
         for exchange in exchanges:
             if exchange.get('type') == 'technosphere':
@@ -609,9 +627,24 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                 if 'amount_ref' in exchange:
                     # Resolve the reference path (e.g., "energy_metadata.primary_input.value")
                     ref_path = exchange['amount_ref']
-                    base_amount = lci_data.get('energy_metadata', {}).get('primary_input', {}).get('value', 1.0)
-                    amount = base_amount * scaling_factor
-                    print(f"   ⚡ Energy exchange resolved: {base_amount} MJ (base) × {scaling_factor:.3f} = {amount:.3f} {exchange.get('unit', 'MJ')}")
+                    base_amount_mj = lci_data.get('energy_metadata', {}).get('primary_input', {}).get('value', 1.0)
+                    scaled_amount_mj = base_amount_mj * scaling_factor
+
+                    exchange_unit_raw = exchange.get('unit', 'MJ')
+                    exchange_unit_norm = _normalize_energy_unit(exchange_unit_raw)
+
+                    # amount_ref is anchored to energy_metadata.primary_input.value in MJ.
+                    # Convert to the exchange unit expected by the linked ecoinvent activity.
+                    try:
+                        amount = convert_energy_units(scaled_amount_mj, "MJ", exchange_unit_norm)
+                    except Exception:
+                        amount = scaled_amount_mj
+
+                    print(
+                        "   ⚡ Energy exchange resolved: "
+                        f"{base_amount_mj:.6f} MJ (base) × {scaling_factor:.6f} = "
+                        f"{scaled_amount_mj:.6f} MJ → {amount:.6f} {exchange_unit_raw}"
+                    )
                 else:
                     # Direct amount (non-energy exchanges are not scaled)
                     amount = exchange.get('amount', 1.0)
