@@ -1,0 +1,18 @@
+{
+  "lcia_methods": [
+    {
+      "name": "IPCC 2021 climate change global warming potential GWP100",
+      "description": "SimaPro label 'IPCC 2021 GWP100 V1.03' mapped to the Brightway IPCC 2021 GWP100 method available in ecoinvent 3.10.",
+      "simapro_label": "IPCC 2021 GWP100 V1.03",
+      "category": "climate_change",
+      "unit": "kg CO2-eq",
+      "midpoint": true,
+      "time_horizon": 100,
+      "brightway_tuple": [
+        "IPCC 2021",
+        "climate change",
+        "global warming potential (GWP100)"
+      ]
+    }
+  ]
+}

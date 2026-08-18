@@ -33,17 +33,17 @@ pip install -r requirements.txt
 
 **Requirements:**
 - Python 3.9-3.13
-- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py` and `scripts/setup_ecoinvent.py`)
+- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py`)
 
 
 **Setting up Ecoinvent:**
 If you don't have an ecoinvent database:
 ```bash
-# Check what's available
-python scripts/setup_ecoinvent.py --check
+# Show current project status only
+python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --check
 
-# Get setup instructions
-python scripts/setup_ecoinvent.py --version 3.12 --system-model cutoff
+# Import ecoinvent (LCI + LCIA)
+python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --system-model cutoff
 ```
 
 See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
@@ -83,6 +83,23 @@ Black-box compliance policy:
 - By default, create_fmu enforces black-box auditing and fails export if readable source/data payloads are present in resources/.
 - By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
 - For local debugging only, use --blackbox-policy warn or --blackbox-policy off.
+
+### Dymola Export Preset (Short Guide)
+
+Use the Dymola preset when importing FMUs into Dymola:
+
+```bash
+# Dymola-compatible defaults (source mode + runtime guidance)
+python scripts/create_fmu.py grid --method ipcc --target-tool dymola --accept-ip-risk
+
+# Preferred for external sharing / stronger IP protection
+python scripts/create_fmu.py grid --method ipcc --target-tool dymola --export-mode bytecode --blackbox-policy enforce
+```
+
+Notes:
+- `--target-tool dymola` sets compatibility-oriented defaults unless you override them.
+- Source mode is not black-box compliant; the CLI prints a risk warning and requires explicit acknowledgment.
+- For ecoinvent/IP-sensitive distribution, use bytecode + enforce and validate importer compatibility before sharing.
 
 ### Simulate (& co-simulate) FMUs (FUTURE ADDITION, nomenclature TBD)
 python scripts/co-simulate.py --fmu1 [name] --fmu2 [name]

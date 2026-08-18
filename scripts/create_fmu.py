@@ -54,6 +54,7 @@ import json
 import sys
 import tempfile
 import textwrap
+from typing import Any
 from pathlib import Path
 
 # Add src to path for library imports
@@ -84,6 +85,14 @@ def configure_console_encoding() -> None:
                 stream.reconfigure(encoding="utf-8", errors="replace")
             except Exception:
                 pass
+
+
+def _arg_was_provided(option_name: str) -> bool:
+    """Return True when a CLI option was explicitly provided by the user."""
+    for arg in sys.argv[1:]:
+        if arg == option_name or arg.startswith(option_name + "="):
+            return True
+    return False
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
@@ -185,6 +194,49 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
         raise RuntimeError(f"LCA analysis failed: {e}")
 
 
+def _resolve_lci_base_energy_mj(lci_data: dict[str, Any], default: float = 1.0) -> float:
+    """Resolve base energy quantity from LCI energy_metadata.primary_input.value."""
+    value = (
+        lci_data.get("energy_metadata", {})
+        .get("primary_input", {})
+        .get("value", default)
+    )
+    try:
+        base_energy_mj = float(value)
+    except (TypeError, ValueError):
+        base_energy_mj = default
+
+    if base_energy_mj <= 0.0:
+        return default
+    return base_energy_mj
+
+
+def _resolve_one_base_unit_mj(lci_data: dict[str, Any], default_mj: float = 1.0) -> tuple[float, str]:
+    """Return the MJ equivalent of 1 inventory base energy unit and the normalized base unit label."""
+    base_unit_raw = (
+        lci_data.get("energy_metadata", {})
+        .get("primary_input", {})
+        .get("unit", "MJ")
+    )
+    base_unit = str(base_unit_raw or "MJ").strip().upper()
+
+    unit_to_mj = {
+        "J": 1.0e-6,
+        "WH": 3.6e-3,
+        "KWH": 3.6,
+        "MWH": 3600.0,
+        "MJ": 1.0,
+        "GJ": 1000.0,
+        "TJ": 1.0e6,
+    }
+
+    if base_unit not in unit_to_mj:
+        print(f"⚠️ Unsupported base energy unit '{base_unit_raw}', defaulting basis to 1 MJ")
+        return default_mj, "MJ"
+
+    return unit_to_mj[base_unit], base_unit
+
+
 # ── Main CLI ─────────────────────────────────────────────────────────────────
 
 def main():
@@ -215,7 +267,7 @@ def main():
               python scripts/create_fmu.py example
               python scripts/create_fmu.py example --method ipcc
               python scripts/create_fmu.py example --method recipe_endpoint
-              python scripts/create_fmu.py example --name "Example_Climate" --version 2.0
+              python scripts/create_fmu.py example --dymola --export-mode source --blackbox-policy warn
         """),
     )
     parser.add_argument(
@@ -228,6 +280,21 @@ def main():
         default="ipcc",
         choices=list(METHOD_CONFIG.keys()),
         help="LCIA method to use: 'ipcc' (GWP100, default) or 'recipe_endpoint' (single score Pt)"
+    )
+    parser.add_argument(
+        "--target-tool",
+        choices=["generic", "dymola"],
+        default="generic",
+        help=(
+            "Importer compatibility preset. "
+            "dymola selects source export defaults to avoid Python bytecode version lock-in "
+            "and prints runtime guidance."
+        )
+    )
+    parser.add_argument(
+        "--dymola",
+        action="store_true",
+        help="Shorthand for --target-tool dymola"
     )
     parser.add_argument(
         "--name",
@@ -263,8 +330,79 @@ def main():
             "bytecode=compile implementation modules to .pyc and keep only a minimal loader stub (default)"
         )
     )
+    parser.add_argument(
+        "--default-step-size",
+        type=float,
+        default=60.0,
+        help=(
+            "FMI DefaultExperiment stepSize in seconds embedded in modelDescription.xml "
+            "(used by some importers as a default communication step; default: 60.0)"
+        )
+    )
+    parser.add_argument(
+        "--accept-ip-risk",
+        action="store_true",
+        help=(
+            "Acknowledge that readable source-mode exports are not black-box compliant "
+            "and may increase external disclosure risk if redistributed."
+        )
+    )
 
     args = parser.parse_args()
+
+    if args.dymola:
+        args.target_tool = "dymola"
+
+    export_mode_overridden = _arg_was_provided("--export-mode")
+    blackbox_policy_overridden = _arg_was_provided("--blackbox-policy")
+    step_size_overridden = _arg_was_provided("--default-step-size")
+
+    if args.target_tool == "dymola":
+        print("\n🔧 Target preset: dymola")
+        if not export_mode_overridden:
+            args.export_mode = "source"
+            print("   • export_mode set to source (improves runtime compatibility across Python versions)")
+        if not blackbox_policy_overridden:
+            args.blackbox_policy = "warn"
+            print("   • blackbox_policy set to warn (source mode is not black-box compliant)")
+        if not step_size_overridden:
+            args.default_step_size = 60.0
+            print("   • default_step_size set to 60.0 s")
+
+        print("   Runtime guidance:")
+        print("   • If InstantiateModel fails, align Dymola's Python runtime with FMU build environment.")
+        print("   • If simulation is event-heavy, increase communication step size in importer settings.")
+
+    if args.default_step_size <= 0.0:
+        parser.error("--default-step-size must be > 0")
+
+    if args.export_mode == "source" and args.blackbox_policy == "enforce":
+        parser.error(
+            "--export-mode source conflicts with --blackbox-policy enforce. "
+            "Use --blackbox-policy warn/off for source mode, or switch to --export-mode bytecode."
+        )
+
+    source_export_nonblackbox = (
+        args.export_mode == "source"
+        and args.blackbox_policy in {"warn", "off"}
+    )
+
+    if source_export_nonblackbox:
+        print("\n⚠️  IP / EULA risk notice")
+        print("   Source-mode FMUs include readable Python resources and are NOT black-box compliant.")
+        print("   Do not redistribute externally unless your license/compliance review allows it.")
+
+        if not args.accept_ip_risk:
+            if sys.stdin is not None and sys.stdin.isatty():
+                print("\nType 'I ACCEPT' to continue export with source-mode disclosure risk.")
+                response = input("> ").strip()
+                if response != "I ACCEPT":
+                    parser.error("Export cancelled: IP risk acknowledgment not provided.")
+            else:
+                parser.error(
+                    "Source-mode export requires explicit acknowledgment. "
+                    "Re-run with --accept-ip-risk to proceed."
+                )
 
     # ── Resolve LCI file ─────────────────────────────────────────────────────
     lci_path = Path(args.lci_stem)
@@ -283,25 +421,37 @@ def main():
     fmu_name = args.name or f"{safe_classname(stem)}_{method_label}_v{args.version}"
     class_name = safe_classname(fmu_name)
 
-    # Baseline energy for factor calculation (not user-configurable)
-    baseline_energy_mj = 180.0
+    # Resolve LCI once so we can derive unitary use-phase slope from the
+    # inventory's own energy reference quantity.
+    try:
+        with open(lci_path, "r", encoding="utf-8") as f:
+            lci_data = json.load(f)
+    except Exception as exc:
+        parser.error(f"Failed to read LCI JSON '{lci_path}': {exc}")
+
+    base_energy_mj = _resolve_lci_base_energy_mj(lci_data, default=1.0)
+    unitary_energy_mj, base_energy_unit = _resolve_one_base_unit_mj(lci_data, default_mj=1.0)
 
     # ── Dry run mode ─────────────────────────────────────────────────────────
     if args.dry_run:
         print("🧪 DRY RUN MODE - Testing configuration")
 
         try:
-            with open(lci_path, 'r') as f:
-                lci_data = json.load(f)
             print(f"✅ LCI file valid: {lci_data.get('name', 'Unknown process')}")
         except Exception as e:
             print(f"❌ LCI file error: {e}")
             sys.exit(1)
 
         print(f"✅ Method configuration: {args.method} -> {method_cfg['output_label']}")
+        print(f"✅ Target tool: {args.target_tool}")
         print(f"✅ FMU name: {fmu_name}")
         print(f"✅ Class name: {class_name}")
+        print(f"✅ Export mode: {args.export_mode}")
+        print(f"✅ Black-box policy: {args.blackbox_policy}")
+        print(f"✅ Default step size: {args.default_step_size} s")
         print(f"✅ Output variable: {method_cfg['output_var']} [{method_cfg['output_unit']}]")
+        print(f"✅ LCI base energy metadata: {base_energy_mj} {base_energy_unit}")
+        print(f"✅ FMU slope basis: 1 {base_energy_unit} ({unitary_energy_mj} MJ)")
         print("✅ Dry run completed successfully - ready for FMU creation")
         sys.exit(0)
 
@@ -316,14 +466,20 @@ def main():
 
     try:
         # ── Step 1: Run LCA analysis ─────────────────────────────────────────
-        lca_results = run_lca_analysis(lci_path, baseline_energy_mj, method_cfg["keywords"])
+        # Use exactly 1 inventory base energy unit as the dynamic basis so
+        # slope extraction is independent of absolute inventory magnitude.
+        lca_results = run_lca_analysis(
+            lci_path,
+            unitary_energy_mj,
+            method_cfg["keywords"],
+        )
 
         # ── Step 2: Extract factors and stage impacts ────────────────────────
         print(f"\n{'='*60}")
         print(f"  Step 2 – Extracting emission factors and stage impacts")
         print(f"{'='*60}")
 
-        factors = extract_emission_factors(lca_results, method_cfg, baseline_energy_mj)
+        factors = extract_emission_factors(lca_results, method_cfg, unitary_energy_mj)
         stage_impacts = extract_stage_impacts(lca_results, method_cfg)
 
         # ── Step 3: Generate and build FMU ───────────────────────────────────
@@ -358,7 +514,10 @@ def main():
             output_path=final_path,
             output_var="y",
             output_unit=method_cfg["output_unit"],
-            output_description=f"Cumulative {method_cfg['output_label']}"
+            output_description=f"Cumulative {method_cfg['output_label']}",
+            input_var="u",
+            input_unit="W",
+            default_step_size=args.default_step_size,
         )
 
         # ── Step 5: Optional bytecode packaging ──────────────────────────────
@@ -407,18 +566,21 @@ def main():
             print(f"  ⚠️   FMU created but validation had issues: {msg}")
         print(f"  📁  Output : {final_path}")
         print(f"  🖥️   Platform: Windows 64-bit, Linux 64-bit")
+        print(f"  🎯  Target tool     : {args.target_tool}")
         print(f"  📦  Export mode     : {args.export_mode}")
         print(f"  🔐  Black-box policy: {args.blackbox_policy}")
         print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")
         print(f"")
         print(f"  🔄  Cumulative Impact Tracking:")
-        print(f"     • Input  : u [MW]  (power_input_mw)")
+        print(f"     • Input  : u [W]  (power_input_w)")
         print(f"     • Output : y [{method_cfg['output_unit']}]  ({method_cfg['output_var']}_cumulative)")
         print(f"")
         print(f"  📊  Life Cycle Stages:")
         print(f"     • Production : {stage_impacts['production']:.4e} {method_cfg['output_unit']} (t=start)")
         print(f"     • Transport  : {stage_impacts['transport']:.4e} {method_cfg['output_unit']} (t=start)")
-        print(f"     • Use rate   : {factors['energy_factor']*3600:.4e} {method_cfg['output_unit']}/MWh (∫P dt)")
+        base_unit_rate = factors['energy_factor'] * unitary_energy_mj
+        print(f"     • Use rate   : {base_unit_rate:.4e} {method_cfg['output_unit']}/{base_energy_unit} (derived from 1 {base_energy_unit})")
+        print(f"                   {factors['energy_factor']/1.0e6:.4e} {method_cfg['output_unit']}/J (used in FMU u*dt)")
         print(f"     • End-of-Life: {stage_impacts['eol']:.4e} {method_cfg['output_unit']} (t=stop)")
         print(f"{'='*60}\n")
 

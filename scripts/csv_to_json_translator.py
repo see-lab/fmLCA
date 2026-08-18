@@ -7,9 +7,9 @@ with energy propagation for dynamic consumption rates.
 Features:
   • Automatic energy process detection (by unit: MJ, kWh, GJ, etc.)
   • Energy processes use amount_ref instead of hardcoded amounts
-  • Automatic unit conversion for energy metadata (standardized to MJ)
+    • Energy metadata retains original inventory base value and unit (no normalization)
   • Modern energy_metadata format with "value" field
-  • No conversion factors needed - handled by LCA engine
+    • Conversion to required analysis units is handled by lca_engine before impacts
 
 Usage:
     python scripts/csv_to_json_translator.py input.csv [output.json]
@@ -17,10 +17,11 @@ Usage:
 
 Energy Process Conversion:
   • CSV: "Water pump, 540, MJ" → JSON: "amount_ref": "energy_metadata.primary_input.value"
-  • CSV: "Electricity, 25, kWh" → Metadata: "value": 90.0 (converted to MJ)
+    • CSV: "Electricity, 25, kWh" → Metadata: "value": 25, "unit": "kWh"
   • All non-energy processes keep direct amounts
 
 Supports flexible CSV formats through configuration-driven field mapping.
+Lines beginning with '#' are treated as metadata/comments and ignored.
 """
 
 import csv
@@ -74,8 +75,8 @@ def convert_csv_to_lci_json_flexible(csv_file, output_file=None):
     print(f"   📁 Output: {output_file}")
     
     # Initialize managers
-    from config_manager import get_config
-    from lci_data_manager import LCIDataManager
+    from src.config_manager import get_config
+    from src.lci_data_manager import LCIDataManager
 
     config = get_config()
     lci_manager = LCIDataManager()
@@ -106,7 +107,7 @@ def test_with_lca_analysis(json_file, product_name):
     """Test the generated JSON with the LCA system"""
     try:
         # Import LCA system components
-        from lca_engine import run_lca_energy
+        from src.lca_engine import run_lca_energy
         
         # Test with default methods
         methods = ["IPCC 2021 climate change total excl biogenic GWP100"]
@@ -143,6 +144,9 @@ Examples:
   
   # With validation
   python scripts/csv_to_json_translator.py example --validate
+
+Metadata/comments:
+    # Lines starting with '#' in CSV files are ignored by the translator.
         """
     )
     
@@ -179,7 +183,7 @@ Examples:
         
         # Validation
         if args.validate:
-            from inventory_processor import validate_inventory_format
+            from src.lci_data_manager import validate_inventory_format
 
             print("   🔍 Validating JSON structure...")
             is_valid = validate_inventory_format(lci_data)

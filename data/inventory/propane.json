@@ -1,0 +1,264 @@
+{
+  "name": "Propane Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "propane production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Propane Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Propane_System_DB",
+        "Propane_1unit"
+      ]
+    },
+    {
+      "name": "Aluminum",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 15.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "39de88a95c4bc8f41284279cf3a5b3a0"
+      ],
+      "process_match": "aluminium production, primary, cast alloy slab from continuous casting"
+    },
+    {
+      "name": "Copper",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 15.0,
+      "location": "US",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "cbeb81298985f02ca088bddbb987d820"
+      ],
+      "process_match": "copper mine operation and beneficiation, sulfide ore"
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 7.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "632eadaaaba7cdf5119d0368e930a53a"
+      ],
+      "process_match": "electronics production, for control units"
+    },
+    {
+      "name": "Polymers (PVC, PE, rubber)",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 5.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "aa610f36311cdbd27f6e1d2235ee6109"
+      ],
+      "process_match": "polyvinylchloride production, bulk polymerisation"
+    },
+    {
+      "name": "Propane",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 1050.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "a977e4d800ba681098addd56720e3630"
+      ],
+      "process_match": "natural gas liquids fractionation"
+    },
+    {
+      "name": "Stainless steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 140.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "3a2caa153f4b39980c02f7a307874b83"
+      ],
+      "process_match": "market for steel, chromium steel 18/8"
+    },
+    {
+      "name": "Carbon steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 400.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "43d1be52900f5c223951b7698a215441"
+      ],
+      "process_match": "steel production, electric, low-alloyed"
+    },
+    {
+      "name": "Injection mold",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 5.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "63ea78293c97f602d88f5085811e53d1"
+      ],
+      "location": "RoW",
+      "process_match": "injection moulding"
+    },
+    {
+      "name": "Powder coat",
+      "unit": "m2",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 15.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "70dbfb5ec518c47e0a2e5524a321893d"
+      ],
+      "location": "RER",
+      "process_match": "powder coating, aluminium sheet"
+    },
+    {
+      "name": "Sheet rolling",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 15.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "b535b02a0b5bf294e2eed5337ffca6d4"
+      ],
+      "location": "GLO",
+      "process_match": "market for sheet rolling, aluminium"
+    },
+    {
+      "name": "Welding",
+      "unit": "m2",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6234c94191b279f7b7b38609e9f32db1"
+      ],
+      "location": "GLO",
+      "process_match": "market for welding, arc, steel"
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 7.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "b91739cb22b20891ee5d062d1d761f96"
+      ],
+      "location": "GLO",
+      "process_match": "market for wire drawing, steel"
+    },
+    {
+      "name": "Truck",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 349.2669235,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "b55984574fb40dc63cefa057201c367f"
+      ],
+      "process_match": "market for transport, freight, lorry 16-32 metric ton, EURO3"
+    },
+    {
+      "name": "Propane consumption",
+      "unit": "MJ",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "941fd1983e7c7b3c0e16ac8c2cb45bab"
+      ],
+      "process_match": "market for propane, burned in building machine"
+    },
+    {
+      "name": "Landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": 623.0,
+      "location": "Europe without Switzerland",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6f42c8e521c824591cc43ba21447560c"
+      ],
+      "process_match": "process-specific burdens, residual material landfill"
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Aluminum",
+        "Copper",
+        "Electronics",
+        "Polymers (PVC, PE, rubber)",
+        "Propane",
+        "Stainless steel",
+        "Carbon steel",
+        "Injection mold",
+        "Powder coat",
+        "Sheet rolling",
+        "Welding",
+        "Wire drawing"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "Truck"
+      ]
+    },
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "Propane consumption"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "Landfill"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 135000.0
+    }
+  },
+  "unlinked_exchanges": []
+}
