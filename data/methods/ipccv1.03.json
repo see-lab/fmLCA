@@ -9,7 +9,6 @@
       "midpoint": true,
       "time_horizon": 100,
       "brightway_tuple": [
-        "ecoinvent-3.10",
         "IPCC 2021",
         "climate change",
         "global warming potential (GWP100)"

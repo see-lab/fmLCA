@@ -11,6 +11,7 @@ The log-log axes keep low-magnitude stage impacts visible (e.g., EOL).
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 import json
 import math
@@ -190,8 +191,31 @@ def load_cached_lca_stage_scores(
 
     method_key = str(method_tuple)
 
+    def _parsed_tuple(raw_key: str) -> tuple[Any, ...] | None:
+        try:
+            parsed = ast.literal_eval(raw_key)
+        except (ValueError, SyntaxError):
+            return None
+        return tuple(parsed) if isinstance(parsed, (list, tuple)) else None
+
+    def _canonicalize_method_keys(payload: dict[str, Any]) -> bool:
+        changed = False
+        for section in ("stage_breakdown", "impact_results"):
+            section_map = payload.get(section)
+            if not isinstance(section_map, dict) or method_key in section_map:
+                continue
+            for existing_key in list(section_map.keys()):
+                parsed = _parsed_tuple(existing_key)
+                if parsed and tuple(parsed[-len(method_tuple):]) == method_tuple:
+                    section_map[method_key] = section_map.pop(existing_key)
+                    changed = True
+                    break
+        return changed
+
     for result_json in result_json_candidates:
         payload = json.loads(result_json.read_text(encoding="utf-8"))
+        if _canonicalize_method_keys(payload):
+            result_json.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
         stage_breakdown = payload.get("stage_breakdown") or {}
         stage_map = stage_breakdown.get(method_key)
