@@ -317,7 +317,7 @@ def plot_points(points: list[dict[str, Any]], output_png: Path, output_svg: Path
     ax.set_xlim(plot_min, plot_max)
     ax.set_ylim(plot_min, plot_max)
     ax.set_xlabel("SimaPro Score (kg CO2-eq)")
-    ax.set_ylabel("Brighway Score via LCA-FMU (kg CO2-eq)")
+    ax.set_ylabel("Brightway Score via LCA-FMU (kg CO2-eq)")
     ax.grid(False)
     ax.minorticks_on()
     ax.tick_params(which="major", direction="in")
