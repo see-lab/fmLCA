@@ -4,8 +4,8 @@
 Computes stage-wise percent difference as:
     (LCA-FMU - SimaPro) / SimaPro * 100
 
-Produces one scatter marker per product+stage pair and shades an approximate
-±0.5% parity band around y=x.
+Produces one scatter marker per product+stage pair and plots a y=x reference line.
+The log-log axes keep low-magnitude stage impacts visible (e.g., EOL).
 """
 
 from __future__ import annotations
