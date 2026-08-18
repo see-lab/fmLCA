@@ -45,7 +45,7 @@
       "name": "energy_input",
       "unit": "kWh",
       "description": "Energy input to the system",
-      "value": 1.0
+      "value": 4450.54
     }
   },
   "unlinked_exchanges": []
