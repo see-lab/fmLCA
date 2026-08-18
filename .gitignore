@@ -41,6 +41,7 @@ ENV/
 
 # Project specific ignores
 results/*.png
+results/*.svg
 results/*.json
 results/*.csv
 logs/*.log
