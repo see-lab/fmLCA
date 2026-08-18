@@ -452,7 +452,16 @@ def _resolve_fmi_var_metadata(input_unit: str, output_unit: str) -> Dict[str, Di
     out_unit_raw = (output_unit or "").strip()
 
     # Input: normalize power signal metadata for better importer behavior.
+    if in_unit_raw.upper() == "MW":
+        u_meta = {
+            "quantity": "Power",
+            "unit": "W",
+            "display_unit": "MW",
+            "unit_def": {
+                "name": "W",
+                "base_unit": {"kg": "1", "m": "2", "s": "-3"},
                 "display_units": [{"name": "MW", "factor": "1e6"}],
+            },
         }
     elif in_unit_raw.upper() == "W":
         u_meta = {

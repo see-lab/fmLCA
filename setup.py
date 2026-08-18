@@ -71,7 +71,7 @@ setup(
             "lca-fmu-create=scripts.create_fmu:main",
             "lca-fmu-csv2json=scripts.csv_to_json_translator:main",
             "lca-fmu-setup-brightway=scripts.setup_brightway:main",
-            "lca-fmu-setup-ecoinvent=scripts.setup_ecoinvent:main",
+            "lca-fmu-setup-ecoinvent=scripts.setup_brightway:main",
             "lca-fmu-setup-env=scripts.setup_environment:main",
             "lca-fmu-validate=scripts.validate_simple:main",
         ],
