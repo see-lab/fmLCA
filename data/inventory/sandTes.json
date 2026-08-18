@@ -1,0 +1,348 @@
+{
+  "name": "Sandtes Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "sandtes production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Sandtes Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Sandtes_System_DB",
+        "Sandtes_1unit"
+      ]
+    },
+    {
+      "name": "Silica sand",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 1400.0,
+      "location": "CH",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "9c4433c53c6413d47737f6f2011c9859"
+      ],
+      "process_match": "gravel and sand quarry operation"
+    },
+    {
+      "name": "Carbon steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 260.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6da8d63a29e38a11d9dd6341aa71e1ed"
+      ],
+      "process_match": "steel production, converter, low-alloyed"
+    },
+    {
+      "name": "Stainless steel",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 35.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6f9ddf8deb882d0e10f43fa9c9786a73"
+      ],
+      "process_match": "steel production, electric, chromium steel 18/8"
+    },
+    {
+      "name": "Nichrome alloy",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 8.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "d4f96bd0c19d8d5103cc176fef49f800"
+      ],
+      "process_match": "iron-nickel-chromium alloy production"
+    },
+    {
+      "name": "Stone wool",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 120.0,
+      "location": "CH",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "31ad4d4d882daf154bd418ee6198c54a"
+      ],
+      "process_match": "stone wool production, packed"
+    },
+    {
+      "name": "Gypsum board",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 60.0,
+      "location": "CH",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "fd315886219a55daf11ba96845ddfa14"
+      ],
+      "process_match": "gypsum plasterboard production"
+    },
+    {
+      "name": "Glass wool",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 18.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "aee12caed1a9a44e3cab4dc62f921289"
+      ],
+      "process_match": "glass wool mat production"
+    },
+    {
+      "name": "Copper",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 6.0,
+      "location": "US",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "cbeb81298985f02ca088bddbb987d820"
+      ],
+      "process_match": "copper mine operation and beneficiation, sulfide ore"
+    },
+    {
+      "name": "Aluminum",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 12.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "39de88a95c4bc8f41284279cf3a5b3a0"
+      ],
+      "process_match": "aluminium production, primary, cast alloy slab from continuous casting"
+    },
+    {
+      "name": "PVC",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 8.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "66962c4c8b0add26cfdea7c597596cc4"
+      ],
+      "process_match": "polyvinylchloride production, emulsion polymerisation"
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "632eadaaaba7cdf5119d0368e930a53a"
+      ],
+      "process_match": "electronics production, for control units"
+    },
+    {
+      "name": "Pump",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 1.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "4e2928b4504c3e801d5340b34dec8532"
+      ],
+      "process_match": "market for permanent magnet, for electric motor"
+    },
+    {
+      "name": "Polymer mfg",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 8.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "c033968cb16f64462f0f128aeb00a484"
+      ],
+      "process_match": "injection moulding"
+    },
+    {
+      "name": "Aluminum mfg",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 12.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "cdf7cdcfbf15f8baf489a054d69a0443"
+      ],
+      "process_match": "sheet rolling, aluminium"
+    },
+    {
+      "name": "Insulation mfg",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 198.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "728e9442b9d5e4a0d99ab487713021dc"
+      ],
+      "process_match": "market for thermoforming, with calendering"
+    },
+    {
+      "name": "Steel mfg",
+      "unit": "m",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6234c94191b279f7b7b38609e9f32db1"
+      ],
+      "process_match": "market for welding, arc, steel"
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 10.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "09927fa5d779bfd18ab68dc0302fd699"
+      ],
+      "process_match": "market for wire drawing, copper"
+    },
+    {
+      "name": "Truck",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 928.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "5059050b95b949d40f4f2547270bbd96"
+      ],
+      "process_match": "transport, freight, lorry >32 metric ton, EURO3"
+    },
+    {
+      "name": "Pumping electricity",
+      "unit": "MJ",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "c572d910a4ba5ed39f5397351a84e0ec"
+      ],
+      "process_match": "water pump operation, electric"
+    },
+    {
+      "name": "Water consumption",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount": 100.0,
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "6432893c7cc7a375544d55a57b4e1080"
+      ],
+      "process_match": "market for tap water"
+    },
+    {
+      "name": "Landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": 249.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "5a510c0368c448c8a12859349a44b615"
+      ],
+      "process_match": "market for process-specific burdens, inert material landfill"
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Silica sand",
+        "Carbon steel",
+        "Stainless steel",
+        "Nichrome alloy",
+        "Stone wool",
+        "Gypsum board",
+        "Glass wool",
+        "Copper",
+        "Aluminum",
+        "PVC",
+        "Electronics",
+        "Pump",
+        "Polymer mfg",
+        "Aluminum mfg",
+        "Insulation mfg",
+        "Steel mfg",
+        "Wire drawing"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "Truck"
+      ]
+    },
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "Pumping electricity",
+        "Water consumption"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "Landfill"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 540.0
+    }
+  },
+  "unlinked_exchanges": []
+}

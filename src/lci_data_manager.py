@@ -11,9 +11,39 @@ Supports CSV, JSON, and other formats with configurable mappings
 """
 
 import csv
+import io
 import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+
+
+def validate_inventory_format(data: Dict[str, Any]) -> bool:
+    """Validate core inventory structure for downstream LCA processing."""
+    required_fields = ["name", "unit", "exchanges"]
+    for field in required_fields:
+        if field not in data:
+            print(f"❌ Missing required field: {field}")
+            return False
+
+    if not isinstance(data["exchanges"], list):
+        print("❌ 'exchanges' must be a list")
+        return False
+
+    for i, exchange in enumerate(data["exchanges"]):
+        if not isinstance(exchange, dict):
+            print(f"❌ Exchange {i} is not a dictionary")
+            return False
+
+        if "type" not in exchange:
+            print(f"❌ Exchange {i} missing 'type' field")
+            return False
+
+        if exchange.get("type") == "production":
+            amount = exchange.get("amount")
+            if amount is not None and amount != 1.0:
+                print(f"⚠️  Production exchange should have amount=1.0, found {amount}")
+
+    return True
 
 # Handle both relative and absolute imports
 try:
@@ -73,14 +103,23 @@ class LCIDataManager:
     def import_from_csv(self, csv_file: Path) -> Dict[str, Any]:
         """Import from CSV with flexible column mapping"""
         with open(csv_file, 'r', encoding='utf-8') as f:
-            # Detect delimiter
-            sample = f.read(1024)
-            f.seek(0)
-            
-            delimiter = ',' if ',' in sample else '\t' if '\t' in sample else ';'
-            
-            reader = csv.DictReader(f, delimiter=delimiter)
-            rows = list(reader)
+            raw_lines = f.readlines()
+
+        # Skip metadata/comment lines (starting with '#') and blank lines.
+        data_lines = [
+            line for line in raw_lines
+            if line.strip() and not line.lstrip().startswith('#')
+        ]
+
+        if not data_lines:
+            raise ValueError(f"No CSV data lines found in file: {csv_file}")
+
+        # Detect delimiter from non-comment content.
+        sample = ''.join(data_lines[:20])
+        delimiter = ',' if ',' in sample else '\t' if '\t' in sample else ';'
+
+        reader = csv.DictReader(io.StringIO(''.join(data_lines)), delimiter=delimiter)
+        rows = [row for row in reader if any((v or '').strip() for v in row.values())]
         
         if not rows:
             raise ValueError(f"No data found in CSV file: {csv_file}")
@@ -359,37 +398,29 @@ class LCIDataManager:
         return unit_is_energy
     
     def determine_energy_value(self, energy_processes: List[Dict[str, Any]]) -> float:
-        """Determine the energy value from energy processes in the CSV"""
+        """Determine energy metadata value while preserving inventory base quantity."""
         if not energy_processes:
             return 100.0  # Default energy value if no energy processes found
         
-        # Use the amount from the first energy process as the baseline
+        # Use the first detected energy process as the inventory baseline.
         first_energy = energy_processes[0]
         original_amount = first_energy.get("original_amount", first_energy.get("amount", 100.0))
-        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ")).upper()
-        
-        # Convert to MJ if needed (our standard energy unit)
-        if original_unit in ["KWH", "KILOWATT HOUR"]:
-            # Convert kWh to MJ: 1 kWh = 3.6 MJ
-            energy_value_mj = original_amount * 3.6
-            print(f"   🔄 Converted {original_amount} kWh → {energy_value_mj} MJ for energy metadata")
-        elif original_unit in ["MJ", "MEGAJOULE"]:
-            energy_value_mj = original_amount
-        elif original_unit in ["GJ", "GIGAJOULE"]:
-            # Convert GJ to MJ: 1 GJ = 1000 MJ
-            energy_value_mj = original_amount * 1000
-            print(f"   🔄 Converted {original_amount} GJ → {energy_value_mj} MJ for energy metadata")
-        else:
-            # Unknown unit, assume MJ
-            energy_value_mj = original_amount
-            print(f"   ⚠️ Unknown energy unit '{original_unit}', assuming MJ")
-        
-        print(f"   ⚡ Energy metadata value: {energy_value_mj} MJ (from {original_amount} {original_unit})")
-        return energy_value_mj
+        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ"))
+
+        print(
+            "   ⚡ Energy metadata retained from inventory base: "
+            f"{original_amount} {original_unit}"
+        )
+        return float(original_amount)
     
     def determine_energy_unit(self, energy_processes: List[Dict[str, Any]]) -> str:
-        """Determine the energy unit for metadata (standardize to MJ)"""
-        return "MJ"  # Always use MJ as the standard energy unit in metadata
+        """Determine energy metadata unit while preserving inventory base unit."""
+        if not energy_processes:
+            return "MJ"
+
+        first_energy = energy_processes[0]
+        original_unit = first_energy.get("original_unit", first_energy.get("unit", "MJ"))
+        return str(original_unit).strip() or "MJ"
     
     def normalize_json_structure(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Normalize JSON structure for consistency"""

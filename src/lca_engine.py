@@ -76,7 +76,7 @@ def load_lcia_methods(methods_file):
             elif isinstance(item, dict):
                 # Enhanced format: method with metadata
                 name = item.get("name")
-                brightway_tuple = item.get("brightway_tuple")
+                brightway_tuple = item.get("brightway_tuple") or item.get("brightway_tuple_hint")
                 
                 # Use brightway_tuple if available, otherwise use name
                 method_key = tuple(brightway_tuple) if brightway_tuple else name
@@ -307,11 +307,30 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
         
         print(f"✅ Using primary database: {primary_db}")
         
-        # Process energy-based scaling
-        # Get base energy from LCI energy_metadata (if present) or use default
-        base_energy = lci_data.get('energy_metadata', {}).get('primary_input', {}).get('value', 180.0)
-        scaling_factor = energy_amount_mj / base_energy
-        print(f"🔄 Energy scaling: {energy_amount_mj} MJ / {base_energy} MJ (base) = {scaling_factor:.3f}x")
+        # Process energy-based scaling in base Joules to avoid unit assumptions.
+        primary_input = lci_data.get('energy_metadata', {}).get('primary_input', {})
+        base_energy_value = float(primary_input.get('value', 180.0))
+        base_energy_unit = str(primary_input.get('unit', 'MJ')).strip().upper()
+
+        to_j_factor = {
+            "J": 1.0,
+            "WH": 3.6e3,
+            "KWH": 3.6e6,
+            "MWH": 3.6e9,
+            "MJ": 1.0e6,
+            "GJ": 1.0e9,
+            "TJ": 1.0e12,
+        }.get(base_energy_unit)
+
+        if to_j_factor is None:
+            return {"error": f"Unsupported energy metadata unit: {base_energy_unit}"}
+
+        base_energy_j = base_energy_value * to_j_factor
+        if base_energy_j == 0:
+            return {"error": "Invalid energy metadata: primary_input.value is 0"}
+
+        target_energy_j = float(energy_amount_mj) * 1.0e6
+        scaling_factor = target_energy_j / base_energy_j
         
         # Create temporary database name
         process_name = lci_data.get('name', 'process').replace(' ', '_')
@@ -597,6 +616,48 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
         
         # Add technosphere exchanges
         exchanges = lci_data.get('exchanges', [])
+
+        def _normalize_energy_unit(unit: str) -> str:
+            u = str(unit or "").strip().lower()
+            aliases = {
+                "j": "J",
+                "joule": "J",
+                "joules": "J",
+                "mj": "MJ",
+                "megajoule": "MJ",
+                "megajoules": "MJ",
+                "mwh": "MWH",
+                "megawatt hour": "MWH",
+                "megawatt hours": "MWH",
+                "kwh": "KWH",
+                "kilowatt hour": "KWH",
+                "kilowatt hours": "KWH",
+                "wh": "WH",
+                "watt hour": "WH",
+                "watt hours": "WH",
+                "gj": "GJ",
+                "gigajoule": "GJ",
+                "gigajoules": "GJ",
+                "tj": "TJ",
+                "terajoule": "TJ",
+                "terajoules": "TJ",
+            }
+            return aliases.get(u, str(unit or "").upper())
+
+        def _to_j_factor(unit: str) -> float:
+            u = _normalize_energy_unit(unit)
+            factors = {
+                "J": 1.0,
+                "WH": 3.6e3,
+                "KWH": 3.6e6,
+                "MWH": 3.6e9,
+                "MJ": 1.0e6,
+                "GJ": 1.0e9,
+                "TJ": 1.0e12,
+            }
+            if u not in factors:
+                raise ValueError(f"Unsupported energy unit for conversion: {unit}")
+            return factors[u]
         
         for exchange in exchanges:
             if exchange.get('type') == 'technosphere':
@@ -609,9 +670,65 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                 if 'amount_ref' in exchange:
                     # Resolve the reference path (e.g., "energy_metadata.primary_input.value")
                     ref_path = exchange['amount_ref']
-                    base_amount = lci_data.get('energy_metadata', {}).get('primary_input', {}).get('value', 1.0)
-                    amount = base_amount * scaling_factor
-                    print(f"   ⚡ Energy exchange resolved: {base_amount} MJ (base) × {scaling_factor:.3f} = {amount:.3f} {exchange.get('unit', 'MJ')}")
+                    primary_input = lci_data.get('energy_metadata', {}).get('primary_input', {})
+                    base_amount_raw = float(primary_input.get('value', 1.0))
+                    base_unit_raw = str(primary_input.get('unit', 'MJ'))
+
+                    scaled_amount_raw = base_amount_raw * scaling_factor
+                    scaled_amount_j = scaled_amount_raw * _to_j_factor(base_unit_raw)
+
+                    # Prefer the linked Brightway activity unit to avoid mismatches.
+                    exchange_unit_raw = exchange.get('unit')
+                    activity_name = ''
+                    try:
+                        from bw2data import get_activity
+                        act = get_activity(input_key)
+                        activity_unit = str(act.get('unit', '') or '').strip()
+                        activity_name = str(act.get('name', '') or '').strip()
+                    except Exception:
+                        activity_unit = ''
+
+                    if activity_unit:
+                        if exchange_unit_raw and _normalize_energy_unit(exchange_unit_raw) != _normalize_energy_unit(activity_unit):
+                            print(
+                                "   ⚠️ Unit mismatch in inventory entry: "
+                                f"JSON unit '{exchange_unit_raw}' vs activity unit '{activity_unit}'. "
+                                "Using activity unit for conversion."
+                            )
+                        exchange_unit_raw = activity_unit
+
+                    if not exchange_unit_raw:
+                        exchange_unit_raw = 'MJ'
+
+                    base_unit_norm = _normalize_energy_unit(base_unit_raw)
+                    exchange_unit_norm = _normalize_energy_unit(exchange_unit_raw)
+
+                    # Convert via absolute Joule base, then to the activity exchange unit.
+                    to_exchange_factor_j = _to_j_factor(exchange_unit_raw)
+                    amount = scaled_amount_j / to_exchange_factor_j if to_exchange_factor_j else scaled_amount_j
+
+                    # Verification-first logging: only print conversion details if unit change is required.
+                    if base_unit_norm == exchange_unit_norm:
+                        target_desc = activity_name if activity_name else exchange.get('name', 'Unknown')
+                        print(
+                            "   ✅ Energy unit verification: "
+                            f"metadata unit {base_unit_norm} matches assigned inventory unit {exchange_unit_norm} "
+                            f"for '{target_desc}'."
+                        )
+                    else:
+                        # Print conversion using absolute dataset values (non-normalized).
+                        base_amount_exchange_abs = (
+                            (base_amount_raw * _to_j_factor(base_unit_raw)) / to_exchange_factor_j
+                            if to_exchange_factor_j else base_amount_raw
+                        )
+                        unit_for_factor = exchange_unit_norm
+
+                        print(
+                            "⚡Energy unit conversion to base J: "
+                            f"{base_amount_exchange_abs:.6e} {unit_for_factor} x "
+                            f"{to_exchange_factor_j:.6e} J/{unit_for_factor} = "
+                            f"{(base_amount_raw * _to_j_factor(base_unit_raw)):.6e} J"
+                        )
                 else:
                     # Direct amount (non-energy exchanges are not scaled)
                     amount = exchange.get('amount', 1.0)
@@ -619,7 +736,7 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                 process_data[process_key]['exchanges'].append({
                     'name': exchange.get('name', 'Unknown'),
                     'amount': amount,
-                    'unit': exchange.get('unit', 'kg'),
+                    'unit': exchange_unit_raw if 'amount_ref' in exchange else exchange.get('unit', 'kg'),
                     'type': 'technosphere',
                     'input': input_key
                 })
@@ -636,10 +753,23 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
 def resolve_lcia_methods(method_names):
     """Resolve LCIA method names to actual method objects"""
     available_methods = list(methods)
+    available_set = set(available_methods)
     resolved = []
     
     for method_name in method_names:
-        keywords = method_name.lower().split()
+        # 1) Exact tuple/list methods (preferred when provided)
+        if isinstance(method_name, (tuple, list)):
+            candidate = tuple(method_name)
+            if candidate in available_set:
+                resolved.append(candidate)
+                print(f"   ✅ Resolved (exact tuple): {simplify_method_name(str(candidate))}")
+                continue
+
+            # Fallback: tuple component search if exact tuple is unavailable
+            keywords = [str(part).lower() for part in candidate if str(part).strip()]
+        else:
+            # 2) String keyword matching (legacy behavior)
+            keywords = str(method_name).lower().split()
         
         # Find methods containing all keywords
         matching_methods = []
@@ -650,7 +780,7 @@ def resolve_lcia_methods(method_names):
         
         if matching_methods:
             # Prefer methods without "no LT"
-            preferred = [m for m in matching_methods if 'no LT' not in str(m)]
+            preferred = [m for m in matching_methods if 'no lt' not in str(m).lower()]
             selected = preferred[0] if preferred else matching_methods[0]
             resolved.append(selected)
             print(f"   ✅ Resolved: {simplify_method_name(str(selected))}")
@@ -683,12 +813,32 @@ def calculate_stage_breakdown_with_lca(lci_data, lca_obj, method_unit, temp_db_n
         stage_breakdown[stage_name] = {"score": 0.0, "unit": method_unit}
     
     try:
-        # Build a mapping: exchange name -> life_cycle_stage
-        exchange_to_stage = {}
+        def _norm(text):
+            return " ".join(str(text or "").lower().split())
+
+        # Build robust mappings from original LCI exchanges.
+        input_to_stage = {}
+        process_match_to_stage = {}
+        name_to_stage = {}
         for exc in lci_data.get('exchanges', []):
+            if exc.get('type') != 'technosphere':
+                continue
+
             stage = exc.get('life_cycle_stage')
-            if stage:
-                exchange_to_stage[exc.get('name', '')] = stage
+            if not stage:
+                continue
+
+            inp = exc.get('input') or []
+            if len(inp) >= 2 and inp[0] and inp[1]:
+                input_to_stage[(inp[0], inp[1])] = stage
+
+            process_match = _norm(exc.get('process_match'))
+            if process_match:
+                process_match_to_stage[process_match] = stage
+
+            exc_name = _norm(exc.get('name'))
+            if exc_name:
+                name_to_stage[exc_name] = stage
         
         # Get the main process activity
         from bw2data import get_activity
@@ -698,13 +848,38 @@ def calculate_stage_breakdown_with_lca(lci_data, lca_obj, method_unit, temp_db_n
         for exc in main_act.technosphere():
             inp_act = exc.input
             inp_name = inp_act.get('name', '')
-            
+
             # Find which stage this exchange belongs to
             matched_stage = None
-            for exc_name, stage_name in exchange_to_stage.items():
-                if exc_name.lower() in inp_name.lower() or inp_name.lower() in exc_name.lower():
-                    matched_stage = stage_name
-                    break
+
+            # 1) Preferred: exact input (database, code) match
+            inp_key = None
+            try:
+                inp_key = tuple(inp_act.key)
+            except Exception:
+                try:
+                    inp_key = (inp_act.get('database'), inp_act.get('code'))
+                except Exception:
+                    inp_key = None
+
+            if inp_key and inp_key in input_to_stage:
+                matched_stage = input_to_stage[inp_key]
+
+            # 2) Fallback: process_match name against Brightway activity name
+            if not matched_stage:
+                norm_inp_name = _norm(inp_name)
+                for pm_name, stage_name in process_match_to_stage.items():
+                    if pm_name and (pm_name in norm_inp_name or norm_inp_name in pm_name):
+                        matched_stage = stage_name
+                        break
+
+            # 3) Last fallback: item/display name matching
+            if not matched_stage:
+                norm_inp_name = _norm(inp_name)
+                for exc_name, stage_name in name_to_stage.items():
+                    if exc_name and (exc_name in norm_inp_name or norm_inp_name in exc_name):
+                        matched_stage = stage_name
+                        break
             
             if not matched_stage:
                 matched_stage = 'Unassigned'
@@ -915,6 +1090,23 @@ def simplify_method_name(method_str):
             
     except:
         return method_str[:30] + "..." if len(method_str) > 30 else method_str
+
+
+def _energy_to_mj(value, unit):
+    """Convert an energy value to MJ for run_lca_energy input semantics."""
+    factors_to_mj = {
+        "J": 1.0e-6,
+        "WH": 3.6e-3,
+        "KWH": 3.6,
+        "MWH": 3600.0,
+        "MJ": 1.0,
+        "GJ": 1000.0,
+        "TJ": 1.0e6,
+    }
+    norm = str(unit or "MJ").strip().upper()
+    if norm not in factors_to_mj:
+        raise ValueError(f"Unsupported energy unit: {unit}")
+    return float(value) * factors_to_mj[norm]
 
 def create_visualization(results, output_file="lca_results.png"):
     """
@@ -1199,11 +1391,27 @@ Examples:
     
     # Placeholder functional unit
     functional_unit = {("LCA_DB", "process_1"): 1.0}
+
+    # Use inventory-defined base energy as the default analysis basis.
+    try:
+        with open(lci_file, "r", encoding="utf-8") as f:
+            preview = json.load(f)
+        primary_input = preview.get("energy_metadata", {}).get("primary_input", {})
+        base_value = float(primary_input.get("value", 1.0))
+        base_unit = str(primary_input.get("unit", "MJ"))
+        energy_amount_mj = _energy_to_mj(base_value, base_unit)
+        print(
+            "Energy basis: using inventory base input "
+            f"{base_value} {base_unit} ({energy_amount_mj:.6g} MJ)"
+        )
+    except Exception as e:
+        print(f"⚠️ Could not resolve inventory base energy ({e}); falling back to 1.0 MJ")
+        energy_amount_mj = 1.0
     
     print("Starting LCA analysis...")
     
-    # Run LCA (energy amount is determined by inventory file)
-    results = run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=1.0)
+    # Run LCA using inventory base energy by default.
+    results = run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=energy_amount_mj)
     
     # Generate output filenames based on inventory and method
     inventory_name = Path(lci_file).stem  # e.g., "example", "grid"

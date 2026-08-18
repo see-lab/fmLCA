@@ -1,0 +1,15 @@
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Propane (of project EnergyStorage)
+Method: 	IPCC 2021 GWP100 V1.03
+Indicator: 	Damage assessment
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Propane_Production	Propane_Transport	Propane_Use	Propane_End-Of-Life
+GWP100	kg CO2-eq	15474.848	2631.7552	68.408051	12772.578	2.1075758

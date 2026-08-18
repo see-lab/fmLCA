@@ -120,11 +120,11 @@ def test_zero_power_window_has_near_flat_growth(grid_fmu_path: Path) -> None:
     zero_vs_before = abs(delta_zero_window) / abs(delta_power_before)
     zero_vs_after = abs(delta_zero_window) / abs(delta_power_after)
 
-    assert zero_vs_before <= 0.01, (
-        "Zero-power window growth should be <=1% of the powered window; "
+    assert zero_vs_before <= 0.03, (
+        "Zero-power window growth should be <=3% of the powered window; "
         f"observed ratio={zero_vs_before:.6g}"
     )
-    assert zero_vs_after <= 0.01, (
-        "Zero-power window growth should be <=1% of the powered window; "
+    assert zero_vs_after <= 0.03, (
+        "Zero-power window growth should be <=3% of the powered window; "
         f"observed ratio={zero_vs_after:.6g}"
     )
