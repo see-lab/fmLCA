@@ -597,7 +597,7 @@ def fix_fmu_metadata(fmu_path: Path,
                     output_unit: str,
                     output_description: str,
                     input_var: str = "u",
-                    input_unit: str = "MW",
+                    input_unit: str = "W",
                     default_step_size: Optional[float] = None) -> Path:
     """
     Fix FMU ModelDescription.xml metadata.
