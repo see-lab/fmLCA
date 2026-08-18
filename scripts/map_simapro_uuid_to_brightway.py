@@ -46,12 +46,17 @@ def default_output_path(csv_path: Path) -> Path:
     return PROJECT_ROOT / "data" / "inventory" / f"{csv_path.stem}-populated.csv"
 
 
+def is_metadata_line(line: str) -> bool:
+    s = line.lstrip()
+    return s.startswith("#") or s.startswith('"#') or s.startswith("'#")
+
+
 def read_inventory_csv(path: Path) -> Tuple[List[str], List[str], List[Dict[str, str]]]:
     with path.open("r", encoding="utf-8", newline="") as f:
         raw_lines = f.readlines()
 
-    metadata_lines = [line for line in raw_lines if line.lstrip().startswith("#")]
-    data_lines = [line for line in raw_lines if line.strip() and not line.lstrip().startswith("#")]
+    metadata_lines = [line for line in raw_lines if is_metadata_line(line)]
+    data_lines = [line for line in raw_lines if line.strip() and not is_metadata_line(line)]
 
     if not data_lines:
         raise ValueError(f"No CSV data rows found in: {path}")
@@ -145,8 +150,22 @@ def significant_tokens(s: str) -> List[str]:
 
 
 def build_queries(parsed: Dict[str, str]) -> List[str]:
-    # Minimal variants by design.
-    queries = [parsed["activity_name"], parsed["process_name"]]
+    activity_name = (parsed.get("activity_name") or "").strip()
+    process_name = (parsed.get("process_name") or "").strip()
+    compact_activity = re.sub(r"[,;:]+", " ", activity_name)
+    compact_process = re.sub(r"[,;:]+", " ", process_name)
+    token_query = " ".join(significant_tokens(activity_name or process_name)[:7])
+    joined_token_query = " ".join(significant_tokens(f"{process_name} {activity_name}")[:10])
+
+    queries = [
+        activity_name,
+        process_name,
+        compact_activity,
+        compact_process,
+        token_query,
+        joined_token_query,
+        normalize(activity_name),
+    ]
     seen = set()
     unique = []
     for q in queries:
@@ -178,6 +197,14 @@ def score_candidate(activity: Dict, parsed: Dict[str, str]) -> int:
     if process_name and process_name in cand_name:
         score += 25
 
+    target_tokens = set(significant_tokens(parsed["activity_name"]))
+    cand_tokens = set(significant_tokens(activity.get("name", "")))
+    if target_tokens and cand_tokens:
+        overlap = len(target_tokens & cand_tokens)
+        score += 10 * overlap
+        if overlap == len(target_tokens):
+            score += 25
+
     # Penalize semantic drift when target intent is explicit.
     if " production " in f" {target_name} " and " production " not in f" {cand_name} ":
         score -= 25
@@ -198,20 +225,35 @@ def score_candidate(activity: Dict, parsed: Dict[str, str]) -> int:
 def is_acceptable_match(activity: Dict, parsed: Dict[str, str], min_similarity: float = 0.72) -> bool:
     cand_name_raw = (activity.get("name") or "").strip()
     target_name_raw = (parsed.get("activity_name") or "").strip()
+    process_name_raw = (parsed.get("process_name") or "").strip()
     cand_name = normalize(cand_name_raw)
     target_name = normalize(target_name_raw)
+    process_name = normalize(process_name_raw)
 
     if not cand_name or not target_name:
         return False
 
     similarity = SequenceMatcher(None, target_name, cand_name).ratio()
-    if similarity < min_similarity:
+    process_similarity = SequenceMatcher(None, process_name, cand_name).ratio() if process_name else 0.0
+    if max(similarity, process_similarity) < min_similarity:
         return False
 
     target_tokens = set(significant_tokens(target_name_raw))
+    process_tokens = set(significant_tokens(process_name_raw))
     candidate_tokens = set(significant_tokens(cand_name_raw))
-    if target_tokens and not target_tokens.issubset(candidate_tokens):
-        return False
+    token_bases = [target_tokens]
+    if process_tokens:
+        token_bases.append(target_tokens | process_tokens)
+
+    if any(token_bases):
+        overlap_ratio = 0.0
+        for base in token_bases:
+            if not base:
+                continue
+            overlap = len(base & candidate_tokens)
+            overlap_ratio = max(overlap_ratio, overlap / max(len(base), 1))
+        if overlap_ratio < 0.60:
+            return False
 
     # If SimaPro explicitly says "production", do not accept non-production activities.
     if " production " in f" {target_name} " and " production " not in f" {cand_name} ":
@@ -226,7 +268,7 @@ def is_acceptable_match(activity: Dict, parsed: Dict[str, str], min_similarity: 
     return True
 
 
-def find_best_activity(db: bd.Database, parsed: Dict[str, str], limit_per_query: int = 12) -> Optional[Dict]:
+def find_best_activity(db: bd.Database, parsed: Dict[str, str], limit_per_query: int = 30) -> Optional[Dict]:
     candidates = {}
 
     for query in build_queries(parsed):
@@ -315,7 +357,7 @@ def main() -> None:
         description="Map SimaPro UUID inventory rows to Brightway activities using Inventory Selection names",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("csv_path", nargs="?", default="bess", help="Input CSV path or inventory stem")
+    parser.add_argument("csv_path", nargs="?", default="example", help="Input CSV path or inventory stem")
     parser.add_argument("--output-csv", default=None, help="Output CSV path")
     parser.add_argument("--in-place", action="store_true", help="Write results back to input CSV")
     parser.add_argument("--dry-run", action="store_true", help="Run matching but do not write output")
