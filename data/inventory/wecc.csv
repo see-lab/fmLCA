@@ -1,0 +1,7 @@
+# Version: 1.0
+# Date: August 12 2026
+# Description: Grid consumption only for the Western Electricity Coordinating Council (WECC) region of the United States.
+#               Case study site: San Francisco CA
+# 4450.54 kWh/year
+Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,Brightway Match Code,Brightway Match Key,Description
+Use,Grid energy,"market for electricity, low voltage","Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",1,kWh,ecoinvent-3.12-cutoff,16075,f1896ce156e61662bc1dab03de703e0b,"('ecoinvent-3.12-cutoff', 'f1896ce156e61662bc1dab03de703e0b')","Electricity, low voltage, in the Western USA (incl. California) | Brightway: market for electricity, low voltage | US-WECC" 

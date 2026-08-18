@@ -24,10 +24,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 900.0,
+      "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "17b8810b-980e-553b-bc36-2b618d60de7e"
-      ]
+        "46c7a294d0b06ed3004c0158f2387073"
+      ],
+      "process_match": "battery cell production, Li-ion, NMC811"
     },
     {
       "name": "Inverter",
@@ -35,10 +37,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 1.0,
+      "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "96e974e5-313a-5edb-827e-546233ed055a"
-      ]
+        "f85d93ed99a8631a2dfda3be7dd8194c"
+      ],
+      "process_match": "inverter production, 0.5kW"
     },
     {
       "name": "Electronics housing",
@@ -46,10 +50,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 10.0,
+      "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "04212d2d-b271-54c1-96d3-e5f0f89ce20e"
-      ]
+        "3c187b384218a3c75c961bc3556576de"
+      ],
+      "process_match": "polypropylene production, granulate"
     },
     {
       "name": "Wiring",
@@ -57,10 +63,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 20.0,
+      "location": "US",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "848c507a-bf63-55fe-806c-cce2ec49e197"
-      ]
+        "cbeb81298985f02ca088bddbb987d820"
+      ],
+      "process_match": "copper mine operation and beneficiation, sulfide ore"
     },
     {
       "name": "Electronics",
@@ -68,10 +76,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 10.0,
+      "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "b88ece4b-cff4-5bc6-871b-632757248445"
-      ]
+        "632eadaaaba7cdf5119d0368e930a53a"
+      ],
+      "process_match": "electronics production, for control units"
     },
     {
       "name": "Injection molding",
@@ -79,10 +89,12 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 10.0,
+      "location": "CA-QC",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "17b8810b-980e-553b-bc36-2b618d60de7e"
-      ]
+        "c033968cb16f64462f0f128aeb00a484"
+      ],
+      "process_match": "injection moulding"
     },
     {
       "name": "Wire drawing",
@@ -90,10 +102,51 @@
       "type": "technosphere",
       "life_cycle_stage": "Production",
       "amount": 20.0,
+      "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
-        "14ba74a0-11f1-54c2-a187-5eb6f3d7eea1"
-      ]
+        "4e6d4f0f9f56b770580da017e61dcbc6"
+      ],
+      "process_match": "wire drawing, copper"
+    },
+    {
+      "name": "Ocean freight",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 13892.0,
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "adfdb80aa11ef79207fe78da285a5320"
+      ],
+      "process_match": "transport, freight, sea, container ship"
+    },
+    {
+      "name": "Truck",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 1528.0,
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "5059050b95b949d40f4f2547270bbd96"
+      ],
+      "process_match": "transport, freight, lorry >32 metric ton, EURO3"
+    },
+    {
+      "name": "Landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": 1280.0,
+      "input": [
+        "ecoinvent-3.10-cutoff",
+        "d36fed351a206298d821449cc2634f60"
+      ],
+      "location": "RoW",
+      "process_match": "process-specific burdens, inert material landfill"
     }
   ],
   "life_cycle_stages": {
@@ -107,6 +160,19 @@
         "Electronics",
         "Injection molding",
         "Wire drawing"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "Ocean freight",
+        "Truck"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "Landfill"
       ]
     }
   },

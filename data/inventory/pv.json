@@ -1,0 +1,139 @@
+{
+  "name": "Pv Production System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "pv production"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Pv Production System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Pv_System_DB",
+        "Pv_1unit"
+      ]
+    },
+    {
+      "name": "market for photovoltaic panel, single-Si wafer",
+      "unit": "m2",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 38.0,
+      "location": "GLO"
+    },
+    {
+      "name": "inverter production, 0.5kW",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 76.0,
+      "location": "RoW"
+    },
+    {
+      "name": "market for steel, low-alloyed",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 350.0,
+      "location": "GLO"
+    },
+    {
+      "name": "market for aluminium, wrought alloy",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 160.0,
+      "location": "GLO"
+    },
+    {
+      "name": "wire drawing, copper",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": 45.0,
+      "location": "RoW"
+    },
+    {
+      "name": "transport, freight, sea, container ship",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 7000.0,
+      "location": "GLO"
+    },
+    {
+      "name": "transport, freight, lorry, unspecified",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": 900.0,
+      "location": "RoW"
+    },
+    {
+      "name": "market for electricity, low voltage",
+      "unit": "kWh",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "location": "Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f1896ce156e61662bc1dab03de703e0b"
+      ]
+    },
+    {
+      "name": "process-specific burdens, inert material landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": 850.0,
+      "location": "RoW"
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "market for photovoltaic panel, single-Si wafer",
+        "inverter production, 0.5kW",
+        "market for steel, low-alloyed",
+        "market for aluminium, wrought alloy",
+        "wire drawing, copper"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "transport, freight, sea, container ship",
+        "transport, freight, lorry, unspecified"
+      ]
+    },
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "market for electricity, low voltage"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "process-specific burdens, inert material landfill"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "kWh",
+      "description": "Energy input to the system",
+      "value": 38.0
+    }
+  },
+  "unlinked_exchanges": []
+}
