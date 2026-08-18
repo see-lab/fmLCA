@@ -227,8 +227,7 @@ def main() -> int:
         # Report delivered energy to make power-vs-energy interpretation explicit.
         time = np.array(result["time"], dtype=np.float64)
         u = np.array(result["u"], dtype=np.float64)
-        energy_mwh = float(np.trapezoid(u, time) / 3600.0)
-
+        energy_mwh = float(np.trapezoid(u, time) / 3.6e9)  # W*s -> J -> MWh
         print(
             f"✅ Simulation complete: {len(result['time'])} points, "
             f"y_final = {result['y'][-1]:.6g}"
