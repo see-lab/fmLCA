@@ -1,0 +1,15 @@
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Sand Battery (of project EnergyStorage)
+Method: 	IPCC 2021 GWP100 V1.03
+Indicator: 	Damage assessment
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Sand_Production	Sand_Transport	Sand_Use	Sand_End-of-Life
+GWP100	kg CO2-eq	1839.108	1726.8304	100.97415	10.583923	0.71950493
