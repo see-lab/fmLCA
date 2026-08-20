@@ -14,6 +14,7 @@ Built with Brightway 2.5 and ecoinvent integration.
 ## Features
 
 - **Dynamic Energy Propagation** - Energy scaling throughout LCA calculations
+- **Parameterized Subsystems** - Combine multiple CSV inventories with parameters (e.g., n_pv, n_bess)
 - **Automatic Process Detection** - Zero-config CSV import with energy process recognition
 - **FMU Generation** - Create functional mockup units for co-simulation
 - **IPCC 2021 & IMPACT World+** - 728+ LCIA methods including climate change indicators
@@ -56,10 +57,14 @@ python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
 
 ### Convert CSV to JSON for LCI import
 
-
 ```bash
-# Auto-detect energy processes and convert CSV
+# Single file - auto-detect energy processes and convert CSV
+# Parameterized single files are the same command. Parameter metadata is auto detected.
 python scripts/csv_to_json_translator.py example.csv
+
+# Combine multiple parameterized subsystems, with a declared output name
+# Default output name is `example1_example2_combined.json'
+python scripts/csv_to_json_translator.py example1 example2 --output combined_system.json
 ```
 
 ### Run LCA Analysis
