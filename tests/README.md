@@ -50,3 +50,34 @@ Outputs:
 
 - Store expected values in plain text files under `tests/reference_results/`
 - Use `key=value` pairs for easy parsing in tests
+
+## Parameterization Tests (NEW - August 2026)
+
+### `test_parameter_lca.py`
+**Purpose:** 	Validate that LCA impacts scale proportionally with inventory parameters
+
+**Usage:**
+```bash
+python tests/test_parameter_lca.py
+```
+
+**What it tests:**
+- Loads `example.json` with `n_units` parameter
+- Runs LCA with `n_units = 1, 5, 10`
+- Validates impacts scale proportionally (5x and 10x)
+- Verifies within 1% tolerance
+
+### `test_parameter_propegation.py`
+**Purpose:** 	Test parameter extraction and multi-file combination.
+				This essentially is a formatting check.
+
+**Usage:**
+```bash
+python tests/test_parameter_propegation.py
+```
+
+**What it tests:**
+- Single CSV parameter extraction
+- Multiple CSV file combination  
+- Parameter propagation to exchanges
+- JSON output structure validation
