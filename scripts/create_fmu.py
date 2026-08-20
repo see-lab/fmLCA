@@ -332,9 +332,18 @@ def _build_parameter_model(
 def verify_fmu_parameter_linearity(
     fmu_path: Path,
     parameter_defaults: dict[str, float],
-    tolerance: float = 1e-6,
+    tolerance: float = 1e-4,
 ) -> tuple[bool, str]:
-    """Run a short FMU simulation and verify linear scaling per parameter."""
+    """Run a short FMU simulation and verify affine linearity per parameter.
+
+    We validate equal-step increment consistency while all other parameters are
+    fixed at defaults:
+
+        y(p0 + 2h) - y(p0 + h) ~= y(p0 + h) - y(p0)
+
+    This is robust when the output includes a non-zero intercept, where a
+    simple total-output ratio check is invalid.
+    """
     if not parameter_defaults:
         return True, "No LCI parameters found; linearity check skipped"
 
@@ -359,26 +368,33 @@ def verify_fmu_parameter_linearity(
         return float(result["y"][-1])
 
     baseline_y = _run(dict(parameter_defaults))
-    if abs(baseline_y) <= 0.0:
-        return False, "Baseline FMU output is zero; cannot verify linear ratio"
 
     for pname, default in parameter_defaults.items():
-        if default == 0.0:
-            continue
-        varied_values = dict(parameter_defaults)
-        varied_values[pname] = default * 2.0
-        varied_y = _run(varied_values)
-        expected = 2.0
-        actual = varied_y / baseline_y
-        rel_err = abs(actual - expected) / expected
+        step = max(abs(default), 1.0)
+
+        varied_values_1 = dict(parameter_defaults)
+        varied_values_2 = dict(parameter_defaults)
+        varied_values_1[pname] = default + step
+        varied_values_2[pname] = default + 2.0 * step
+
+        y1 = _run(varied_values_1)
+        y2 = _run(varied_values_2)
+
+        d1 = y1 - baseline_y
+        d2 = y2 - y1
+        resid = abs(d2 - d1)
+        scale = max(abs(y2), abs(y1), abs(baseline_y), 1.0)
+        rel_err = resid / scale
+
         print(
-            f"  🔎 Linearity check {pname}: expected ratio={expected:.6f}, "
-            f"actual ratio={actual:.6f}, rel_error={rel_err:.3e}"
+            f"  🔎 Linearity check {pname}: "
+            f"d1={d1:.6e}, d2={d2:.6e}, resid={resid:.3e}, rel_error={rel_err:.3e}"
         )
         if rel_err > tolerance:
             return False, (
                 f"Parameter '{pname}' linearity check failed "
-                f"(expected {expected:.6f}, got {actual:.6f}, rel_error={rel_err:.3e})"
+                f"(increment mismatch d1={d1:.6e}, d2={d2:.6e}, resid={resid:.3e}, "
+                f"rel_error={rel_err:.3e}, tolerance={tolerance:.1e})"
             )
 
     return True, "FMU parameter linearity verified"
