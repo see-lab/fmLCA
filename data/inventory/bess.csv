@@ -1,7 +1,10 @@
-# Version: 1.0,,,,,,,,,,,
-# Date: August 6 2026,,,,,,,,,,,
-# Description: Battery energy storage system inventory.,,,,,,,,,,,
-# Functional unit: 200 kWh energy discharged from storage during use over a 15-year lifetime,,,,,,,,,,,
+# Version: 2.0
+# Date: August 18 2026
+# Description: Battery energy storage system inventory
+# Functional unit: 200 kWh/n_bess energy discharged from storage during use over a 15-year lifetime
+# Parameter: n_bess
+# Parameter_Description: Number of battery energy storage systems
+# Parameter_Default: 1.0
 Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,UUID-Source,Brightway Match Code,Brightway Match Key,Description,Brightway Match Name,Brightway Match Database,Brightway Match Location,Brightway Match Ref Product
 Production,Battery,"Battery cell, Li-ion, NMC811 {RoW}| battery cell production, Li-ion, NMC811 | Cut-off, U",RoW,900,kg,ecoinvent-3.10-cutoff,17b8810b-980e-553b-bc36-2b618d60de7e,SimaPro,46c7a294d0b06ed3004c0158f2387073,"('ecoinvent-3.10-cutoff', '46c7a294d0b06ed3004c0158f2387073')",NMC type,"battery cell production, Li-ion, NMC811",ecoinvent-3.10-cutoff,RoW,"battery cell, Li-ion, NMC811"
 Production,Inverter,"Inverter, 0.5kW {RoW}| inverter production, 0.5kW | Cut-off, U",RoW,1,p,ecoinvent-3.10-cutoff,96e974e5-313a-5edb-827e-546233ed055a,SimaPro,f85d93ed99a8631a2dfda3be7dd8194c,"('ecoinvent-3.10-cutoff', 'f85d93ed99a8631a2dfda3be7dd8194c')","Power electronics, magnetics, heat sinks, casing","inverter production, 0.5kW",ecoinvent-3.10-cutoff,RoW,"inverter, 0.5kW"

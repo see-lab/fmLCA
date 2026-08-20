@@ -1,8 +1,8 @@
-# Version: 1.0
-# Date: August 14 2026
-# Description: Cradle-to-grave inventory template for a ground-mounted crystalline-silicon PV system.
+# Version: 2.0
+# Date: August 18 2026
+# Description: Cradle-to-grave inventory for a ground-mounted crystalline-silicon PV system.
 # Functional unit context: 38 m2 active module area - nominal irradiance 1000 W/m2 (≈38 kW instantaneous DC nameplate at STC).
-# Dynamic base input for FMU: 38 kWh (1 hour at 1000 W/m2 and 38 m2 before conversion losses).
+# Dynamic base input for FMU: 38 kWh (1 hour at 1000 W/m2 and 38 m2 before conversion losses) per functional unit. 
 #
 # Reference guidance (peer-reviewed / scholarly LCA context):
 #  - de Wild-Scholten, M. (2013). Energy payback time and carbon footprint of commercial PV systems. Prog. Photovolt., 21, 229-241.
@@ -12,6 +12,11 @@
 # Notes:
 #  - ecoinvent 3.12 cutoff activities are used as foreground proxies.
 #  - Quantities below are engineering-scale approximations anchored to the references above and should be site/spec-specific refined.
+#  - Functional unit is parameterized based on the number of PV panels (n_pv).
+#  - Grid power during use is not within this file but included externally 
+# Parameter: n_pv
+# Parameter_Description: Number of PV panels in the system
+# Parameter_Default: 1.0
 Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,Brightway Match Code,Brightway Match Key,Description
 Production,"market for photovoltaic panel, single-Si wafer","Photovoltaic panel, single-Si wafer {GLO}| market for photovoltaic panel, single-Si wafer | Cut-off, U",GLO,38,m2,ecoinvent-3.12-cutoff,,,,"Crystalline-Si module supply scaled to 38 m2 active area"
 Production,"inverter production, 0.5kW","Inverter, 0.5kW {RoW}| inverter production, 0.5kW | Cut-off, U",RoW,76,p,ecoinvent-3.12-cutoff,,,,"Approximate inverter capacity matching 38 kW system (76 x 0.5 kW units equivalent)"
@@ -20,5 +25,4 @@ Production,"market for aluminium, wrought alloy","Aluminium, wrought alloy {GLO}
 Production,"wire drawing, copper","Wire drawing, copper {RoW}| wire drawing, copper | Cut-off, U",RoW,45,kg,ecoinvent-3.12-cutoff,,,,"DC/AC cabling and electrical interconnects"
 Transport,"transport, freight, sea, container ship","Transport, freight, sea, container ship {GLO}| transport, freight, sea, container ship | Cut-off, U",GLO,7000,tkm,ecoinvent-3.12-cutoff,,,,"Representative international module supply transport"
 Transport,"transport, freight, lorry, unspecified","Transport, freight, lorry, unspecified {RoW}| transport, freight, lorry, unspecified | Cut-off, U",RoW,900,tkm,ecoinvent-3.12-cutoff,,,,"Regional inland freight transport"
-Use,"market for electricity, low voltage","market for electricity, low voltage","Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",38,kWh,ecoinvent-3.12-cutoff,16075,f1896ce156e61662bc1dab03de703e0b,"('ecoinvent-3.12-cutoff', 'f1896ce156e61662bc1dab03de703e0b')","Dynamic FMU base energy reference at nominal irradiance (1000 W/m2) over 1 hour"
 End-of-life,"process-specific burdens, inert material landfill","Process-specific burdens, inert material landfill {RoW}| process-specific burdens, inert material landfill | Cut-off, U",RoW,850,kg,ecoinvent-3.12-cutoff,,,,"End-of-life disposal proxy for module/BOS residuals"

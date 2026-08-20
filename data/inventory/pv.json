@@ -75,18 +75,6 @@
       "location": "RoW"
     },
     {
-      "name": "market for electricity, low voltage",
-      "unit": "kWh",
-      "type": "technosphere",
-      "life_cycle_stage": "Use",
-      "amount_ref": "energy_metadata.primary_input.value",
-      "location": "Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "f1896ce156e61662bc1dab03de703e0b"
-      ]
-    },
-    {
       "name": "process-specific burdens, inert material landfill",
       "unit": "kg",
       "type": "technosphere",
@@ -95,6 +83,13 @@
       "location": "RoW"
     }
   ],
+  "parameters": {
+    "n_pv": {
+      "name": "n_pv",
+      "description": "Number of PV panels in the system",
+      "default": 1.0
+    }
+  },
   "life_cycle_stages": {
     "Production": {
       "description": "Production stage processes",
@@ -113,12 +108,6 @@
         "transport, freight, lorry, unspecified"
       ]
     },
-    "Use": {
-      "description": "Use stage processes",
-      "exchanges": [
-        "market for electricity, low voltage"
-      ]
-    },
     "EOL": {
       "description": "EOL stage processes",
       "exchanges": [
@@ -127,12 +116,12 @@
     }
   },
   "energy_metadata": {
-    "energy_processes": 1,
+    "energy_processes": 0,
     "primary_input": {
       "name": "energy_input",
-      "unit": "kWh",
+      "unit": "MJ",
       "description": "Energy input to the system",
-      "value": 38.0
+      "value": 100.0
     }
   },
   "unlinked_exchanges": []

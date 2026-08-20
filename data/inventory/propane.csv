@@ -1,7 +1,7 @@
-# Version: 1.0,,,,,,,,,,,
-# Date: August 6 2026,,,,,,,,,,,
-# Description: Propane tank + furnace inventory.,,,,,,,,,,,
-# Functional unit: 200 kWh energy discharged from storage during use over a 15-year lifetime,,,,,,,,,,,
+# Version: 1.0
+# Date: August 6 2026
+# Description: Propane tank + furnace inventory
+# Functional unit: 200 kWh energy discharged from storage during use over a 15-year lifetime
 Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,UUID-Source,Brightway Match Code,Brightway Match Key,Description,Brightway Match Name,Brightway Match Database,Brightway Match Location,Brightway Match Ref Product
 Production,Aluminum,"Aluminium, primary, cast alloy slab from continuous casting {CA-QC}| aluminium production, primary, cast alloy slab from continuous casting | Cut-off, U",CA-QC,15,kg,ecoinvent-3.10-cutoff,956615e5-f9f1-58f5-a11a-42fbd83509c8,SimaPro,39de88a95c4bc8f41284279cf3a5b3a0,"('ecoinvent-3.10-cutoff', '39de88a95c4bc8f41284279cf3a5b3a0')",,"aluminium production, primary, cast alloy slab from continuous casting",ecoinvent-3.10-cutoff,CA-QC,"aluminium, primary, cast alloy slab from continuous casting"
 Production,Copper,"Copper concentrate, sulfide ore {US}| copper mine operation and beneficiation, sulfide ore | Cut-off, U",US,15,kg,ecoinvent-3.10-cutoff,848c507a-bf63-55fe-806c-cce2ec49e197,SimaPro,cbeb81298985f02ca088bddbb987d820,"('ecoinvent-3.10-cutoff', 'cbeb81298985f02ca088bddbb987d820')",,"copper mine operation and beneficiation, sulfide ore",ecoinvent-3.10-cutoff,US,"copper concentrate, sulfide ore"
