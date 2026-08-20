@@ -3,6 +3,7 @@
 # Supports multiple databases, methods, and input parameters
 
 import json
+import ast
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -658,6 +659,68 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
             if u not in factors:
                 raise ValueError(f"Unsupported energy unit for conversion: {unit}")
             return factors[u]
+
+        parameter_defaults = {
+            name: float(info.get("default", 1.0))
+            for name, info in lci_data.get("parameters", {}).items()
+            if isinstance(info, dict)
+        }
+
+        def _eval_amount_expression(raw_amount, exchange_name: str) -> float:
+            if isinstance(raw_amount, (int, float)):
+                return float(raw_amount)
+            if raw_amount is None:
+                return 1.0
+
+            expr = str(raw_amount).strip()
+            if not expr:
+                return 1.0
+
+            try:
+                return float(expr)
+            except ValueError:
+                pass
+
+            tree = ast.parse(expr, mode="eval")
+
+            def _eval_node(node):
+                if isinstance(node, ast.Expression):
+                    return _eval_node(node.body)
+                if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+                    return float(node.value)
+                if isinstance(node, ast.Name):
+                    if node.id in parameter_defaults:
+                        return float(parameter_defaults[node.id])
+                    raise ValueError(f"Unknown parameter '{node.id}'")
+                if isinstance(node, ast.BinOp):
+                    left = _eval_node(node.left)
+                    right = _eval_node(node.right)
+                    if isinstance(node.op, ast.Add):
+                        return left + right
+                    if isinstance(node.op, ast.Sub):
+                        return left - right
+                    if isinstance(node.op, ast.Mult):
+                        return left * right
+                    if isinstance(node.op, ast.Div):
+                        return left / right
+                    if isinstance(node.op, ast.Pow):
+                        return left ** right
+                    raise ValueError("Unsupported math operator")
+                if isinstance(node, ast.UnaryOp):
+                    value = _eval_node(node.operand)
+                    if isinstance(node.op, ast.UAdd):
+                        return value
+                    if isinstance(node.op, ast.USub):
+                        return -value
+                    raise ValueError("Unsupported unary operator")
+                raise ValueError("Unsupported expression syntax")
+
+            try:
+                return float(_eval_node(tree))
+            except Exception as exc:
+                raise ValueError(
+                    f"Invalid amount expression '{expr}' for exchange '{exchange_name}': {exc}"
+                )
         
         for exchange in exchanges:
             if exchange.get('type') == 'technosphere':
@@ -669,10 +732,13 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                 # Handle amount_ref (energy metadata reference) or direct amount
                 if 'amount_ref' in exchange:
                     # Resolve the reference path (e.g., "energy_metadata.primary_input.value")
-                    ref_path = exchange['amount_ref']
                     primary_input = lci_data.get('energy_metadata', {}).get('primary_input', {})
                     base_amount_raw = float(primary_input.get('value', 1.0))
                     base_unit_raw = str(primary_input.get('unit', 'MJ'))
+                    exchange_multiplier = _eval_amount_expression(
+                        exchange.get('amount', 1.0),
+                        exchange.get('name', 'Unknown')
+                    )
 
                     scaled_amount_raw = base_amount_raw * scaling_factor
                     scaled_amount_j = scaled_amount_raw * _to_j_factor(base_unit_raw)
@@ -705,7 +771,10 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
 
                     # Convert via absolute Joule base, then to the activity exchange unit.
                     to_exchange_factor_j = _to_j_factor(exchange_unit_raw)
-                    amount = scaled_amount_j / to_exchange_factor_j if to_exchange_factor_j else scaled_amount_j
+                    amount = (
+                        (scaled_amount_j / to_exchange_factor_j if to_exchange_factor_j else scaled_amount_j)
+                        * exchange_multiplier
+                    )
 
                     # Verification-first logging: only print conversion details if unit change is required.
                     if base_unit_norm == exchange_unit_norm:
@@ -731,7 +800,10 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                         )
                 else:
                     # Direct amount (non-energy exchanges are not scaled)
-                    amount = exchange.get('amount', 1.0)
+                    amount = _eval_amount_expression(
+                        exchange.get('amount', 1.0),
+                        exchange.get('name', 'Unknown')
+                    )
                 
                 process_data[process_key]['exchanges'].append({
                     'name': exchange.get('name', 'Unknown'),

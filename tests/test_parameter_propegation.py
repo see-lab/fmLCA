@@ -85,13 +85,12 @@ def test_multiple_parameterized_csv():
     assert len(lci_data['subsystems']) == 2
     print(f"\n📦 Subsystems: {lci_data['subsystems']}")
     
-    # Verify parameter formulas in exchanges
-    print(f"\n🔄 Exchanges with parameter formulas:")
+    # Verify parameterized amounts in exchanges
+    print(f"\n🔄 Exchanges with parameterized amounts:")
     for exchange in lci_data['exchanges']:
-        if 'amount_formula' in exchange:
+        if isinstance(exchange.get('amount'), str):
             print(f"   - {exchange['name']} ({exchange.get('subsystem', 'N/A')})")
-            print(f"     Formula: {exchange['amount_formula']}")
-            print(f"     Base amount: {exchange.get('amount_base', exchange.get('amount'))}")
+            print(f"     Amount: {exchange['amount']}")
     
     return True
 
@@ -111,26 +110,29 @@ def test_parameter_propagation():
     
     lci_data = lci_manager.import_multiple_csv(csv_files)
     
-    # Count exchanges by parameter
+    # Count exchanges by parameterized amount expression
     param_counts = {}
     for exchange in lci_data['exchanges']:
-        if 'parameter' in exchange:
-            param = exchange['parameter']
-            param_counts[param] = param_counts.get(param, 0) + 1
+        amount_expr = exchange.get('amount')
+        if isinstance(amount_expr, str):
+            if 'n_pv' in amount_expr:
+                param_counts['n_pv'] = param_counts.get('n_pv', 0) + 1
+            if 'n_bess' in amount_expr:
+                param_counts['n_bess'] = param_counts.get('n_bess', 0) + 1
     
     print(f"✅ Parameter usage in exchanges:")
     for param, count in param_counts.items():
         print(f"   - {param}: {count} exchanges")
     
-    # Verify all PV exchanges have n_pv parameter
+    # Verify all PV exchanges have n_pv in amount expression
     pv_exchanges = [ex for ex in lci_data['exchanges'] if ex.get('subsystem') == 'Pv']
     for ex in pv_exchanges:
-        assert ex.get('parameter') == 'n_pv', f"PV exchange {ex['name']} missing n_pv parameter"
+        assert 'n_pv' in str(ex.get('amount', '')), f"PV exchange {ex['name']} missing n_pv in amount"
     
-    # Verify all BESS exchanges have n_bess parameter
+    # Verify all BESS exchanges have n_bess in amount expression
     bess_exchanges = [ex for ex in lci_data['exchanges'] if ex.get('subsystem') == 'Bess']
     for ex in bess_exchanges:
-        assert ex.get('parameter') == 'n_bess', f"BESS exchange {ex['name']} missing n_bess parameter"
+        assert 'n_bess' in str(ex.get('amount', '')), f"BESS exchange {ex['name']} missing n_bess in amount"
     
     print(f"✅ All subsystem exchanges correctly linked to parameters")
     
@@ -172,9 +174,9 @@ def test_json_output_structure():
         assert 'default' in param_info
         print(f"✅ Parameter '{param_name}' has complete metadata")
     
-    # Verify exchange formulas
-    formula_count = sum(1 for ex in data['exchanges'] if 'amount_formula' in ex)
-    print(f"✅ {formula_count} exchanges have parameter formulas")
+    # Verify exchange parameterized amounts
+    parameterized_count = sum(1 for ex in data['exchanges'] if isinstance(ex.get('amount'), str))
+    print(f"✅ {parameterized_count} exchanges have parameterized amounts")
     
     return True
 

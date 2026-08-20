@@ -23,7 +23,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 900.0,
+      "amount": "900.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -36,7 +36,7 @@
       "unit": "p",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 1.0,
+      "amount": "1.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -49,7 +49,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 10.0,
+      "amount": "10.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -62,7 +62,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 20.0,
+      "amount": "20.0 * n_bess",
       "location": "US",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -75,7 +75,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 10.0,
+      "amount": "10.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -88,7 +88,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 10.0,
+      "amount": "10.0 * n_bess",
       "location": "CA-QC",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -101,7 +101,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 20.0,
+      "amount": "20.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -114,7 +114,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": 13892.0,
+      "amount": "13892.0 * n_bess",
       "location": "GLO",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -127,7 +127,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": 1528.0,
+      "amount": "1528.0 * n_bess",
       "location": "RoW",
       "input": [
         "ecoinvent-3.10-cutoff",
@@ -140,7 +140,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "EOL",
-      "amount": 1280.0,
+      "amount": "1280.0 * n_bess",
       "input": [
         "ecoinvent-3.10-cutoff",
         "d36fed351a206298d821449cc2634f60"
@@ -149,6 +149,13 @@
       "process_match": "process-specific burdens, inert material landfill"
     }
   ],
+  "parameters": {
+    "n_bess": {
+      "name": "n_bess",
+      "description": "Number of battery energy storage systems",
+      "default": 1.0
+    }
+  },
   "life_cycle_stages": {
     "Production": {
       "description": "Production stage processes",

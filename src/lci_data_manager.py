@@ -256,14 +256,6 @@ class LCIDataManager:
         for subsystem in subsystems:
             subsystem_name = subsystem['subsystem_name']
             
-            # Get the parameter for this subsystem (if any)
-            subsystem_param = None
-            if 'parameters' in subsystem:
-                # Usually just one parameter per subsystem
-                params = list(subsystem['parameters'].keys())
-                if params:
-                    subsystem_param = params[0]
-            
             # Process exchanges (skip production exchange)
             for exchange in subsystem.get('exchanges', []):
                 if exchange.get('type') == 'production':
@@ -274,21 +266,6 @@ class LCIDataManager:
                 
                 # Add subsystem tracking
                 merged_exchange['subsystem'] = subsystem_name
-                
-                # If this subsystem has a parameter, reference it
-                if subsystem_param:
-                    merged_exchange['parameter'] = subsystem_param
-                    
-                    # Modify amount to include parameter scaling
-                    if 'amount' in merged_exchange:
-                        # Store original amount
-                        merged_exchange['amount_base'] = merged_exchange['amount']
-                        # Create formula: amount_base * parameter
-                        merged_exchange['amount_formula'] = f"{merged_exchange['amount_base']} * {subsystem_param}"
-                    elif 'amount_ref' in merged_exchange:
-                        # Energy processes already use references
-                        # Add parameter scaling to the reference
-                        merged_exchange['amount_formula'] = f"{merged_exchange['amount_ref']} * {subsystem_param}"
                 
                 all_exchanges.append(merged_exchange)
             
@@ -391,6 +368,9 @@ class LCIDataManager:
         # Add parameters if present
         if parameters:
             lci_data["parameters"] = parameters
+
+        # Use the first declared parameter as the subsystem/unit scaling variable.
+        primary_parameter = next(iter(parameters), None) if parameters else None
         
         # Group by lifecycle stages
         stages = {}
@@ -442,6 +422,12 @@ class LCIDataManager:
             
             # Create exchange
             exchange = self.create_exchange(process_data, stage)
+
+            if exchange and primary_parameter and exchange.get("type") == "technosphere":
+                if "amount" in exchange:
+                    exchange["amount"] = f"{exchange['amount']} * {primary_parameter}"
+                elif "amount_ref" in exchange:
+                    exchange["amount"] = primary_parameter
             
             if exchange:
                 all_exchanges.append(exchange)

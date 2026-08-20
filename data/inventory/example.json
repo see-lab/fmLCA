@@ -23,7 +23,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": 100.0,
+      "amount": "100.0 * n_units",
       "location": "Global",
       "input": [
         "ecoinvent-3.12-cutoff",
@@ -35,7 +35,7 @@
       "unit": "pkm",
       "type": "technosphere",
       "life_cycle_stage": "Use",
-      "amount": 50.0,
+      "amount": "50.0 * n_units",
       "location": "Europe",
       "input": [
         "ecoinvent-3.12-cutoff",
@@ -52,7 +52,8 @@
       "input": [
         "ecoinvent-3.12-cutoff",
         "0fccfcf29a4a39921f7438aaeedef528"
-      ]
+      ],
+      "amount": "n_units"
     }
   ],
   "parameters": {

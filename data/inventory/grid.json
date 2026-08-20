@@ -43,9 +43,9 @@
     "energy_processes": 1,
     "primary_input": {
       "name": "energy_input",
-      "unit": "MJ",
+      "unit": "kWh",
       "description": "Energy input to the system",
-      "value": 3.6
+      "value": 1.0
     }
   },
   "unlinked_exchanges": []
