@@ -1207,6 +1207,48 @@ def _energy_to_mj(value, unit):
         raise ValueError(f"Unsupported energy unit: {unit}")
     return float(value) * factors_to_mj[norm]
 
+
+def _parse_param_assignments(assignments):
+    """Parse repeated CLI parameter assignments like key=value or key:value."""
+    parsed = {}
+    for raw in assignments or []:
+        text = str(raw).strip()
+        if not text:
+            continue
+        if "=" in text:
+            key, value = text.split("=", 1)
+        elif ":" in text:
+            key, value = text.split(":", 1)
+        else:
+            raise ValueError(f"Invalid --param '{raw}'. Use name=value")
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            raise ValueError(f"Invalid --param '{raw}'. Missing parameter name")
+        parsed[key] = float(value)
+    return parsed
+
+
+def resolve_parameter_values(param_args=None, params_json=None, params_file=None):
+    """Resolve parameter overrides from CLI inputs and merge with last-write-wins precedence."""
+    values = {}
+    values.update(_parse_param_assignments(param_args))
+
+    if params_json:
+        json_values = json.loads(params_json)
+        if not isinstance(json_values, dict):
+            raise ValueError("--params-json must decode to an object/dict")
+        values.update({str(k): float(v) for k, v in json_values.items()})
+
+    if params_file:
+        with open(params_file, 'r', encoding='utf-8') as f:
+            file_values = json.load(f)
+        if not isinstance(file_values, dict):
+            raise ValueError("--params-file must contain a JSON object/dict")
+        values.update({str(k): float(v) for k, v in file_values.items()})
+
+    return values
+
 def create_visualization(results, output_file="lca_results.png"):
     """
     Create a stacked bar chart visualization showing life cycle stage breakdown for each impact method
@@ -1419,6 +1461,12 @@ Examples:
   
   # Specifying both positional and named arguments
   python src/lca_engine.py example --methods midpoints
+
+    # Parameter overrides (repeat --param, or provide JSON)
+    python src/lca_engine.py example --param n_units=10
+    python src/lca_engine.py example --param n_pv=2 --param n_bess=3
+    python src/lca_engine.py example --params-json '{"n_units": 5}'
+    python src/lca_engine.py example --params-file data/inventory/params.json
         """
     )
     
@@ -1428,7 +1476,19 @@ Examples:
                        help='Full path to LCI JSON file (alternative to stem argument)')
     parser.add_argument('--methods', type=str, default='methods',
                        help='Methods file stem in data/methods/ (e.g., "ipcc", "midpoints", "iw_damages"). Default: "methods"')
+    parser.add_argument('--param', action='append', default=[],
+                       help='Parameter assignment override, e.g. --param n_units=10 (repeatable)')
+    parser.add_argument('--params-json', type=str, default=None,
+                       help='JSON object string with parameter overrides, e.g. {"n_units": 10}')
+    parser.add_argument('--params-file', type=str, default=None,
+                       help='Path to JSON file containing parameter overrides as an object/dict')
     args = parser.parse_args()
+
+    try:
+        parameter_values = resolve_parameter_values(args.param, args.params_json, args.params_file)
+    except Exception as e:
+        print(f"❌ Invalid parameter overrides: {e}")
+        exit(1)
     
     # Resolve LCI file path
     if args.lci_file:
@@ -1508,9 +1568,18 @@ Examples:
         energy_amount_mj = 1.0
     
     print("Starting LCA analysis...")
+
+    if parameter_values:
+        print(f"Parameter overrides: {parameter_values}")
     
     # Run LCA using inventory base energy by default.
-    results = run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=energy_amount_mj)
+    results = run_lca(
+        lci_file,
+        lcia_methods,
+        parameter_values=parameter_values,
+        functional_unit=functional_unit,
+        energy_amount_mj=energy_amount_mj,
+    )
     
     # Generate output filenames based on inventory and method
     inventory_name = Path(lci_file).stem  # e.g., "example", "grid"
