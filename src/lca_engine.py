@@ -4,6 +4,7 @@
 
 import json
 import ast
+import tempfile
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -467,6 +468,32 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
             print(f"⚠️ Cleanup warning (project): {cleanup_err}")
 
         return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+def run_lca(lci_file, lcia_methods, parameter_values=None, functional_unit=None, energy_amount_mj=180.0):
+    """Run LCA with optional parameter overrides passed as direct input."""
+    functional_unit = functional_unit or {}
+    if not parameter_values:
+        return run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj)
+
+    with open(lci_file, 'r', encoding='utf-8') as f:
+        lci_data = json.load(f)
+
+    for name, value in parameter_values.items():
+        if name not in lci_data.get("parameters", {}):
+            raise ValueError(f"Unknown parameter '{name}' in {lci_file}")
+        lci_data["parameters"][name]["default"] = float(value)
+
+    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8')
+    try:
+        with temp_file:
+            json.dump(lci_data, temp_file, indent=2)
+        return run_lca_energy(temp_file.name, lcia_methods, functional_unit, energy_amount_mj)
+    finally:
+        try:
+            Path(temp_file.name).unlink(missing_ok=True)
+        except Exception:
+            pass
 
 
 def _write_temp_database(db, process_data):
