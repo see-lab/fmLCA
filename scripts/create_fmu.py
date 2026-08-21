@@ -99,6 +99,7 @@ def _arg_was_provided(option_name: str) -> bool:
 # ── Configuration ────────────────────────────────────────────────────────────
 
 DIST_FMU = ROOT / "fmu"
+DIST_FMU_PROPRIETARY = DIST_FMU / "proprietary"
 
 # Supported LCIA methods
 METHOD_CONFIG = {
@@ -667,13 +668,19 @@ def main():
         sys.exit(0)
 
     # ── Setup paths ──────────────────────────────────────────────────────────
-    ensure_dir_exists(DIST_FMU)
-    simulatable_path = DIST_FMU / f"{fmu_name}_Simulatable.fmu"
-    final_path = DIST_FMU / f"{fmu_name}.fmu"
+    # Safeguard: keep non-black-box or Dymola-targeted exports in fmu/proprietary.
+    is_proprietary_export = source_export_nonblackbox or args.target_tool == "dymola"
+    output_dir = DIST_FMU_PROPRIETARY if is_proprietary_export else DIST_FMU
+    ensure_dir_exists(output_dir)
+
+    simulatable_path = output_dir / f"{fmu_name}_Simulatable.fmu"
+    final_path = output_dir / f"{fmu_name}.fmu"
 
     print(f"\n🚀  Creating FMU: {fmu_name}")
     print(f"    LCI file   : {lci_path}")
     print(f"    Method     : {args.method}  →  {method_cfg['output_var']}  [{method_cfg['output_unit']}]")
+    if is_proprietary_export:
+        print(f"    Output dir : {DIST_FMU_PROPRIETARY} (proprietary safeguard)")
 
     try:
         # ── Step 1: Run LCA analysis ─────────────────────────────────────────
