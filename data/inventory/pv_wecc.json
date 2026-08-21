@@ -1,0 +1,172 @@
+{
+  "name": "Pv + Wecc Combined System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "combined system"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Pv + Wecc Combined System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Combined_System_DB",
+        "Combined_1unit"
+      ]
+    },
+    {
+      "name": "market for photovoltaic panel, single-Si wafer",
+      "unit": "m2",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "38.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "inverter production, 0.5kW",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "76.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "market for steel, low-alloyed",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "350.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "market for aluminium, wrought alloy",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "160.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "wire drawing, copper",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "45.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "transport, freight, sea, container ship",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "7000.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "transport, freight, lorry, unspecified",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "900.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "process-specific burdens, inert material landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": "850.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "Grid energy",
+      "unit": "kWh",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "location": "Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f1896ce156e61662bc1dab03de703e0b"
+      ],
+      "subsystem": "Wecc"
+    }
+  ],
+  "parameters": {
+    "n_pv": {
+      "name": "n_pv",
+      "description": "Number of PV panels in the system",
+      "default": 1.0,
+      "subsystem": "Pv"
+    }
+  },
+  "subsystems": [
+    "Pv",
+    "Wecc"
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Pv: market for photovoltaic panel, single-Si wafer",
+        "Pv: inverter production, 0.5kW",
+        "Pv: market for steel, low-alloyed",
+        "Pv: market for aluminium, wrought alloy",
+        "Pv: wire drawing, copper"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "Pv: transport, freight, sea, container ship",
+        "Pv: transport, freight, lorry, unspecified"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "Pv: process-specific burdens, inert material landfill"
+      ]
+    },
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "Wecc: Grid energy"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "kWh",
+      "description": "Energy input to the system",
+      "value": 1.0
+    },
+    "subsystems": [
+      {
+        "subsystem": "Wecc",
+        "count": 1,
+        "primary_input": {
+          "name": "energy_input",
+          "unit": "kWh",
+          "description": "Energy input to the system",
+          "value": 1.0
+        }
+      }
+    ]
+  },
+  "unlinked_exchanges": []
+}
