@@ -23,7 +23,7 @@
       "unit": "m2",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "38.0 * n_pv",
+      "amount": "7.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -32,7 +32,7 @@
       "unit": "p",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "76.0 * n_pv",
+      "amount": "12.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -41,7 +41,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "350.0 * n_pv",
+      "amount": "65.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -50,7 +50,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "160.0 * n_pv",
+      "amount": "30.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -59,7 +59,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "45.0 * n_pv",
+      "amount": "9.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -68,7 +68,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": "7000.0 * n_pv",
+      "amount": "1300.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -77,7 +77,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": "900.0 * n_pv",
+      "amount": "170.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -86,7 +86,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "EOL",
-      "amount": "850.0 * n_pv",
+      "amount": "160.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
