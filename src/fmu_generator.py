@@ -78,27 +78,58 @@ def extract_emission_factors(lca_results: Dict[str, Any],
     out_unit = method_config["output_unit"]
     
     if single_score:
-        # Sum score_pt from all endpoint results
+        # Sum endpoint totals for single-score methods.
+        # Prefer score_pt if present, otherwise accept total_score from lca_engine.
         total_pt = 0.0
         found = 0
         for data in impact_data.values():
-            if isinstance(data, dict) and "score_pt" in data:
-                total_pt += data["score_pt"]
+            if not isinstance(data, dict):
+                continue
+            if "score_pt" in data:
+                total_pt += float(data["score_pt"])
                 found += 1
-        
+            elif "total_score" in data:
+                total_pt += float(data["total_score"])
+                found += 1
+
         if found == 0:
-            print("  ⚠️  No Pt scores found — using placeholder factors (0).")
+            print("  ⚠️  No single-score totals found — using placeholder factors (0).")
             return {
                 "base_impact": 0.0,
                 "energy_factor": 0.0,
                 "scaling_factor": 1.0,
                 "unit": out_unit
             }
-        
-        factor = total_pt / energy_mj if energy_mj else 0.0
-        print(f"  ✅ Single score: {total_pt:.4f} Pt  ({found} damage categories), "
-              f"factor/MJ = {factor:.4e} Pt/MJ")
-        
+
+        # Prefer use-stage totals for the dynamic factor to avoid double counting
+        # embodied stages that are already tracked as static terms in the FMU.
+        use_total = 0.0
+        use_found = 0
+        stage_breakdown = lca_results.get("stage_breakdown", {})
+        if isinstance(stage_breakdown, dict):
+            for method_stages in stage_breakdown.values():
+                if not isinstance(method_stages, dict):
+                    continue
+                use_stage = method_stages.get("Use")
+                if isinstance(use_stage, dict) and isinstance(use_stage.get("score"), (int, float)):
+                    use_total += float(use_stage["score"])
+                    use_found += 1
+
+        if use_found > 0:
+            factor = use_total / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Single score: total = {total_pt:.4f} Pt "
+                f"({found} categories), use = {use_total:.4e} Pt "
+                f"({use_found} categories), factor/MJ = {factor:.4e} Pt/MJ"
+            )
+        else:
+            factor = total_pt / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Single score: total = {total_pt:.4f} Pt "
+                f"({found} categories), factor/MJ = {factor:.4e} Pt/MJ "
+                "(fallback: total-based)"
+            )
+
         return {
             "base_impact": total_pt,
             "energy_factor": factor,
@@ -190,8 +221,18 @@ def extract_stage_impacts(lca_results: Dict[str, Any],
         print("  ⚠️  No stage breakdown found — using zero stage impacts")
         return stages
     
-    # Get stage breakdown for the first method (should only be one)
-    for method_stages in stage_breakdown.values():
+    # For single-score methods (e.g., ReCiPe endpoint), aggregate across all
+    # selected endpoint categories. For non-single-score methods, process the
+    # first method entry (legacy behavior).
+    method_stage_sets = []
+    if method_config.get("single_score", False):
+        method_stage_sets = [m for m in stage_breakdown.values() if isinstance(m, dict)]
+    else:
+        first_method_stages = next(iter(stage_breakdown.values()), None)
+        if isinstance(first_method_stages, dict):
+            method_stage_sets = [first_method_stages]
+
+    for method_stages in method_stage_sets:
         # Map LCA stage names to our standard names
         stage_mapping = {
             'Production': 'production',
@@ -210,8 +251,6 @@ def extract_stage_impacts(lca_results: Dict[str, Any],
                 std_name = stage_mapping.get(stage_name, stage_name.lower())
                 if std_name in stages:
                     stages[std_name] += score
-        
-        break  # Only process first method
     
     print(f"  ✅ Stage impacts extracted:")
     for stage, impact in stages.items():
