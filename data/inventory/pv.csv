@@ -6,9 +6,8 @@
 # Dynamic base input for FMU: 7 kWh (1 hour at 1000 W/m2 and 7 m2 before conversion losses) per functional unit. 
 #
 # References:
-#  - de Wild-Scholten, M. (2013). Energy payback time and carbon footprint of commercial PV systems. Prog. Photovolt., 21, 229-241.
-#  - Fthenakis, V., Kim, H.C., Alsema, E. (2008/2011 updates). Emissions from photovoltaic life cycles. Environ. Sci. Technol.
-#  - IEA PVPS Task 12 methodological reports (used as harmonized LCA practice guidance).
+#  - de Wild-Scholten, M. (2013). Energy payback time and carbon footprint of commercial PV systems. Sol. Ene. Mat. Sol. Cel., 119, 296-305.
+#  - Götz, M, Deuber, R. Gazbour, N, Brailovsky, P.H., Nold, S., Marchand-Lasserre, M., et. al. (2026). Life Cycle Inventories of Photovoltaic Systems. IEA Task 12, IEA-PVPS T12-33:2026. 
 #
 # Notes:
 #  - ecoinvent 3.12 cutoff activities are used as foreground proxies.
