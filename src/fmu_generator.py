@@ -584,10 +584,10 @@ def _resolve_fmi_var_metadata(input_unit: str, output_unit: str) -> Dict[str, Di
     elif out_lower == "pt":
         y_meta = {
             "quantity": "ImpactScore",
-            "unit": "1",
+            "unit": "Pt",
             "display_unit": "Pt",
             "unit_def": {
-                "name": "1",
+                "name": "Pt",
                 "base_unit": None,
                 "display_units": [{"name": "Pt", "factor": "1"}],
             },
