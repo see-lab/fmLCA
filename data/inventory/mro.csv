@@ -1,0 +1,7 @@
+# Version: 1.0
+# Date: September 1 2026
+# Description: Grid consumption only for the Midwest Reliability Council (MRO) of the United States.
+#               Case study site: Chicago IL
+# 4450.54 kWh/year
+Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,Brightway Match Code,Brightway Match Key,Description,Brightway Match Name,Brightway Match Database,Brightway Match Location,Brightway Match Ref Product
+Use,Grid energy,"market for electricity, low voltage","Midwest Reliability Organization, US part only",1,kwh,ecoinvent-3.12-cutoff,,bdcaa00af04527bcea80a3be4914f720,"('ecoinvent-3.12-cutoff', 'bdcaa00af04527bcea80a3be4914f720')",,"market for electricity, low voltage",ecoinvent-3.12-cutoff,Midwest-USA,"electricity, low voltage"

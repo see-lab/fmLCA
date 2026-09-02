@@ -1,5 +1,5 @@
 {
-  "name": "Pv + Bess312 + Wecc Combined System",
+  "name": "Pv + Wecc + Bess Combined System",
   "unit": "unit",
   "location": "GLO",
   "categories": [
@@ -9,7 +9,7 @@
   "type": "process",
   "exchanges": [
     {
-      "name": "Pv + Bess312 + Wecc Combined System",
+      "name": "Pv + Wecc + Bess Combined System",
       "amount": 1.0,
       "unit": "unit",
       "type": "production",
@@ -23,7 +23,7 @@
       "unit": "m2",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "38.0 * n_pv",
+      "amount": "7.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -32,7 +32,7 @@
       "unit": "p",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "76.0 * n_pv",
+      "amount": "12.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -41,7 +41,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "350.0 * n_pv",
+      "amount": "65.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -50,7 +50,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "160.0 * n_pv",
+      "amount": "30.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -59,7 +59,7 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "Production",
-      "amount": "45.0 * n_pv",
+      "amount": "9.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -68,7 +68,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": "7000.0 * n_pv",
+      "amount": "1300.0 * n_pv",
       "location": "GLO",
       "subsystem": "Pv"
     },
@@ -77,7 +77,7 @@
       "unit": "tkm",
       "type": "technosphere",
       "life_cycle_stage": "Transport",
-      "amount": "900.0 * n_pv",
+      "amount": "170.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
     },
@@ -86,149 +86,9 @@
       "unit": "kg",
       "type": "technosphere",
       "life_cycle_stage": "EOL",
-      "amount": "850.0 * n_pv",
+      "amount": "160.0 * n_pv",
       "location": "RoW",
       "subsystem": "Pv"
-    },
-    {
-      "name": "Battery",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "900.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "dd1f0c438b4fdf3987994b66ba725239"
-      ],
-      "process_match": "battery cell production, Li-ion, NMC811",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Inverter",
-      "unit": "p",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "1.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "9bf3858720b7b3ebb71170c83decfbef"
-      ],
-      "process_match": "inverter production, 0.5kW",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Electronics housing",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "10.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "f0fabe27a63e2a4a70c6dd34a211922b"
-      ],
-      "process_match": "polypropylene production, granulate",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Wiring",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "20.0 * n_bess",
-      "location": "US",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "a5054bb4fefd08d98c8c4dc393a5d113"
-      ],
-      "process_match": "copper mine operation and beneficiation, sulfide ore",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Electronics",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "10.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "98171caf6d8e65fb81de703cebc81862"
-      ],
-      "process_match": "electronics production, for control units",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Injection molding",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "10.0 * n_bess",
-      "location": "CA-QC",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "4ad095a0e6bcdee0c92b6da1ae8b57d1"
-      ],
-      "process_match": "injection moulding",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Wire drawing",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "Production",
-      "amount": "20.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "0794af4c0abe8e128f97d0c784c9d985"
-      ],
-      "process_match": "wire drawing, copper",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Ocean freight",
-      "unit": "tkm",
-      "type": "technosphere",
-      "life_cycle_stage": "Transport",
-      "amount": "13892.0 * n_bess",
-      "location": "GLO",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "f049dace574f0ee3bb9e466a2cf1d881"
-      ],
-      "process_match": "transport, freight, sea, container ship, heavy fuel oil",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Truck",
-      "unit": "tkm",
-      "type": "technosphere",
-      "life_cycle_stage": "Transport",
-      "amount": "1528.0 * n_bess",
-      "location": "RoW",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "ef6bffe58e9d5976728177a00f317f71"
-      ],
-      "process_match": "transport, freight, lorry 28 metric ton, fatty acid methyl ester 100%",
-      "subsystem": "Bess312"
-    },
-    {
-      "name": "Landfill",
-      "unit": "kg",
-      "type": "technosphere",
-      "life_cycle_stage": "EOL",
-      "amount": "1280.0 * n_bess",
-      "input": [
-        "ecoinvent-3.12-cutoff",
-        "f3bdece169ea4e6928a81e570afca6b9"
-      ],
-      "location": "RoW",
-      "process_match": "process-specific burdens, inert material landfill",
-      "subsystem": "Bess312"
     },
     {
       "name": "Grid energy",
@@ -242,6 +102,146 @@
         "f1896ce156e61662bc1dab03de703e0b"
       ],
       "subsystem": "Wecc"
+    },
+    {
+      "name": "Battery",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "450.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "dd1f0c438b4fdf3987994b66ba725239"
+      ],
+      "process_match": "battery cell production, Li-ion, NMC811",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Inverter",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "0.5 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9bf3858720b7b3ebb71170c83decfbef"
+      ],
+      "process_match": "inverter production, 0.5kW",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Electronics housing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f0fabe27a63e2a4a70c6dd34a211922b"
+      ],
+      "process_match": "polypropylene production, granulate",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Wiring",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "10.0 * n_bess",
+      "location": "US",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a5054bb4fefd08d98c8c4dc393a5d113"
+      ],
+      "process_match": "copper mine operation and beneficiation, sulfide ore",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "98171caf6d8e65fb81de703cebc81862"
+      ],
+      "process_match": "electronics production, for control units",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Injection molding",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "4ad095a0e6bcdee0c92b6da1ae8b57d1"
+      ],
+      "process_match": "injection moulding",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "10.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0794af4c0abe8e128f97d0c784c9d985"
+      ],
+      "process_match": "wire drawing, copper",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Ocean freight",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "6946.0 * n_bess",
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f049dace574f0ee3bb9e466a2cf1d881"
+      ],
+      "process_match": "transport, freight, sea, container ship, heavy fuel oil",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Truck",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "764.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ef6bffe58e9d5976728177a00f317f71"
+      ],
+      "process_match": "transport, freight, lorry 28 metric ton, fatty acid methyl ester 100%",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": "640.0 * n_bess",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f3bdece169ea4e6928a81e570afca6b9"
+      ],
+      "location": "RoW",
+      "process_match": "process-specific burdens, inert material landfill",
+      "subsystem": "Bess"
     }
   ],
   "parameters": {
@@ -255,13 +255,13 @@
       "name": "n_bess",
       "description": "Number of battery energy storage systems",
       "default": 1.0,
-      "subsystem": "Bess312"
+      "subsystem": "Bess"
     }
   },
   "subsystems": [
     "Pv",
-    "Bess312",
-    "Wecc"
+    "Wecc",
+    "Bess"
   ],
   "life_cycle_stages": {
     "Production": {
@@ -272,13 +272,13 @@
         "Pv: market for steel, low-alloyed",
         "Pv: market for aluminium, wrought alloy",
         "Pv: wire drawing, copper",
-        "Bess312: Battery",
-        "Bess312: Inverter",
-        "Bess312: Electronics housing",
-        "Bess312: Wiring",
-        "Bess312: Electronics",
-        "Bess312: Injection molding",
-        "Bess312: Wire drawing"
+        "Bess: Battery",
+        "Bess: Inverter",
+        "Bess: Electronics housing",
+        "Bess: Wiring",
+        "Bess: Electronics",
+        "Bess: Injection molding",
+        "Bess: Wire drawing"
       ]
     },
     "Transport": {
@@ -286,15 +286,15 @@
       "exchanges": [
         "Pv: transport, freight, sea, container ship",
         "Pv: transport, freight, lorry, unspecified",
-        "Bess312: Ocean freight",
-        "Bess312: Truck"
+        "Bess: Ocean freight",
+        "Bess: Truck"
       ]
     },
     "EOL": {
       "description": "EOL stage processes",
       "exchanges": [
         "Pv: process-specific burdens, inert material landfill",
-        "Bess312: Landfill"
+        "Bess: Landfill"
       ]
     },
     "Use": {

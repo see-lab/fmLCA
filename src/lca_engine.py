@@ -11,6 +11,7 @@ import pandas as pd
 import argparse
 import traceback
 import shutil
+import re
 from pathlib import Path
 
 # Import Brightway components
@@ -253,6 +254,77 @@ def _find_source_project_for_db(target_db_name):
     return None
 
 
+RECIPE_ENDPOINT_SINGLE_SCORE_FACTORS = {
+    "total human health": {
+        "normalization_denom": 2.3983071517732924e-02,  # DALY
+        "weight": 0.4,
+        "damage_unit": "DALY",
+    },
+    "total ecosystem quality": {
+        "normalization_denom": 1.4793022106342942e-03,  # species.yr
+        "weight": 0.4,
+        "damage_unit": "species.yr",
+    },
+    "total natural resources": {
+        "normalization_denom": 2.8010825716165531e04,  # USD2013
+        "weight": 0.2,
+        "damage_unit": "USD2013",
+    },
+}
+
+
+def _recipe_single_score_config(method_obj):
+    """Return ReCiPe single-score conversion config for endpoint totals, else None."""
+    method_text = str(method_obj).lower()
+    method_norm = " ".join(re.sub(r"[^a-z0-9]+", " ", method_text).split())
+    if "recipe 2016" not in method_text or "endpoint (h)" not in method_text:
+        return None
+
+    for key, cfg in RECIPE_ENDPOINT_SINGLE_SCORE_FACTORS.items():
+        key_norm = " ".join(re.sub(r"[^a-z0-9]+", " ", key.lower()).split())
+        if key_norm in method_norm:
+            return cfg
+    return None
+
+
+def _damage_to_single_score_pt(damage_score, conversion_cfg):
+    """Convert ReCiPe damage-level score to single-score points (Pt)."""
+    normalization_denom = float(conversion_cfg["normalization_denom"])
+    weight = float(conversion_cfg["weight"])
+
+    normalized_score = float(damage_score) / normalization_denom if normalization_denom else 0.0
+    score_kpt = normalized_score * weight
+    score_pt = score_kpt * 1000.0
+
+    return {
+        "normalized_score": float(normalized_score),
+        "score_kpt": float(score_kpt),
+        "score_pt": float(score_pt),
+    }
+
+
+def _convert_stage_breakdown_to_recipe_pt(stage_breakdown, conversion_cfg):
+    """Convert stage scores from ReCiPe damage units to single-score Pt."""
+    converted = {}
+    for stage_name, info in (stage_breakdown or {}).items():
+        score = 0.0
+        if isinstance(info, dict):
+            score = float(info.get("score", 0.0))
+
+        pt_data = _damage_to_single_score_pt(score, conversion_cfg)
+        converted[stage_name] = {
+            "score": pt_data["score_pt"],
+            "unit": "Pt",
+            "damage_score": score,
+            "damage_unit": conversion_cfg.get("damage_unit", "impact units"),
+            "normalized_score": pt_data["normalized_score"],
+            "score_kpt": pt_data["score_kpt"],
+            "score_pt": pt_data["score_pt"],
+        }
+
+    return converted
+
+
 def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180.0):
     """
     Run LCA analysis with energy-based inputs using the new modular architecture
@@ -404,20 +476,48 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
                 lca.lci()
                 lca.lcia()
                 
-                impact_score = lca.score
-                results["impact_results"][str(method)] = {
-                    "total_score": float(impact_score),
-                    "unit": method_unit,
-                    "method_name": simplified_name
-                }
-                
-                print(f"  ✅ Total impact: {impact_score:.6e} {method_unit}")
-                
-                # Calculate stage breakdown using actual LCA results
+                impact_score = float(lca.score)
+
+                # Calculate stage breakdown using actual LCA results.
                 stage_breakdown = calculate_stage_breakdown_with_lca(
                     lci_data, lca, method_unit, temp_db_name
                 )
-                results["stage_breakdown"][str(method)] = stage_breakdown
+
+                recipe_cfg = _recipe_single_score_config(method)
+                if recipe_cfg is not None:
+                    pt_data = _damage_to_single_score_pt(impact_score, recipe_cfg)
+                    results["impact_results"][str(method)] = {
+                        "total_score": pt_data["score_pt"],
+                        "unit": "Pt",
+                        "method_name": simplified_name,
+                        "damage_score": impact_score,
+                        "damage_unit": recipe_cfg.get("damage_unit", method_unit),
+                        "normalized_score": pt_data["normalized_score"],
+                        "score_kpt": pt_data["score_kpt"],
+                        "score_pt": pt_data["score_pt"],
+                    }
+
+                    results["stage_breakdown"][str(method)] = _convert_stage_breakdown_to_recipe_pt(
+                        stage_breakdown,
+                        recipe_cfg,
+                    )
+
+                    print(
+                        "  ✅ Total impact (single score): "
+                        f"{pt_data['score_pt']:.6e} Pt "
+                        f"[damage={impact_score:.6e} {recipe_cfg.get('damage_unit', method_unit)}, "
+                        f"normalized={pt_data['normalized_score']:.6e}, "
+                        f"weighted={pt_data['score_kpt']:.6e} kPt]"
+                    )
+                else:
+                    results["impact_results"][str(method)] = {
+                        "total_score": impact_score,
+                        "unit": method_unit,
+                        "method_name": simplified_name
+                    }
+
+                    results["stage_breakdown"][str(method)] = stage_breakdown
+                    print(f"  ✅ Total impact: {impact_score:.6e} {method_unit}")
                 
             except Exception as e:
                 print(f"  ❌ Error with method {simplified_name}: {e}")
@@ -1118,6 +1218,17 @@ def simplify_method_name(method_str):
         str: Simplified method name with main method source
     """
     try:
+        method_lower = str(method_str).lower()
+
+        # Keep ReCiPe endpoint totals distinct in plots and CSV exports.
+        if "recipe 2016" in method_lower and "endpoint (h)" in method_lower:
+            if "total: ecosystem quality" in method_lower or "total ecosystem quality" in method_lower:
+                return "ReCiPe endpoint, ecosystems"
+            if "total: human health" in method_lower or "total human health" in method_lower:
+                return "ReCiPe endpoint, human health"
+            if "total: natural resources" in method_lower or "total natural resources" in method_lower:
+                return "ReCiPe endpoint, resources"
+
         # Determine the main method source
         method_source = ""
         if 'IPCC 2021' in method_str:
@@ -1332,7 +1443,7 @@ def create_visualization(results, output_file="lca_results.png"):
         ax.set_xlabel('Impact Score', fontsize=12)
         ax.set_ylabel('Impact Method', fontsize=12)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels([f"{m}\n({u})" for m, u in zip(methods, units)], fontsize=10)
+        ax.set_yticklabels([f"{m} ({u})" for m, u in zip(methods, units)], fontsize=10)
         
         # Add legend
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -1402,7 +1513,7 @@ def save_results_csv(results, output_file="lca_results.csv"):
         csv_data = []
         for method, data in impact_data.items():
             if isinstance(data, dict) and "total_score" in data:
-                simplified_name = simplify_method_name(method)
+                simplified_name = data.get("method_name") or simplify_method_name(method)
                 csv_data.append({
                     'Impact_Category': simplified_name,
                     'Total_Score': data["total_score"],
@@ -1418,7 +1529,8 @@ def save_results_csv(results, output_file="lca_results.csv"):
         if stage_data:
             stage_csv_data = []
             for method, stages in stage_data.items():
-                simplified_method = simplify_method_name(method)
+                method_data = impact_data.get(method, {}) if isinstance(impact_data, dict) else {}
+                simplified_method = method_data.get("method_name") or simplify_method_name(method)
                 method_unit = None
                 
                 # Get the unit from impact_data

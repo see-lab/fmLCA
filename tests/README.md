@@ -16,6 +16,19 @@ Pytest-based unit and integration tests for LCA-FMU.
 python -m pytest tests/
 ```
 
+Storage validation scripts:
+
+```bash
+# IPCC staged-impact parity plot/table
+python tests/storage_validation.py
+
+# ReCiPe single-score (Pt) parity plot/table
+python tests/storage_validation_recipe.py
+
+# Or run both via Makefile
+make validation-suite
+```
+
 Optional marker filters:
 
 ```bash

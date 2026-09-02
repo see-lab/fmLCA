@@ -1,0 +1,55 @@
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Sand Battery (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Damage assessment
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Sand_Production	Sand_Transport	Sand_Use	Sand_End-of-Life
+Human health	DALY	0.017477149	0.017060199	0.0002657682	0.00014906727	2.1144545E-6
+Ecosystems	species.yr	1.3291272E-5	1.2572411E-5	5.5431774E-7	1.6290526E-7	1.6378668E-9
+Resources	USD2013	134.88918	119.90684	14.155501	0.73651177	0.090333678
+
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Sand Battery (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Normalization
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Sand_Production	Sand_Transport	Sand_Use	Sand_End-of-Life
+Human health		0.7287971	0.71141029	0.011082534	0.0062161054	8.8172754E-5
+Ecosystems		0.0089849	0.00849895	0.00037471879	0.00011012395	1.107198E-6
+Resources		0.0048155438	0.004280674	0.00050535139	2.629347E-5	3.2249123E-6
+
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Sand Battery (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Single score
+Skip categories: 	Never
+Default units: 	No
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Sand_Production	Sand_Transport	Sand_Use	Sand_End-of-Life
+Total	Pt	296.07591	288.81983	4.6839714	2.5357504	0.036356963
+Human health	Pt	291.51884	284.56411	4.4330136	2.4864421	0.035269102
+Ecosystems	Pt	3.59396	3.39958	0.14988752	0.044049581	0.00044287919
+Resources	Pt	0.96310876	0.85613481	0.10107028	0.005258694	0.00064498246
