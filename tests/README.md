@@ -64,7 +64,7 @@ Outputs:
 - Store expected values in plain text files under `tests/reference_results/`
 - Use `key=value` pairs for easy parsing in tests
 
-## Parameterization Tests (NEW - August 2026)
+## Parameterization Tests
 
 ### `test_parameter_lca.py`
 **Purpose:** 	Validate that LCA impacts scale proportionally with inventory parameters
