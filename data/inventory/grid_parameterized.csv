@@ -1,8 +1,0 @@
-# Version: 1.0
-# Date: August 20 2026
-# Description: Grid inventory sample -- parameterized to evaluate scaling.
-# Parameter: n_connections
-# Parameter_Description: Number of 1 kWh connections in the system
-# Parameter_Default: 1.0
-Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,Brightway Match Code,Brightway Match Key,Description
-Use,Grid energy,"market for electricity, low voltage","Northeast Power Coordinating Council, US part only (US-NPCC)",1,kWh,ecoinvent-3.12-cutoff,16075,f1aca55f8d85f86399d3016d3f4b1b2a,"('ecoinvent-3.12-cutoff', 'f1aca55f8d85f86399d3016d3f4b1b2a')","Electricity, low voltage, in the Northeastern USA | Brightway: market for electricity, low voltage | US-NPCC"
