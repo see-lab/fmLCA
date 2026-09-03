@@ -147,7 +147,11 @@ def run_lca_analysis(
         RuntimeError: If LCA analysis fails
     """
     # Lazy import keeps '-h/--help' fast and avoids Brightway startup warnings.
-    from lca_engine import run_lca
+    # Prefer package-qualified import for installed distributions.
+    try:
+        from src.lca_engine import run_lca
+    except ImportError:
+        from lca_engine import run_lca
 
     # Load LCI file to display metadata
     try:
