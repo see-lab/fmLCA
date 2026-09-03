@@ -84,6 +84,58 @@ python scripts/create_fmu.py example --method ipcc
 python scripts/create_fmu.py example --method ipcc --export-mode bytecode --blackbox-policy enforce
 ```
 
+### Simulate FMUs and run sequential co-simulation
+
+Use `scripts/run_fmu.py` in either single-FMU mode or sequential co-simulation mode.
+
+```bash
+# Single FMU mode (default)
+python scripts/run_fmu.py --mode single --fmu fmu/Example_Ipcc_v1.0.fmu --u0 100 --step-size 60
+
+# Sequential co-simulation mode
+# system output -> LCA input
+python scripts/run_fmu.py \
+	--mode cosim \
+	--system-fmu fmu/PV_System_WECC.fmu \
+	--lca-fmu fmu/PvWecc_Ipcc_v1.0.fmu \
+	--system-output gri.P.real \
+	--lca-input u \
+	--lca-output y \
+	--parameter-name n_pv \
+	--parameter-value 2.0 \
+	--output-interval 3600 \
+	--solver CVode \
+	--save-plot results/cosim.png
+```
+
+Supported co-simulation flags:
+- `--system-fmu`, `--lca-fmu`
+- `--system-output`, `--lca-input`, `--lca-output`
+- `--parameter-name`, `--parameter-value`
+- `--system-start-value key=value` (repeatable)
+- `--lca-start-value key=value` (repeatable)
+- `--output-interval`, `--solver`
+
+Notebook import usage (no local function redefinition required):
+
+```python
+from pathlib import Path
+from scripts.run_fmu import inspect_fmu, simulate_system_fmu, sequential_cosim
+
+system_result, lca_result = sequential_cosim(
+		system_fmu=Path("fmu/PV_System_WECC.fmu"),
+		lca_fmu=Path("fmu/PvWecc_Ipcc_v1.0.fmu"),
+		start_s=0.0,
+		stop_s=365 * 24 * 3600.0,
+		system_output="gri.P.real",
+		lca_input="u",
+		lca_output="y",
+		parameter_name="n_pv",
+		parameter_value=2.0,
+		output_interval_s=3600.0,
+)
+```
+
 Black-box compliance policy:
 - By default, create_fmu enforces black-box auditing and fails export if readable source/data payloads are present in resources/.
 - By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
