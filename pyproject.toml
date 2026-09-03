@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "LCA-FMU"
-version = "0.1"
+name = "lca-fmu"
+version = "1.0.0"
 authors = [
   { name="Kathryn Hinkelman", email="kathryn.hinkelman@uvm.edu" },
 ]
