@@ -1,6 +1,6 @@
 # LCA-FMU
 
-Life Cycle Assessment(LCA) platform with Functional Mock-up Unit (FMU) generation for dynamic energy systems modeling.
+Life Cycle Assessment (LCA) platform with Functional Mock-up Unit (FMU) generation for dynamic energy systems modeling.
 
 Built with Brightway 2.5 and ecoinvent integration.
 

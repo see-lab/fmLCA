@@ -3,12 +3,12 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "LCA-FMU"
-version = "0.1"
+name = "lca-fmu"
+version = "1.0.0"
 authors = [
   { name="Kathryn Hinkelman", email="kathryn.hinkelman@uvm.edu" },
 ]
-description = "Co-simulation package for coupling Brigthway LCA with dynamic energy system models."
+description = "Co-simulation package for coupling Brightway LCA with dynamic energy system models."
 readme = "README.md"
 requires-python = ">=3.9"
 dynamic = ["dependencies", "optional-dependencies", "scripts"]

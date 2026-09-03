@@ -74,11 +74,10 @@ Outputs:
 python tests/test_parameter_lca.py
 ```
 
-**What it tests:**
 - Loads `example.json` with `n_units` parameter
-- Runs LCA with `n_units = 1, 5, 10`
-- Validates impacts scale proportionally (5x and 10x)
-- Verifies within 1% tolerance
+- Runs LCA with `n_units = 1, 10`
+- Validates impacts scale proportionally (10x)
+- Verifies within `REL_TOL` (see `tests/test_parameter_lca.py`)
 
 ### `test_parameter_propegation.py`
 **Purpose:** 	Test parameter extraction and multi-file combination.

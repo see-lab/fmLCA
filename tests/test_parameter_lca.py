@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run LCA with three parameter declarations and verify linear scaling."""
+"""Run LCA with an inventory parameter and verify linear scaling."""
 
 import sys
 from pathlib import Path
@@ -14,11 +14,10 @@ from src.lca_engine import run_lca
 LCI_FILE = project_root / "data" / "inventory" / "example.json"
 METHODS = ["IPCC 2021 climate change total excl biogenic GWP100"]
 CASES = [
-	{"n_units": 1.0},
-	{"n_units": 10.0},
+    {"n_units": 1.0},
+    {"n_units": 10.0},
 ]
 REL_TOL = 1e-6  # relative tolerance for linear scaling check
-
 
 def _score(result):
 	impact_results = result.get("impact_results", {})
