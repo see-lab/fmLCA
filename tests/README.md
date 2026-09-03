@@ -16,6 +16,19 @@ Pytest-based unit and integration tests for LCA-FMU.
 python -m pytest tests/
 ```
 
+Storage validation scripts:
+
+```bash
+# IPCC staged-impact parity plot/table
+python tests/storage_validation.py
+
+# ReCiPe single-score (Pt) parity plot/table
+python tests/storage_validation_recipe.py
+
+# Or run both via Makefile
+make validation-suite
+```
+
 Optional marker filters:
 
 ```bash
@@ -50,3 +63,33 @@ Outputs:
 
 - Store expected values in plain text files under `tests/reference_results/`
 - Use `key=value` pairs for easy parsing in tests
+
+## Parameterization Tests
+
+### `test_parameter_lca.py`
+**Purpose:** 	Validate that LCA impacts scale proportionally with inventory parameters
+
+**Usage:**
+```bash
+python tests/test_parameter_lca.py
+```
+
+- Loads `example.json` with `n_units` parameter
+- Runs LCA with `n_units = 1, 10`
+- Validates impacts scale proportionally (10x)
+- Verifies within `REL_TOL` (see `tests/test_parameter_lca.py`)
+
+### `test_parameter_propegation.py`
+**Purpose:** 	Test parameter extraction and multi-file combination.
+				This essentially is a formatting check.
+
+**Usage:**
+```bash
+python tests/test_parameter_propegation.py
+```
+
+**What it tests:**
+- Single CSV parameter extraction
+- Multiple CSV file combination  
+- Parameter propagation to exchanges
+- JSON output structure validation

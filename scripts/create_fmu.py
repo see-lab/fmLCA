@@ -54,6 +54,8 @@ import json
 import sys
 import tempfile
 import textwrap
+import re
+import math
 from typing import Any
 from pathlib import Path
 
@@ -97,6 +99,7 @@ def _arg_was_provided(option_name: str) -> bool:
 # ── Configuration ────────────────────────────────────────────────────────────
 
 DIST_FMU = ROOT / "fmu"
+DIST_FMU_PROPRIETARY = DIST_FMU / "proprietary"
 
 # Supported LCIA methods
 METHOD_CONFIG = {
@@ -123,7 +126,12 @@ METHOD_CONFIG = {
 
 # ── LCA Analysis ─────────────────────────────────────────────────────────────
 
-def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
+def run_lca_analysis(
+    lci_file: Path,
+    energy_mj: float,
+    keywords: list,
+    parameter_values: dict[str, float] | None = None,
+) -> dict:
     """
     Run LCA analysis using the LCA engine.
     
@@ -139,7 +147,11 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
         RuntimeError: If LCA analysis fails
     """
     # Lazy import keeps '-h/--help' fast and avoids Brightway startup warnings.
-    from lca_engine import run_lca_energy
+    # Prefer package-qualified import for installed distributions.
+    try:
+        from src.lca_engine import run_lca
+    except ImportError:
+        from lca_engine import run_lca
 
     # Load LCI file to display metadata
     try:
@@ -156,6 +168,8 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
     print(f"  Step 1 – Running LCA Analysis")
     print(f"    LCI    : {lci_file.name}")
     print(f"    Methods: {keywords}")
+    if parameter_values:
+        print(f"    Parameters: {parameter_values}")
     if primary_input:
         print(f"    Dynamic Input: {primary_input.get('description', 'Energy input')} "
               f"({primary_input.get('value', 0.0)} {primary_input.get('unit', 'MJ')} base)")
@@ -163,9 +177,10 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
     
     # Run LCA analysis
     try:
-        results = run_lca_energy(
+        results = run_lca(
             lci_file=str(lci_file),
             lcia_methods=keywords,
+            parameter_values=parameter_values,
             functional_unit={},
             energy_amount_mj=energy_mj
         )
@@ -192,6 +207,202 @@ def run_lca_analysis(lci_file: Path, energy_mj: float, keywords: list) -> dict:
         
     except Exception as e:
         raise RuntimeError(f"LCA analysis failed: {e}")
+
+
+def _resolve_lci_parameters(lci_data: dict[str, Any]) -> dict[str, float]:
+    """Resolve numeric parameter defaults from LCI JSON metadata."""
+    params = lci_data.get("parameters", {})
+    resolved: dict[str, float] = {}
+    for name, meta in params.items():
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(name)):
+            raise ValueError(f"Unsupported parameter name '{name}' for FMU variable export")
+        default = 1.0
+        if isinstance(meta, dict):
+            default = float(meta.get("default", 1.0))
+        resolved[str(name)] = default
+    return resolved
+
+
+def _build_parameter_model(
+    lci_path: Path,
+    method_cfg: dict[str, Any],
+    unitary_energy_mj: float,
+    baseline_factors: dict[str, Any],
+    baseline_stage_impacts: dict[str, float],
+    parameter_defaults: dict[str, float],
+) -> dict[str, Any]:
+    """Build a linear parameter model from additional LCA runs around defaults."""
+    if not parameter_defaults:
+        return {"defaults": {}, "slopes": {}, "stability": {"kappa": 1.0, "ill_conditioned": False}}
+
+    def _choose_safe_delta(default: float) -> float:
+        """Choose a larger but safe perturbation delta for finite differences."""
+        magnitude = abs(default)
+
+        # Larger relative step improves signal-to-noise for LCA differencing.
+        delta = max(0.5 * magnitude, 0.25)
+
+        # Cap excessive perturbations to remain in a local linear neighborhood.
+        cap = max(2.0 * magnitude, 2.0)
+        delta = min(delta, cap)
+
+        # Ensure non-trivial positive step.
+        return max(delta, 1.0e-6)
+
+    slopes = {
+        "production": {},
+        "transport": {},
+        "eol": {},
+        "use_rate_per_j": {},
+    }
+
+    baseline_use_rate = baseline_factors["energy_factor"] / 1.0e6
+
+    for pname, default in parameter_defaults.items():
+        delta = _choose_safe_delta(default)
+        varied = default + delta
+        if math.isclose(varied, default, rel_tol=0.0, abs_tol=1.0e-12):
+            varied = default + 1.0
+
+        overrides = dict(parameter_defaults)
+        overrides[pname] = varied
+
+        varied_results = run_lca_analysis(
+            lci_path,
+            unitary_energy_mj,
+            method_cfg["keywords"],
+            parameter_values=overrides,
+        )
+        varied_factors = extract_emission_factors(varied_results, method_cfg, unitary_energy_mj)
+        varied_stage = extract_stage_impacts(varied_results, method_cfg)
+
+        denom = varied - default
+        slopes["production"][pname] = (varied_stage["production"] - baseline_stage_impacts["production"]) / denom
+        slopes["transport"][pname] = (varied_stage["transport"] - baseline_stage_impacts["transport"]) / denom
+        slopes["eol"][pname] = (varied_stage["eol"] - baseline_stage_impacts["eol"]) / denom
+        slopes["use_rate_per_j"][pname] = ((varied_factors["energy_factor"] / 1.0e6) - baseline_use_rate) / denom
+
+        print(
+            f"  ✅ Parameter sensitivity: {pname} "
+            f"(default={default}, varied={varied}, delta={denom})"
+        )
+
+    # Stability diagnostics: kappa ratio from singular values of the slope system.
+    stability = {"kappa": 1.0, "ill_conditioned": False}
+    try:
+        import numpy as np
+
+        ordered_params = list(parameter_defaults.keys())
+        slope_matrix = np.array(
+            [
+                [slopes["production"][p] for p in ordered_params],
+                [slopes["transport"][p] for p in ordered_params],
+                [slopes["eol"][p] for p in ordered_params],
+                [slopes["use_rate_per_j"][p] for p in ordered_params],
+            ],
+            dtype=float,
+        )
+
+        singular_values = np.linalg.svd(slope_matrix, compute_uv=False)
+        if singular_values.size == 0:
+            kappa = 1.0
+        else:
+            s_max = float(np.max(singular_values))
+            positive = singular_values[singular_values > max(1.0e-14 * s_max, 1.0e-18)]
+            s_min = float(np.min(positive)) if positive.size else 0.0
+            kappa = float("inf") if s_min == 0.0 else s_max / s_min
+
+        stability["kappa"] = kappa
+        stability["ill_conditioned"] = bool(not np.isfinite(kappa) or kappa > 1.0e8)
+
+        if stability["ill_conditioned"]:
+            print(
+                "  ⚠️  Numerical stability warning: parameter sensitivity system appears "
+                f"ill-conditioned (kappa={kappa:.3e}). "
+                "Consider narrowing parameter ranges, rescaling parameters, or validating "
+                "linearity assumptions."
+            )
+        else:
+            print(f"  ✅ Sensitivity system conditioning: kappa={kappa:.3e}")
+    except Exception as exc:
+        print(f"  ⚠️  Conditioning check unavailable: {exc}")
+
+    return {
+        "defaults": parameter_defaults,
+        "slopes": slopes,
+        "stability": stability,
+    }
+
+
+def verify_fmu_parameter_linearity(
+    fmu_path: Path,
+    parameter_defaults: dict[str, float],
+    tolerance: float = 1e-4,
+) -> tuple[bool, str]:
+    """Run a short FMU simulation and verify affine linearity per parameter.
+
+    We validate equal-step increment consistency while all other parameters are
+    fixed at defaults:
+
+        y(p0 + 2h) - y(p0 + h) ~= y(p0 + h) - y(p0)
+
+    This is robust when the output includes a non-zero intercept, where a
+    simple total-output ratio check is invalid.
+    """
+    if not parameter_defaults:
+        return True, "No LCI parameters found; linearity check skipped"
+
+    import numpy as np
+    from fmpy import simulate_fmu
+
+    input_signal = np.array(
+        [(0.0, 100.0), (3600.0, 100.0)],
+        dtype=[("time", np.float64), ("u", np.float64)],
+    )
+
+    def _run(start_values: dict[str, float]) -> float:
+        result = simulate_fmu(
+            filename=str(fmu_path),
+            start_time=0.0,
+            stop_time=3600.0,
+            step_size=60.0,
+            input=input_signal,
+            start_values=start_values,
+            output=["y"],
+        )
+        return float(result["y"][-1])
+
+    baseline_y = _run(dict(parameter_defaults))
+
+    for pname, default in parameter_defaults.items():
+        step = max(abs(default), 1.0)
+
+        varied_values_1 = dict(parameter_defaults)
+        varied_values_2 = dict(parameter_defaults)
+        varied_values_1[pname] = default + step
+        varied_values_2[pname] = default + 2.0 * step
+
+        y1 = _run(varied_values_1)
+        y2 = _run(varied_values_2)
+
+        d1 = y1 - baseline_y
+        d2 = y2 - y1
+        resid = abs(d2 - d1)
+        scale = max(abs(y2), abs(y1), abs(baseline_y), 1.0)
+        rel_err = resid / scale
+
+        print(
+            f"  🔎 Linearity check {pname}: "
+            f"d1={d1:.6e}, d2={d2:.6e}, resid={resid:.3e}, rel_error={rel_err:.3e}"
+        )
+        if rel_err > tolerance:
+            return False, (
+                f"Parameter '{pname}' linearity check failed "
+                f"(increment mismatch d1={d1:.6e}, d2={d2:.6e}, resid={resid:.3e}, "
+                f"rel_error={rel_err:.3e}, tolerance={tolerance:.1e})"
+            )
+
+    return True, "FMU parameter linearity verified"
 
 
 def _resolve_lci_base_energy_mj(lci_data: dict[str, Any], default: float = 1.0) -> float:
@@ -431,6 +642,7 @@ def main():
 
     base_energy_mj = _resolve_lci_base_energy_mj(lci_data, default=1.0)
     unitary_energy_mj, base_energy_unit = _resolve_one_base_unit_mj(lci_data, default_mj=1.0)
+    parameter_defaults = _resolve_lci_parameters(lci_data)
 
     # ── Dry run mode ─────────────────────────────────────────────────────────
     if args.dry_run:
@@ -452,17 +664,27 @@ def main():
         print(f"✅ Output variable: {method_cfg['output_var']} [{method_cfg['output_unit']}]")
         print(f"✅ LCI base energy metadata: {base_energy_mj} {base_energy_unit}")
         print(f"✅ FMU slope basis: 1 {base_energy_unit} ({unitary_energy_mj} MJ)")
+        if parameter_defaults:
+            print(f"✅ LCI parameters: {parameter_defaults}")
+        else:
+            print("✅ LCI parameters: none")
         print("✅ Dry run completed successfully - ready for FMU creation")
         sys.exit(0)
 
     # ── Setup paths ──────────────────────────────────────────────────────────
-    ensure_dir_exists(DIST_FMU)
-    simulatable_path = DIST_FMU / f"{fmu_name}_Simulatable.fmu"
-    final_path = DIST_FMU / f"{fmu_name}.fmu"
+    # Safeguard: keep non-black-box or Dymola-targeted exports in fmu/proprietary.
+    is_proprietary_export = source_export_nonblackbox or args.target_tool == "dymola"
+    output_dir = DIST_FMU_PROPRIETARY if is_proprietary_export else DIST_FMU
+    ensure_dir_exists(output_dir)
+
+    simulatable_path = output_dir / f"{fmu_name}_Simulatable.fmu"
+    final_path = output_dir / f"{fmu_name}.fmu"
 
     print(f"\n🚀  Creating FMU: {fmu_name}")
     print(f"    LCI file   : {lci_path}")
     print(f"    Method     : {args.method}  →  {method_cfg['output_var']}  [{method_cfg['output_unit']}]")
+    if is_proprietary_export:
+        print(f"    Output dir : {DIST_FMU_PROPRIETARY} (proprietary safeguard)")
 
     try:
         # ── Step 1: Run LCA analysis ─────────────────────────────────────────
@@ -481,6 +703,19 @@ def main():
 
         factors = extract_emission_factors(lca_results, method_cfg, unitary_energy_mj)
         stage_impacts = extract_stage_impacts(lca_results, method_cfg)
+        parameter_model = _build_parameter_model(
+            lci_path=lci_path,
+            method_cfg=method_cfg,
+            unitary_energy_mj=unitary_energy_mj,
+            baseline_factors=factors,
+            baseline_stage_impacts=stage_impacts,
+            parameter_defaults=parameter_defaults,
+        )
+        kappa = float(parameter_model.get("stability", {}).get("kappa", 1.0))
+        ill_conditioned = bool(parameter_model.get("stability", {}).get("ill_conditioned", False))
+        print(f"  ℹ️  Sensitivity conditioning (kappa): {kappa:.3e}")
+        if ill_conditioned:
+            print("  ⚠️  Sensitivity system is ill-conditioned; parameter scaling may be numerically fragile.")
 
         # ── Step 3: Generate and build FMU ───────────────────────────────────
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -493,6 +728,7 @@ def main():
                 method_config=method_cfg,
                 factors=factors,
                 stage_impacts=stage_impacts,
+                parameter_model=parameter_model,
                 lci_path=lci_path
             )
 
@@ -551,6 +787,13 @@ def main():
         # ── Step 7: Validate FMU ─────────────────────────────────────────────
         is_valid, msg = validate_fmu(final_path)
 
+        # ── Step 7b: Parameter linearity check ───────────────────────────────
+        linear_ok, linear_msg = verify_fmu_parameter_linearity(final_path, parameter_defaults)
+        if linear_ok:
+            print(f"  ✅ {linear_msg}")
+        else:
+            raise RuntimeError(linear_msg)
+
         # ── Step 8: Clean up intermediate file ───────────────────────────────
         try:
             simulatable_path.unlink()
@@ -570,10 +813,14 @@ def main():
         print(f"  📦  Export mode     : {args.export_mode}")
         print(f"  🔐  Black-box policy: {args.blackbox_policy}")
         print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")
+        print(f"  📐  Parameter linearity: {'PASS' if linear_ok else 'FAIL'}")
+        print(f"  🧮  Conditioning kappa : {kappa:.3e}")
         print(f"")
         print(f"  🔄  Cumulative Impact Tracking:")
         print(f"     • Input  : u [W]  (power_input_w)")
         print(f"     • Output : y [{method_cfg['output_unit']}]  ({method_cfg['output_var']}_cumulative)")
+        if parameter_defaults:
+            print(f"     • Parameters: {', '.join(sorted(parameter_defaults.keys()))}")
         print(f"")
         print(f"  📊  Life Cycle Stages:")
         print(f"     • Production : {stage_impacts['production']:.4e} {method_cfg['output_unit']} (t=start)")

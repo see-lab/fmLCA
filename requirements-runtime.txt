@@ -1,0 +1,17 @@
+# Minimal runtime dependencies for PyPI installation
+# Keep test/notebook/dev tooling out of install_requires.
+
+# Brightway core runtime
+brightway25>=1.1.1
+bw2data>=4.6.0
+bw2calc>=2.4.0
+bw2io>=0.9.14
+
+# FMU runtime/build tooling
+pythonfmu>=0.7.0
+fmpy>=0.3.29
+
+# Numerical and plotting stack used by runtime code
+numpy>=1.24.0,<3.0.0
+pandas>=2.1.0,<4.0.0
+matplotlib>=3.8.0,<4.0.0

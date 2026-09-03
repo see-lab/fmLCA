@@ -12,6 +12,7 @@ Part of the LCA-FMU core library.
 """
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Union, Dict, Any
@@ -102,8 +103,20 @@ def get_src_dir() -> Path:
 
 
 def get_data_dir() -> Path:
-    """Get the data/ directory path."""
-    return get_project_root() / "data"
+    """Get the data directory path, preferring repo layout then bundled assets."""
+    env_root = os.environ.get("LCA_FMU_ROOT")
+    if env_root:
+        env_data = Path(env_root).expanduser().resolve() / "data"
+        if env_data.exists():
+            return env_data
+
+    repo_data = get_project_root() / "data"
+    if repo_data.exists():
+        return repo_data
+
+    # Installed wheel fallback: ship minimal data under src/resources/data.
+    bundled_data = Path(__file__).resolve().parent / "resources" / "data"
+    return bundled_data
 
 
 def get_inventory_dir() -> Path:
@@ -127,8 +140,20 @@ def get_fmu_dir() -> Path:
 
 
 def get_config_dir() -> Path:
-    """Get the config/ directory path."""
-    return get_project_root() / "config"
+    """Get the config directory path, preferring repo layout then bundled assets."""
+    env_root = os.environ.get("LCA_FMU_ROOT")
+    if env_root:
+        env_config = Path(env_root).expanduser().resolve() / "config"
+        if (env_config / "system_config.json").exists():
+            return env_config
+
+    repo_config = get_project_root() / "config"
+    if (repo_config / "system_config.json").exists():
+        return repo_config
+
+    # Installed wheel fallback: ship minimal config under src/resources/config.
+    bundled_config = Path(__file__).resolve().parent / "resources" / "config"
+    return bundled_config
 
 
 def ensure_dir_exists(path: Path) -> Path:

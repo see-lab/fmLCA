@@ -11,9 +11,13 @@ Centralized configuration loading and management
 """
 
 import json
-import os
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+
+try:
+    from .lca_utils import get_config_dir
+except ImportError:
+    from lca_utils import get_config_dir
 
 
 class ConfigManager:
@@ -21,7 +25,7 @@ class ConfigManager:
     
     def __init__(self, config_dir: Optional[Path] = None):
         if config_dir is None:
-            config_dir = Path(__file__).parent.parent / "config"
+            config_dir = get_config_dir()
         
         self.config_dir = Path(config_dir)
         self.system_config = self.load_system_config()

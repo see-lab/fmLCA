@@ -3,12 +3,15 @@
 # Supports multiple databases, methods, and input parameters
 
 import json
+import ast
+import tempfile
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import argparse
 import traceback
 import shutil
+import re
 from pathlib import Path
 
 # Import Brightway components
@@ -22,6 +25,7 @@ try:
     from .config_manager import get_config
     from .database_manager import DatabaseManager
     from .lci_data_manager import LCIDataManager
+    from .lca_utils import get_inventory_dir, get_methods_dir
 except ImportError:
     # Fall back to absolute imports (when run directly)
     import sys
@@ -35,6 +39,7 @@ except ImportError:
     from config_manager import get_config
     from database_manager import DatabaseManager
     from lci_data_manager import LCIDataManager
+    from lca_utils import get_inventory_dir, get_methods_dir
 
 # Initialize configuration
 config = get_config()
@@ -251,6 +256,77 @@ def _find_source_project_for_db(target_db_name):
     return None
 
 
+RECIPE_ENDPOINT_SINGLE_SCORE_FACTORS = {
+    "total human health": {
+        "normalization_denom": 2.3983071517732924e-02,  # DALY
+        "weight": 0.4,
+        "damage_unit": "DALY",
+    },
+    "total ecosystem quality": {
+        "normalization_denom": 1.4793022106342942e-03,  # species.yr
+        "weight": 0.4,
+        "damage_unit": "species.yr",
+    },
+    "total natural resources": {
+        "normalization_denom": 2.8010825716165531e04,  # USD2013
+        "weight": 0.2,
+        "damage_unit": "USD2013",
+    },
+}
+
+
+def _recipe_single_score_config(method_obj):
+    """Return ReCiPe single-score conversion config for endpoint totals, else None."""
+    method_text = str(method_obj).lower()
+    method_norm = " ".join(re.sub(r"[^a-z0-9]+", " ", method_text).split())
+    if "recipe 2016" not in method_text or "endpoint (h)" not in method_text:
+        return None
+
+    for key, cfg in RECIPE_ENDPOINT_SINGLE_SCORE_FACTORS.items():
+        key_norm = " ".join(re.sub(r"[^a-z0-9]+", " ", key.lower()).split())
+        if key_norm in method_norm:
+            return cfg
+    return None
+
+
+def _damage_to_single_score_pt(damage_score, conversion_cfg):
+    """Convert ReCiPe damage-level score to single-score points (Pt)."""
+    normalization_denom = float(conversion_cfg["normalization_denom"])
+    weight = float(conversion_cfg["weight"])
+
+    normalized_score = float(damage_score) / normalization_denom if normalization_denom else 0.0
+    score_kpt = normalized_score * weight
+    score_pt = score_kpt * 1000.0
+
+    return {
+        "normalized_score": float(normalized_score),
+        "score_kpt": float(score_kpt),
+        "score_pt": float(score_pt),
+    }
+
+
+def _convert_stage_breakdown_to_recipe_pt(stage_breakdown, conversion_cfg):
+    """Convert stage scores from ReCiPe damage units to single-score Pt."""
+    converted = {}
+    for stage_name, info in (stage_breakdown or {}).items():
+        score = 0.0
+        if isinstance(info, dict):
+            score = float(info.get("score", 0.0))
+
+        pt_data = _damage_to_single_score_pt(score, conversion_cfg)
+        converted[stage_name] = {
+            "score": pt_data["score_pt"],
+            "unit": "Pt",
+            "damage_score": score,
+            "damage_unit": conversion_cfg.get("damage_unit", "impact units"),
+            "normalized_score": pt_data["normalized_score"],
+            "score_kpt": pt_data["score_kpt"],
+            "score_pt": pt_data["score_pt"],
+        }
+
+    return converted
+
+
 def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180.0):
     """
     Run LCA analysis with energy-based inputs using the new modular architecture
@@ -402,20 +478,48 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
                 lca.lci()
                 lca.lcia()
                 
-                impact_score = lca.score
-                results["impact_results"][str(method)] = {
-                    "total_score": float(impact_score),
-                    "unit": method_unit,
-                    "method_name": simplified_name
-                }
-                
-                print(f"  ✅ Total impact: {impact_score:.6e} {method_unit}")
-                
-                # Calculate stage breakdown using actual LCA results
+                impact_score = float(lca.score)
+
+                # Calculate stage breakdown using actual LCA results.
                 stage_breakdown = calculate_stage_breakdown_with_lca(
                     lci_data, lca, method_unit, temp_db_name
                 )
-                results["stage_breakdown"][str(method)] = stage_breakdown
+
+                recipe_cfg = _recipe_single_score_config(method)
+                if recipe_cfg is not None:
+                    pt_data = _damage_to_single_score_pt(impact_score, recipe_cfg)
+                    results["impact_results"][str(method)] = {
+                        "total_score": pt_data["score_pt"],
+                        "unit": "Pt",
+                        "method_name": simplified_name,
+                        "damage_score": impact_score,
+                        "damage_unit": recipe_cfg.get("damage_unit", method_unit),
+                        "normalized_score": pt_data["normalized_score"],
+                        "score_kpt": pt_data["score_kpt"],
+                        "score_pt": pt_data["score_pt"],
+                    }
+
+                    results["stage_breakdown"][str(method)] = _convert_stage_breakdown_to_recipe_pt(
+                        stage_breakdown,
+                        recipe_cfg,
+                    )
+
+                    print(
+                        "  ✅ Total impact (single score): "
+                        f"{pt_data['score_pt']:.6e} Pt "
+                        f"[damage={impact_score:.6e} {recipe_cfg.get('damage_unit', method_unit)}, "
+                        f"normalized={pt_data['normalized_score']:.6e}, "
+                        f"weighted={pt_data['score_kpt']:.6e} kPt]"
+                    )
+                else:
+                    results["impact_results"][str(method)] = {
+                        "total_score": impact_score,
+                        "unit": method_unit,
+                        "method_name": simplified_name
+                    }
+
+                    results["stage_breakdown"][str(method)] = stage_breakdown
+                    print(f"  ✅ Total impact: {impact_score:.6e} {method_unit}")
                 
             except Exception as e:
                 print(f"  ❌ Error with method {simplified_name}: {e}")
@@ -466,6 +570,32 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
             print(f"⚠️ Cleanup warning (project): {cleanup_err}")
 
         return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+def run_lca(lci_file, lcia_methods, parameter_values=None, functional_unit=None, energy_amount_mj=180.0):
+    """Run LCA with optional parameter overrides passed as direct input."""
+    functional_unit = functional_unit or {}
+    if not parameter_values:
+        return run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj)
+
+    with open(lci_file, 'r', encoding='utf-8') as f:
+        lci_data = json.load(f)
+
+    for name, value in parameter_values.items():
+        if name not in lci_data.get("parameters", {}):
+            raise ValueError(f"Unknown parameter '{name}' in {lci_file}")
+        lci_data["parameters"][name]["default"] = float(value)
+
+    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8')
+    try:
+        with temp_file:
+            json.dump(lci_data, temp_file, indent=2)
+        return run_lca_energy(temp_file.name, lcia_methods, functional_unit, energy_amount_mj)
+    finally:
+        try:
+            Path(temp_file.name).unlink(missing_ok=True)
+        except Exception:
+            pass
 
 
 def _write_temp_database(db, process_data):
@@ -658,6 +788,68 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
             if u not in factors:
                 raise ValueError(f"Unsupported energy unit for conversion: {unit}")
             return factors[u]
+
+        parameter_defaults = {
+            name: float(info.get("default", 1.0))
+            for name, info in lci_data.get("parameters", {}).items()
+            if isinstance(info, dict)
+        }
+
+        def _eval_amount_expression(raw_amount, exchange_name: str) -> float:
+            if isinstance(raw_amount, (int, float)):
+                return float(raw_amount)
+            if raw_amount is None:
+                return 1.0
+
+            expr = str(raw_amount).strip()
+            if not expr:
+                return 1.0
+
+            try:
+                return float(expr)
+            except ValueError:
+                pass
+
+            tree = ast.parse(expr, mode="eval")
+
+            def _eval_node(node):
+                if isinstance(node, ast.Expression):
+                    return _eval_node(node.body)
+                if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+                    return float(node.value)
+                if isinstance(node, ast.Name):
+                    if node.id in parameter_defaults:
+                        return float(parameter_defaults[node.id])
+                    raise ValueError(f"Unknown parameter '{node.id}'")
+                if isinstance(node, ast.BinOp):
+                    left = _eval_node(node.left)
+                    right = _eval_node(node.right)
+                    if isinstance(node.op, ast.Add):
+                        return left + right
+                    if isinstance(node.op, ast.Sub):
+                        return left - right
+                    if isinstance(node.op, ast.Mult):
+                        return left * right
+                    if isinstance(node.op, ast.Div):
+                        return left / right
+                    if isinstance(node.op, ast.Pow):
+                        return left ** right
+                    raise ValueError("Unsupported math operator")
+                if isinstance(node, ast.UnaryOp):
+                    value = _eval_node(node.operand)
+                    if isinstance(node.op, ast.UAdd):
+                        return value
+                    if isinstance(node.op, ast.USub):
+                        return -value
+                    raise ValueError("Unsupported unary operator")
+                raise ValueError("Unsupported expression syntax")
+
+            try:
+                return float(_eval_node(tree))
+            except Exception as exc:
+                raise ValueError(
+                    f"Invalid amount expression '{expr}' for exchange '{exchange_name}': {exc}"
+                )
         
         for exchange in exchanges:
             if exchange.get('type') == 'technosphere':
@@ -669,10 +861,13 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                 # Handle amount_ref (energy metadata reference) or direct amount
                 if 'amount_ref' in exchange:
                     # Resolve the reference path (e.g., "energy_metadata.primary_input.value")
-                    ref_path = exchange['amount_ref']
                     primary_input = lci_data.get('energy_metadata', {}).get('primary_input', {})
                     base_amount_raw = float(primary_input.get('value', 1.0))
                     base_unit_raw = str(primary_input.get('unit', 'MJ'))
+                    exchange_multiplier = _eval_amount_expression(
+                        exchange.get('amount', 1.0),
+                        exchange.get('name', 'Unknown')
+                    )
 
                     scaled_amount_raw = base_amount_raw * scaling_factor
                     scaled_amount_j = scaled_amount_raw * _to_j_factor(base_unit_raw)
@@ -705,7 +900,10 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
 
                     # Convert via absolute Joule base, then to the activity exchange unit.
                     to_exchange_factor_j = _to_j_factor(exchange_unit_raw)
-                    amount = scaled_amount_j / to_exchange_factor_j if to_exchange_factor_j else scaled_amount_j
+                    amount = (
+                        (scaled_amount_j / to_exchange_factor_j if to_exchange_factor_j else scaled_amount_j)
+                        * exchange_multiplier
+                    )
 
                     # Verification-first logging: only print conversion details if unit change is required.
                     if base_unit_norm == exchange_unit_norm:
@@ -731,7 +929,10 @@ def create_simple_process_inventory(lci_data, db_name, primary_db, scaling_facto
                         )
                 else:
                     # Direct amount (non-energy exchanges are not scaled)
-                    amount = exchange.get('amount', 1.0)
+                    amount = _eval_amount_expression(
+                        exchange.get('amount', 1.0),
+                        exchange.get('name', 'Unknown')
+                    )
                 
                 process_data[process_key]['exchanges'].append({
                     'name': exchange.get('name', 'Unknown'),
@@ -1019,6 +1220,17 @@ def simplify_method_name(method_str):
         str: Simplified method name with main method source
     """
     try:
+        method_lower = str(method_str).lower()
+
+        # Keep ReCiPe endpoint totals distinct in plots and CSV exports.
+        if "recipe 2016" in method_lower and "endpoint (h)" in method_lower:
+            if "total: ecosystem quality" in method_lower or "total ecosystem quality" in method_lower:
+                return "ReCiPe endpoint, ecosystems"
+            if "total: human health" in method_lower or "total human health" in method_lower:
+                return "ReCiPe endpoint, human health"
+            if "total: natural resources" in method_lower or "total natural resources" in method_lower:
+                return "ReCiPe endpoint, resources"
+
         # Determine the main method source
         method_source = ""
         if 'IPCC 2021' in method_str:
@@ -1108,6 +1320,48 @@ def _energy_to_mj(value, unit):
         raise ValueError(f"Unsupported energy unit: {unit}")
     return float(value) * factors_to_mj[norm]
 
+
+def _parse_param_assignments(assignments):
+    """Parse repeated CLI parameter assignments like key=value or key:value."""
+    parsed = {}
+    for raw in assignments or []:
+        text = str(raw).strip()
+        if not text:
+            continue
+        if "=" in text:
+            key, value = text.split("=", 1)
+        elif ":" in text:
+            key, value = text.split(":", 1)
+        else:
+            raise ValueError(f"Invalid --param '{raw}'. Use name=value")
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            raise ValueError(f"Invalid --param '{raw}'. Missing parameter name")
+        parsed[key] = float(value)
+    return parsed
+
+
+def resolve_parameter_values(param_args=None, params_json=None, params_file=None):
+    """Resolve parameter overrides from CLI inputs and merge with last-write-wins precedence."""
+    values = {}
+    values.update(_parse_param_assignments(param_args))
+
+    if params_json:
+        json_values = json.loads(params_json)
+        if not isinstance(json_values, dict):
+            raise ValueError("--params-json must decode to an object/dict")
+        values.update({str(k): float(v) for k, v in json_values.items()})
+
+    if params_file:
+        with open(params_file, 'r', encoding='utf-8') as f:
+            file_values = json.load(f)
+        if not isinstance(file_values, dict):
+            raise ValueError("--params-file must contain a JSON object/dict")
+        values.update({str(k): float(v) for k, v in file_values.items()})
+
+    return values
+
 def create_visualization(results, output_file="lca_results.png"):
     """
     Create a stacked bar chart visualization showing life cycle stage breakdown for each impact method
@@ -1191,7 +1445,7 @@ def create_visualization(results, output_file="lca_results.png"):
         ax.set_xlabel('Impact Score', fontsize=12)
         ax.set_ylabel('Impact Method', fontsize=12)
         ax.set_yticks(y_pos)
-        ax.set_yticklabels([f"{m}\n({u})" for m, u in zip(methods, units)], fontsize=10)
+        ax.set_yticklabels([f"{m} ({u})" for m, u in zip(methods, units)], fontsize=10)
         
         # Add legend
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -1261,7 +1515,7 @@ def save_results_csv(results, output_file="lca_results.csv"):
         csv_data = []
         for method, data in impact_data.items():
             if isinstance(data, dict) and "total_score" in data:
-                simplified_name = simplify_method_name(method)
+                simplified_name = data.get("method_name") or simplify_method_name(method)
                 csv_data.append({
                     'Impact_Category': simplified_name,
                     'Total_Score': data["total_score"],
@@ -1277,7 +1531,8 @@ def save_results_csv(results, output_file="lca_results.csv"):
         if stage_data:
             stage_csv_data = []
             for method, stages in stage_data.items():
-                simplified_method = simplify_method_name(method)
+                method_data = impact_data.get(method, {}) if isinstance(impact_data, dict) else {}
+                simplified_method = method_data.get("method_name") or simplify_method_name(method)
                 method_unit = None
                 
                 # Get the unit from impact_data
@@ -1320,6 +1575,12 @@ Examples:
   
   # Specifying both positional and named arguments
   python src/lca_engine.py example --methods midpoints
+
+    # Parameter overrides (repeat --param, or provide JSON)
+    python src/lca_engine.py example --param n_units=10
+    python src/lca_engine.py example --param n_pv=2 --param n_bess=3
+    python src/lca_engine.py example --params-json '{"n_units": 5}'
+    python src/lca_engine.py example --params-file data/inventory/params.json
         """
     )
     
@@ -1329,25 +1590,39 @@ Examples:
                        help='Full path to LCI JSON file (alternative to stem argument)')
     parser.add_argument('--methods', type=str, default='methods',
                        help='Methods file stem in data/methods/ (e.g., "ipcc", "midpoints", "iw_damages"). Default: "methods"')
+    parser.add_argument('--param', action='append', default=[],
+                       help='Parameter assignment override, e.g. --param n_units=10 (repeatable)')
+    parser.add_argument('--params-json', type=str, default=None,
+                       help='JSON object string with parameter overrides, e.g. {"n_units": 10}')
+    parser.add_argument('--params-file', type=str, default=None,
+                       help='Path to JSON file containing parameter overrides as an object/dict')
     args = parser.parse_args()
+
+    try:
+        parameter_values = resolve_parameter_values(args.param, args.params_json, args.params_file)
+    except Exception as e:
+        print(f"❌ Invalid parameter overrides: {e}")
+        exit(1)
     
     # Resolve LCI file path
+    inventory_dir = get_inventory_dir()
+    methods_dir = get_methods_dir()
+
     if args.lci_file:
         # Use explicit --lci-file if provided
         lci_file = args.lci_file
     elif args.lci_stem:
         # Use positional stem argument
-        lci_file = f"data/inventory/{args.lci_stem}.json"
+        lci_file = str(inventory_dir / f"{args.lci_stem}.json")
     else:
         # Default fallback
-        lci_file = "data/inventory/pipe.json"
+        lci_file = str(inventory_dir / "pipe.json")
     
     # Check if file exists
     if not Path(lci_file).exists():
         print(f"❌ Error: LCI file not found: {lci_file}")
-        print(f"\nAvailable inventory files in data/inventory/:")
+        print(f"\nAvailable inventory files in {inventory_dir}:")
         try:
-            inventory_dir = Path("data/inventory")
             if inventory_dir.exists():
                 json_files = sorted(inventory_dir.glob("*.json"))
                 for f in json_files:
@@ -1357,24 +1632,26 @@ Examples:
         exit(1)
     
     # Resolve methods file path
-    methods_file = f"data/methods/{args.methods}.json"
-    if not Path(methods_file).exists():
+    methods_file = methods_dir / f"{args.methods}.json"
+    if not methods_file.exists():
         print(f"⚠️  Methods file not found: {methods_file}")
-        print(f"Available methods files in data/methods/:")
+        print(f"Available methods files in {methods_dir}:")
         try:
-            methods_dir = Path("data/methods")
             if methods_dir.exists():
                 json_files = sorted(methods_dir.glob("*.json"))
                 for f in json_files:
                     print(f"  • {f.stem}")
         except Exception:
             pass
-        print(f"\nUsing default methods file: data/methods/methods.json")
-        methods_file = "data/methods/methods.json"
+        fallback_method_file = methods_dir / "methods.json"
+        if not fallback_method_file.exists():
+            fallback_method_file = methods_dir / "ipcc.json"
+        print(f"\nUsing default methods file: {fallback_method_file}")
+        methods_file = fallback_method_file
     
     # Load LCIA methods from JSON file with enhanced format support
     try:
-        lcia_methods, method_metadata = load_lcia_methods(methods_file)
+        lcia_methods, method_metadata = load_lcia_methods(str(methods_file))
         if lcia_methods:
             print_method_info(lcia_methods, method_metadata)
         else:
@@ -1409,9 +1686,18 @@ Examples:
         energy_amount_mj = 1.0
     
     print("Starting LCA analysis...")
+
+    if parameter_values:
+        print(f"Parameter overrides: {parameter_values}")
     
     # Run LCA using inventory base energy by default.
-    results = run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=energy_amount_mj)
+    results = run_lca(
+        lci_file,
+        lcia_methods,
+        parameter_values=parameter_values,
+        functional_unit=functional_unit,
+        energy_amount_mj=energy_amount_mj,
+    )
     
     # Generate output filenames based on inventory and method
     inventory_name = Path(lci_file).stem  # e.g., "example", "grid"

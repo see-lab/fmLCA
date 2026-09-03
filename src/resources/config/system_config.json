@@ -1,0 +1,213 @@
+{
+    "system": {
+        "default_project": "LCA-FMU",
+        "temp_database_prefix": "LCA_Temp_DB",
+        "supported_databases": [
+            {
+                "name": "ecoinvent",
+                "versions": ["3.8", "3.9", "3.10", "3.11", "3.12"],
+                "naming_patterns": [
+                    "ecoinvent-{version}-cutoff",
+                    "ecoinvent-{version}-consequential", 
+                    "ecoinvent-{version}",
+                    "ecoinvent_{version}_cutoff"
+                ],
+                "process_id_type": "uuid"
+            }
+        ],
+        "project_search_names": [
+            "LCA-FMU"
+        ]
+    },
+    "energy_applications": {
+        "primary_input": {
+            "name": "energy_input", 
+            "unit": "MJ",
+            "description": "Energy input to the system",
+            "value": 100.0
+        },
+        "energy_process_detection": {
+            "energy_units": ["MJ", "kWh", "GJ", "TJ", "Wh", "MW", "kW"],
+            "energy_keywords": ["electricity", "electric", "power", "heat", "thermal", "steam", "fuel", "gas", "diesel", "petrol", "propane", "lpg", "lng", "burned", "combustion", "gasoline", "kerosene", "natural gas", "energy"],
+            "unit_conversion": {
+                "MJ_to_kWh": 0.2777777778,
+                "kWh_to_MJ": 3.6,
+                "GJ_to_MJ": 1000.0,
+                "TJ_to_MJ": 1000000.0
+            }
+        },
+        "energy_metadata_format": {
+            "structure": "energy_metadata.primary_input.value",
+            "propagation_method": "amount_ref",
+            "automatic_scaling": true,
+            "dynamic_calculation": true
+        },
+        "fallback_processes": [
+            {
+                "keywords": ["water", "tap water"],
+                "unit": "kg",
+                "scaling_factor": 0.02,
+                "description": "Water consumption (legacy compatibility)"
+            }
+        ]
+    },
+    "lcia_methods": {
+        "categories": {
+            "climate_change": {
+                "keywords": ["climate change", "global warming", "gwp", "co2"],
+                "preferred_methods": ["IPCC 2021", "IPCC 2013", "ReCiPe 2016"],
+                "specific_methods": [
+                    "IPCC 2021 climate change total excl biogenic GWP100",
+                    "IPCC 2013 climate change GWP100"
+                ],
+                "units": ["kg CO2-eq"],
+                "description": "Global Warming Potential",
+                "exclude_biogenic": true
+            },
+            "acidification": {
+                "keywords": ["acidification"],
+                "preferred_methods": ["ReCiPe 2016", "CML"],
+                "units": ["mol H+-eq", "kg SO2-eq"],
+                "description": "Acidification Potential"
+            },
+            "eutrophication": {
+                "keywords": ["eutrophication"],
+                "preferred_methods": ["ReCiPe 2016", "CML"],
+                "units": ["kg P-eq", "kg N-eq"],
+                "description": "Eutrophication Potential"
+            },
+            "energy_demand": {
+                "keywords": ["energy", "primary energy", "cumulative energy"],
+                "preferred_methods": ["CED", "ReCiPe 2016"],
+                "units": ["MJ primary"],
+                "description": "Cumulative Energy Demand"
+            },
+            "toxicity": {
+                "keywords": ["toxicity", "human toxicity"],
+                "preferred_methods": ["USEtox", "ReCiPe 2016"],
+                "units": ["CTUh"],
+                "description": "Human Toxicity Potential"
+            }
+        },
+        "method_selection": {
+            "auto_detect": true,
+            "fallback_strategy": "first_available",
+            "preference_order": ["IPCC 2021", "ReCiPe 2016", "IPCC 2013", "CML"]
+        }
+    },
+    "data_formats": {
+        "csv_mapping": {
+            "flexible_columns": true,
+            "required_fields": ["name", "amount", "unit"],
+            "field_aliases": {
+                "name": ["Item", "Process", "Activity", "process_name"],
+                "amount": ["Amount", "Quantity", "Value"],
+                "unit": ["Unit", "Units", "UOM"],
+                "stage": ["Stage", "Phase", "lifecycle_stage", "Life_Cycle_Stage"],
+                "location": ["Location", "Geography", "Geo"],
+                "database": ["Database", "DB"],
+                "code": ["Code", "ID", "UUID", "Inventory UID"],
+                "brightway_code": ["Brightway Match Code"],
+                "brightway_database": ["Brightway Match Database"],
+                "brightway_location": ["Brightway Match Location"],
+                "brightway_ref_product": ["Brightway Match Ref Product"],
+                "process_match": ["Brightway Match Name", "Match Name", "ecoinvent_name"]
+            },
+            "optional_fields": ["location", "category", "stage", "notes"],
+            "energy_processing": {
+                "auto_detect": true,
+                "use_amount_ref": true,
+                "metadata_structure": "energy_metadata.primary_input.value"
+            }
+        },
+        "lifecycle_stages": {
+            "default_stages": ["Production", "Transport", "Use", "EOL"],
+            "stage_aliases": {
+                "Production": ["Manufacturing", "Materials", "Raw Materials"],
+                "Transport": ["Transportation", "Distribution", "Logistics"],
+                "Use": ["Operation", "Usage", "Use Phase"],
+                "EOL": ["End of Life", "Disposal", "Waste", "End-of-Life"]
+            }
+        },
+        "json_inventory_format": {
+            "energy_metadata_required": true,
+            "amount_ref_support": true,
+            "dynamic_scaling": true,
+            "metadata_structure": {
+                "energy_metadata": {
+                    "primary_input": {
+                        "value": "number",
+                        "unit": "string",
+                        "description": "string"
+                    }
+                }
+            }
+        }
+    },
+    "fmu_generation": {
+        "modes": {
+            "static": {
+                "description": "Pre-calculated impact factors",
+                "calculation_time": "creation",
+                "performance": "fast",
+                "accuracy": "fixed_energy"
+            },
+            "dynamic": {
+                "description": "Real-time LCA calculation with energy propagation",
+                "calculation_time": "simulation",
+                "performance": "slower",
+                "accuracy": "dynamic_energy"
+            }
+        },
+        "templates": {
+            "energy_based": {
+                "input_variable": "energy_input",
+                "input_unit": "MJ", 
+                "input_description": "Energy input to LCA system",
+                "default_value": 100.0,
+                "supports_dynamic": true
+            },
+            "water_based": {
+                "input_variable": "water_mass",
+                "input_unit": "kg",
+                "input_description": "Water consumption for use phase",
+                "default_value": 50.0,
+                "supports_dynamic": false
+            },
+            "custom": {
+                "input_variable": "system_input",
+                "input_unit": "unit",
+                "input_description": "System input parameter", 
+                "default_value": 1.0,
+                "supports_dynamic": true
+            }
+        },
+        "output_categories": {
+            "climate_change": {
+                "variable": "climate_change_impact",
+                "unit": "kg_CO2_eq",
+                "description": "Climate change impact (IPCC 2021 excl biogenic)"
+            },
+            "acidification": {
+                "variable": "acidification_impact", 
+                "unit": "mol_H_eq",
+                "description": "Acidification impact"
+            },
+            "eutrophication": {
+                "variable": "eutrophication_impact",
+                "unit": "kg_P_eq", 
+                "description": "Eutrophication impact"
+            },
+            "energy_demand": {
+                "variable": "energy_demand",
+                "unit": "MJ_primary",
+                "description": "Primary energy demand"
+            }
+        },
+        "validation": {
+            "auto_validate": true,
+            "check_fmi_compliance": true,
+            "test_simulation": true
+        }
+    }
+}

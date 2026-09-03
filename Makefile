@@ -1,6 +1,6 @@
 # Makefile for LCA Analysis System
 
-.PHONY: help install install-dev test clean lint format fmu docs run-example
+.PHONY: help install install-dev test clean lint format fmu docs run-example storage-validation storage-validation-recipe validation-suite
 
 # Default Python interpreter
 PYTHON ?= python3
@@ -27,6 +27,16 @@ setup-venv: ## Create and setup virtual environment
 
 test: ## Run tests
 	pytest tests/ -v --cov=src --cov-report=html --cov-report=term
+
+storage-validation: ## Run storage IPCC staged-impact validation script
+	$(PYTHON) tests/storage_validation.py
+
+storage-validation-recipe: ## Run storage ReCiPe single-score (Pt) validation script
+	$(PYTHON) tests/storage_validation_recipe.py
+
+validation-suite: ## Run both storage validation scripts (IPCC + ReCiPe)
+	$(PYTHON) tests/storage_validation.py
+	$(PYTHON) tests/storage_validation_recipe.py
 
 lint: ## Run linting checks
 	flake8 src/ scripts/ tests/

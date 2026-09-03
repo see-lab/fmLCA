@@ -78,27 +78,58 @@ def extract_emission_factors(lca_results: Dict[str, Any],
     out_unit = method_config["output_unit"]
     
     if single_score:
-        # Sum score_pt from all endpoint results
+        # Sum endpoint totals for single-score methods.
+        # Prefer score_pt if present, otherwise accept total_score from lca_engine.
         total_pt = 0.0
         found = 0
         for data in impact_data.values():
-            if isinstance(data, dict) and "score_pt" in data:
-                total_pt += data["score_pt"]
+            if not isinstance(data, dict):
+                continue
+            if "score_pt" in data:
+                total_pt += float(data["score_pt"])
                 found += 1
-        
+            elif "total_score" in data:
+                total_pt += float(data["total_score"])
+                found += 1
+
         if found == 0:
-            print("  ⚠️  No Pt scores found — using placeholder factors (0).")
+            print("  ⚠️  No single-score totals found — using placeholder factors (0).")
             return {
                 "base_impact": 0.0,
                 "energy_factor": 0.0,
                 "scaling_factor": 1.0,
                 "unit": out_unit
             }
-        
-        factor = total_pt / energy_mj if energy_mj else 0.0
-        print(f"  ✅ Single score: {total_pt:.4f} Pt  ({found} damage categories), "
-              f"factor/MJ = {factor:.4e} Pt/MJ")
-        
+
+        # Prefer use-stage totals for the dynamic factor to avoid double counting
+        # embodied stages that are already tracked as static terms in the FMU.
+        use_total = 0.0
+        use_found = 0
+        stage_breakdown = lca_results.get("stage_breakdown", {})
+        if isinstance(stage_breakdown, dict):
+            for method_stages in stage_breakdown.values():
+                if not isinstance(method_stages, dict):
+                    continue
+                use_stage = method_stages.get("Use")
+                if isinstance(use_stage, dict) and isinstance(use_stage.get("score"), (int, float)):
+                    use_total += float(use_stage["score"])
+                    use_found += 1
+
+        if use_found > 0:
+            factor = use_total / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Single score: total = {total_pt:.4f} Pt "
+                f"({found} categories), use = {use_total:.4e} Pt "
+                f"({use_found} categories), factor/MJ = {factor:.4e} Pt/MJ"
+            )
+        else:
+            factor = total_pt / energy_mj if energy_mj else 0.0
+            print(
+                f"  ✅ Single score: total = {total_pt:.4f} Pt "
+                f"({found} categories), factor/MJ = {factor:.4e} Pt/MJ "
+                "(fallback: total-based)"
+            )
+
         return {
             "base_impact": total_pt,
             "energy_factor": factor,
@@ -190,8 +221,18 @@ def extract_stage_impacts(lca_results: Dict[str, Any],
         print("  ⚠️  No stage breakdown found — using zero stage impacts")
         return stages
     
-    # Get stage breakdown for the first method (should only be one)
-    for method_stages in stage_breakdown.values():
+    # For single-score methods (e.g., ReCiPe endpoint), aggregate across all
+    # selected endpoint categories. For non-single-score methods, process the
+    # first method entry (legacy behavior).
+    method_stage_sets = []
+    if method_config.get("single_score", False):
+        method_stage_sets = [m for m in stage_breakdown.values() if isinstance(m, dict)]
+    else:
+        first_method_stages = next(iter(stage_breakdown.values()), None)
+        if isinstance(first_method_stages, dict):
+            method_stage_sets = [first_method_stages]
+
+    for method_stages in method_stage_sets:
         # Map LCA stage names to our standard names
         stage_mapping = {
             'Production': 'production',
@@ -210,8 +251,6 @@ def extract_stage_impacts(lca_results: Dict[str, Any],
                 std_name = stage_mapping.get(stage_name, stage_name.lower())
                 if std_name in stages:
                     stages[std_name] += score
-        
-        break  # Only process first method
     
     print(f"  ✅ Stage impacts extracted:")
     for stage, impact in stages.items():
@@ -228,6 +267,7 @@ def generate_fmu_class_code(class_name: str,
                            method_config: Dict[str, Any],
                            factors: Dict[str, Any],
                            stage_impacts: Dict[str, float],
+                           parameter_model: Optional[Dict[str, Any]] = None,
                            lci_path: Optional[Path] = None) -> str:
     """
     Generate Python code for FMU class with cumulative impact tracking.
@@ -247,6 +287,33 @@ def generate_fmu_class_code(class_name: str,
     out_label = method_config["output_label"]
     out_unit = factors["unit"]
     use_rate_per_j = factors["energy_factor"] / 1.0e6  # Convert impact/MJ to impact/J
+
+    param_defaults = (parameter_model or {}).get("defaults", {})
+    param_slopes = (parameter_model or {}).get("slopes", {})
+    param_decl_lines = []
+    for pname, default in param_defaults.items():
+        param_decl_lines.extend([
+            f"                self.{pname} = {float(default):.8e}",
+            "                self.register_variable(Real(",
+            f"                    \"{pname}\",",
+            f"                    start={float(default):.8e},",
+            "                    causality=Fmi2Causality.parameter,",
+            "                    variability=Fmi2Variability.tunable,",
+            "                    initial=Fmi2Initial.exact,",
+            f"                    description=\"LCI parameter override: {pname}\",",
+            "                ))",
+            "",
+        ])
+    param_decl = "\n".join(param_decl_lines).rstrip()
+
+    metric_helper = "\n".join([
+        "            def _metric(self, metric_name: str, baseline: float) -> float:",
+        "                value = baseline",
+        "                for pname, default in self._param_defaults.items():",
+        "                    slope = self._param_slopes.get(metric_name, {}).get(pname, 0.0)",
+        "                    value += slope * (getattr(self, pname) - default)",
+        "                return value",
+    ])
     
     code = textwrap.dedent(f'''\
         """
@@ -278,6 +345,7 @@ def generate_fmu_class_code(class_name: str,
                 self._prev_u = 0.0
                 self.use_phase_impact = 0.0
                 self.eol_added = False
+{param_decl}
 
                 # u — power input in W (maps to: power_input_w)
                 self.register_variable(Real(
@@ -305,8 +373,18 @@ def generate_fmu_class_code(class_name: str,
                 # Use phase rate: impact per joule
                 self.use_rate_per_j = {factors["energy_factor"]:.8e} / 1.0e6  # {out_unit}/J
 
+                self._param_defaults = {repr(param_defaults)}
+                self._param_slopes = {repr(param_slopes)}
+
+{metric_helper}
+
             def do_step(self, current_time: float, step_size: float) -> bool:
                 try:
+                    production_impact = self._metric("production", self.production_impact)
+                    transport_impact = self._metric("transport", self.transport_impact)
+                    eol_impact = self._metric("eol", self.eol_impact)
+                    use_rate_per_j = self._metric("use_rate_per_j", self.use_rate_per_j)
+
                     # Input 'u' is already updated by FMI setReal.
                     power_prev = self._prev_u
                     power_curr = self.u
@@ -314,15 +392,15 @@ def generate_fmu_class_code(class_name: str,
                     # Trapezoidal integration where W*s = J.
                     avg_power = (power_prev + power_curr) / 2.0
                     step_energy_j = avg_power * step_size
-                    step_impact = step_energy_j * self.use_rate_per_j
+                    step_impact = step_energy_j * use_rate_per_j
                     
                     self.use_phase_impact += step_impact
                     
                     # Update cumulative impact
-                    self.y = (self.production_impact + 
-                             self.transport_impact + 
+                    self.y = (production_impact + 
+                             transport_impact + 
                              self.use_phase_impact +
-                             (self.eol_impact if self.eol_added else 0.0))
+                             (eol_impact if self.eol_added else 0.0))
 
                     self._prev_u = power_curr
                     return True
@@ -333,7 +411,9 @@ def generate_fmu_class_code(class_name: str,
 
             def exit_initialization_mode(self):
                 # Initialize with embodied impacts
-                self.y = self.production_impact + self.transport_impact
+                production_impact = self._metric("production", self.production_impact)
+                transport_impact = self._metric("transport", self.transport_impact)
+                self.y = production_impact + transport_impact
                 self.use_phase_impact = 0.0
                 self.eol_added = False
                 self._prev_u = self.u
@@ -342,8 +422,9 @@ def generate_fmu_class_code(class_name: str,
             def terminate(self):
                 # Add end-of-life impacts
                 if not self.eol_added:
+                    eol_impact = self._metric("eol", self.eol_impact)
                     self.eol_added = True
-                    self.y += self.eol_impact
+                    self.y += eol_impact
                 return True
         ''')
     
@@ -503,10 +584,10 @@ def _resolve_fmi_var_metadata(input_unit: str, output_unit: str) -> Dict[str, Di
     elif out_lower == "pt":
         y_meta = {
             "quantity": "ImpactScore",
-            "unit": "1",
+            "unit": "Pt",
             "display_unit": "Pt",
             "unit_def": {
-                "name": "1",
+                "name": "Pt",
                 "base_unit": None,
                 "display_units": [{"name": "Pt", "factor": "1"}],
             },

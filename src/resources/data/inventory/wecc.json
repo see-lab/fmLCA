@@ -1,21 +1,21 @@
 {
-  "name": "Grid Production System",
+  "name": "Wecc Production System",
   "unit": "unit",
   "location": "GLO",
   "categories": [
     "technosphere",
-    "grid production"
+    "wecc production"
   ],
   "type": "process",
   "exchanges": [
     {
-      "name": "Grid Production System",
+      "name": "Wecc Production System",
       "amount": 1.0,
       "unit": "unit",
       "type": "production",
       "input": [
-        "Grid_System_DB",
-        "Grid_1unit"
+        "Wecc_System_DB",
+        "Wecc_1unit"
       ]
     },
     {
@@ -24,10 +24,10 @@
       "type": "technosphere",
       "life_cycle_stage": "Use",
       "amount_ref": "energy_metadata.primary_input.value",
-      "location": "Northeast Power Coordinating Council, US part only (US-NPCC)",
+      "location": "Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",
       "input": [
         "ecoinvent-3.12-cutoff",
-        "f1aca55f8d85f86399d3016d3f4b1b2a"
+        "f1896ce156e61662bc1dab03de703e0b"
       ]
     }
   ],
@@ -43,9 +43,9 @@
     "energy_processes": 1,
     "primary_input": {
       "name": "energy_input",
-      "unit": "MJ",
+      "unit": "kWh",
       "description": "Energy input to the system",
-      "value": 3.6
+      "value": 4450.54
     }
   },
   "unlinked_exchanges": []

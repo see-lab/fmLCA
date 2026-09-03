@@ -48,12 +48,26 @@ results/*.csv
 logs/*.log
 !logs/.gitkeep
 
+# Inventory policy for deployment:
+data/inventory/*.json
+data/inventory/*.csv
+data/inventory/archive/
+data/inventory/projects/
+!data/inventory/default.json
+!data/inventory/example.json
+!data/inventory/wecc.json
+!data/inventory/pv.csv
+!data/inventory/bess.csv
+!data/inventory/pv_wecc_bess.json
+
+
 # Secrets, credentials, & temporary files
 config/secrets/
 secrets/
 config/temp/
 temp/
 fmu/experimental
+fmu/proprietary/
 
 # Data directory (user data, external datasets)
 data/external/
@@ -66,7 +80,6 @@ archive/
 **/archive/
 fmu/archive/
 docs/archive/
-
 
 # Brightway2 data directories
 brightway2/

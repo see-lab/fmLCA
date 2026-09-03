@@ -1,0 +1,55 @@
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Propane (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Damage assessment
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Propane_Production	Propane_Transport	Propane_Use	Propane_End-Of-Life
+Human health	DALY	0.11090291	0.085337928	0.00017990939	0.025379074	5.993533E-6
+Ecosystems	species.yr	6.2550262E-5	1.5413088E-5	3.530474E-7	4.6774965E-5	9.1620834E-9
+Resources	USD2013	2112.4802	618.16894	9.2609435	1484.8107	0.23959727
+
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Propane (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Normalization
+Skip categories: 	Never
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Propane_Production	Propane_Transport	Propane_Use	Propane_End-Of-Life
+Human health		4.6246511	3.5585916	0.0075022217	1.0583074	0.00024993033
+Ecosystems		0.042283977	0.010419247	0.00023866004	0.031619876	6.1935684E-6
+Resources		0.075415542	0.022068631	0.00033061568	0.053007741	8.5536226E-6
+
+
+Calculation: 	Analyze
+Results: 	Impact assessment
+Product: 	1 p Propane (of project EnergyStorage)
+Method: 	ReCiPe 2016 Endpoint (H) V1.09 / World (2010) H/A
+Indicator: 	Single score
+Skip categories: 	Never
+Default units: 	No
+Exclude infrastructure processes: 	No
+Exclude long-term emissions: 	No
+Per impact category: 	No
+Sorted on item: 	Damage category
+Sort order: 	Ascending
+
+Damage category	Unit	Total	Propane_Production	Propane_Transport	Propane_Use	Propane_End-Of-Life
+Total	kPt	1.8818572	1.4320181	0.0031624758	0.44657246	0.00010416028
+Human health	kPt	1.8498605	1.4234366	0.0030008887	0.42332296	9.997213E-5
+Ecosystems	kPt	0.016913591	0.004167699	9.5464016E-5	0.01264795	2.4774274E-6
+Resources	kPt	0.015083108	0.0044137262	6.6123137E-5	0.010601548	1.7107245E-6

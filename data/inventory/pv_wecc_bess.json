@@ -1,0 +1,329 @@
+{
+  "name": "Pv + Wecc + Bess Combined System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "combined system"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Pv + Wecc + Bess Combined System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Combined_System_DB",
+        "Combined_1unit"
+      ]
+    },
+    {
+      "name": "market for photovoltaic panel, single-Si wafer",
+      "unit": "m2",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "7.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "inverter production, 0.5kW",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "12.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "market for steel, low-alloyed",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "65.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "market for aluminium, wrought alloy",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "30.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "wire drawing, copper",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "9.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "transport, freight, sea, container ship",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "1300.0 * n_pv",
+      "location": "GLO",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "transport, freight, lorry, unspecified",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "170.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "process-specific burdens, inert material landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": "160.0 * n_pv",
+      "location": "RoW",
+      "subsystem": "Pv"
+    },
+    {
+      "name": "Grid energy",
+      "unit": "kWh",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "location": "Western Electricity Coordinating Council, US part only (US-WECC; California / San Francisco)",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f1896ce156e61662bc1dab03de703e0b"
+      ],
+      "subsystem": "Wecc"
+    },
+    {
+      "name": "Battery",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "450.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "dd1f0c438b4fdf3987994b66ba725239"
+      ],
+      "process_match": "battery cell production, Li-ion, NMC811",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Inverter",
+      "unit": "p",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "0.5 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "9bf3858720b7b3ebb71170c83decfbef"
+      ],
+      "process_match": "inverter production, 0.5kW",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Electronics housing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f0fabe27a63e2a4a70c6dd34a211922b"
+      ],
+      "process_match": "polypropylene production, granulate",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Wiring",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "10.0 * n_bess",
+      "location": "US",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "a5054bb4fefd08d98c8c4dc393a5d113"
+      ],
+      "process_match": "copper mine operation and beneficiation, sulfide ore",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Electronics",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "98171caf6d8e65fb81de703cebc81862"
+      ],
+      "process_match": "electronics production, for control units",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Injection molding",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "5.0 * n_bess",
+      "location": "CA-QC",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "4ad095a0e6bcdee0c92b6da1ae8b57d1"
+      ],
+      "process_match": "injection moulding",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Wire drawing",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "amount": "10.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "0794af4c0abe8e128f97d0c784c9d985"
+      ],
+      "process_match": "wire drawing, copper",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Ocean freight",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "6946.0 * n_bess",
+      "location": "GLO",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f049dace574f0ee3bb9e466a2cf1d881"
+      ],
+      "process_match": "transport, freight, sea, container ship, heavy fuel oil",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Truck",
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "amount": "764.0 * n_bess",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "ef6bffe58e9d5976728177a00f317f71"
+      ],
+      "process_match": "transport, freight, lorry 28 metric ton, fatty acid methyl ester 100%",
+      "subsystem": "Bess"
+    },
+    {
+      "name": "Landfill",
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "amount": "640.0 * n_bess",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f3bdece169ea4e6928a81e570afca6b9"
+      ],
+      "location": "RoW",
+      "process_match": "process-specific burdens, inert material landfill",
+      "subsystem": "Bess"
+    }
+  ],
+  "parameters": {
+    "n_pv": {
+      "name": "n_pv",
+      "description": "Number of PV panels in the system",
+      "default": 1.0,
+      "subsystem": "Pv"
+    },
+    "n_bess": {
+      "name": "n_bess",
+      "description": "Number of battery energy storage systems",
+      "default": 1.0,
+      "subsystem": "Bess"
+    }
+  },
+  "subsystems": [
+    "Pv",
+    "Wecc",
+    "Bess"
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Production stage processes",
+      "exchanges": [
+        "Pv: market for photovoltaic panel, single-Si wafer",
+        "Pv: inverter production, 0.5kW",
+        "Pv: market for steel, low-alloyed",
+        "Pv: market for aluminium, wrought alloy",
+        "Pv: wire drawing, copper",
+        "Bess: Battery",
+        "Bess: Inverter",
+        "Bess: Electronics housing",
+        "Bess: Wiring",
+        "Bess: Electronics",
+        "Bess: Injection molding",
+        "Bess: Wire drawing"
+      ]
+    },
+    "Transport": {
+      "description": "Transport stage processes",
+      "exchanges": [
+        "Pv: transport, freight, sea, container ship",
+        "Pv: transport, freight, lorry, unspecified",
+        "Bess: Ocean freight",
+        "Bess: Truck"
+      ]
+    },
+    "EOL": {
+      "description": "EOL stage processes",
+      "exchanges": [
+        "Pv: process-specific burdens, inert material landfill",
+        "Bess: Landfill"
+      ]
+    },
+    "Use": {
+      "description": "Use stage processes",
+      "exchanges": [
+        "Wecc: Grid energy"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "kWh",
+      "description": "Energy input to the system",
+      "value": 1.0
+    },
+    "subsystems": [
+      {
+        "subsystem": "Wecc",
+        "count": 1,
+        "primary_input": {
+          "name": "energy_input",
+          "unit": "kWh",
+          "description": "Energy input to the system",
+          "value": 1.0
+        }
+      }
+    ]
+  },
+  "unlinked_exchanges": []
+}
