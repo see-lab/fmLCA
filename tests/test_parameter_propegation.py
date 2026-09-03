@@ -145,18 +145,9 @@ def test_json_output_structure():
     print("TEST 4: JSON Output Structure for FMU Generation")
     print("="*80)
     
-    # Load the combined JSON file
-    json_file = project_root / 'data' / 'inventory' / 'pv_bess_combined.json'
-    
-    if not json_file.exists():
-        print(f"⚠️  Combined JSON not found, generating...")
-        lci_manager = LCIDataManager()
-        csv_files = [
-            project_root / 'data' / 'inventory' / 'pv.csv',
-            project_root / 'data' / 'inventory' / 'bess.csv'
-        ]
-        lci_data = lci_manager.import_multiple_csv(csv_files)
-        lci_manager.export_to_json(lci_data, str(json_file))
+    # Use pre-existing inventory fixture; do not write into tracked source dirs.
+    json_file = project_root / 'data' / 'inventory' / 'pv_wecc_bess.json'
+    assert json_file.exists(), f"Expected fixture not found: {json_file}"
     
     with open(json_file, 'r') as f:
         data = json.load(f)

@@ -5,21 +5,21 @@ Converts CSV inventory data to JSON format,
 with energy propagation for dynamic consumption rates.
 
 Features:
-  • Automatic energy process detection (by unit: MJ, kWh, GJ, etc.)
-  • Energy processes use amount_ref instead of hardcoded amounts
-    • Energy metadata retains original inventory base value and unit (no normalization)
-  • Modern energy_metadata format with "value" field
-    • Conversion to required analysis units is handled by lca_engine before impacts
-  • Combines multiple CSV files into a single system with parameter support
+    - Automatic energy process detection (by unit: MJ, kWh, GJ, etc.)
+    - Energy processes use amount_ref instead of hardcoded amounts
+        - Energy metadata retains original inventory base value and unit (no normalization)
+    - Modern energy_metadata format with "value" field
+        - Conversion to required analysis units is handled by lca_engine before impacts
+    - Combines multiple CSV files into a single system with parameter support
 
 Usage:
     python scripts/csv_to_json_translator.py input # Creates input.json
-    python scripts/csv_to_json_translator.py example1 example2  # Creates example1_example2_combined.json
+    python scripts/csv_to_json_translator.py example1 example2  # Creates example1_example2.json
 
 Energy Process Conversion:
-  • CSV: "Water pump, 540, MJ" → JSON: "amount_ref": "energy_metadata.primary_input.value"
-    • CSV: "Electricity, 25, kWh" → Metadata: "value": 25, "unit": "kWh"
-  • All non-energy processes keep direct amounts
+    - CSV: "Water pump, 540, MJ" -> JSON: "amount_ref": "energy_metadata.primary_input.value"
+        - CSV: "Electricity, 25, kWh" -> Metadata: "value": 25, "unit": "kWh"
+    - All non-energy processes keep direct amounts
 
 Supports flexible CSV formats through configuration-driven field mapping.
 Lines beginning with '#' are treated as metadata/comments.
@@ -91,11 +91,11 @@ def convert_csv_to_lci_json_flexible(csv_files, output_file=None):
         else:
             # For multiple files, create combined name
             combined_name = "_".join([p.stem for p in csv_paths])
-            output_file = csv_paths[0].parent / f"{combined_name}_combined.json"
+            output_file = csv_paths[0].parent / f"{combined_name}.json"
     
-    print(f"🔄 Converting CSV to LCI JSON using flexible configuration...")
-    print(f"   📁 Input: {', '.join(str(p) for p in csv_paths)}")
-    print(f"   📁 Output: {output_file}")
+    print("Converting CSV to LCI JSON using flexible configuration...")
+    print(f"   Input: {', '.join(str(p) for p in csv_paths)}")
+    print(f"   Output: {output_file}")
     
     # Initialize managers
     from src.config_manager import get_config
@@ -116,20 +116,20 @@ def convert_csv_to_lci_json_flexible(csv_files, output_file=None):
         if not lci_data:
             raise Exception("Failed to import CSV data")
         
-        print(f"✅ Successfully converted CSV data")
-        print(f"   📋 Process: {lci_data.get('name', 'Unknown')}")
-        print(f"   🔄 Exchanges: {len(lci_data.get('exchanges', []))}")
+        print("Successfully converted CSV data")
+        print(f"   Process: {lci_data.get('name', 'Unknown')}")
+        print(f"   Exchanges: {len(lci_data.get('exchanges', []))}")
         if 'parameters' in lci_data:
-            print(f"   📊 Parameters: {list(lci_data['parameters'].keys())}")
+            print(f"   Parameters: {list(lci_data['parameters'].keys())}")
         
         # Export to JSON
         lci_manager.export_to_json(lci_data, str(output_file))
         
-        print(f"✅ JSON file created: {output_file}")
+        print(f"JSON file created: {output_file}")
         return lci_data
         
     except Exception as e:
-        print(f"❌ Error during conversion: {e}")
+        print(f"Error during conversion: {e}")
         return None
 
 
@@ -143,18 +143,18 @@ def test_with_lca_analysis(json_file, product_name):
         methods = ["IPCC 2021 climate change total excl biogenic GWP100"]
         functional_unit = {}
         
-        print(f"   🔄 Testing with {json_file}")
+        print(f"   Testing with {json_file}")
         results = run_lca_energy(str(json_file), methods, functional_unit, 180.0)
         
         if "error" in results:
-            print(f"   ⚠️ LCA test had issues: {results['error']}")
+            print(f"   WARNING: LCA test had issues: {results['error']}")
             return False
         else:
-            print("   ✅ LCA test completed successfully")
+            print("   LCA test completed successfully")
             return True
             
     except Exception as e:
-        print(f"   ⚠️ LCA test failed: {e}")
+        print(f"   WARNING: LCA test failed: {e}")
         return False
 
 
@@ -203,11 +203,11 @@ Metadata/comments:
     
     try:
         # Use flexible conversion mode (supports single or multiple files)
-        print("🔄 Using flexible conversion mode")
+        print("Using flexible conversion mode")
         lci_data = convert_csv_to_lci_json_flexible(args.csv_files, args.json_file)
         
         if lci_data is None:
-            print("❌ Conversion failed")
+            print("Conversion failed")
             sys.exit(1)
         
         # Determine output file for validation/testing
@@ -217,7 +217,7 @@ Metadata/comments:
             output_file = Path(args.csv_files[0]).with_suffix('.json')
         else:
             combined_name = "_".join([Path(f).stem for f in args.csv_files])
-            output_file = f"{combined_name}_combined.json"
+            output_file = f"{combined_name}.json"
         
         product_name = Path(args.csv_files[0]).stem
         
@@ -230,27 +230,27 @@ Metadata/comments:
         if args.validate:
             from src.lci_data_manager import validate_inventory_format
 
-            print("   🔍 Validating JSON structure...")
+            print("   Validating JSON structure...")
             is_valid = validate_inventory_format(lci_data)
             if not is_valid:
-                print(f"⚠️  Validation found issues - please review")
+                print("WARNING: Validation found issues - please review")
         
         # Testing
         if args.test:
             test_success = test_with_lca_analysis(output_file, product_name)
             if not test_success:
-                print(f"⚠️  LCA analysis test had issues")
+                print("WARNING: LCA analysis test had issues")
         
-        print(f"\n🎉 CSV to LCI JSON conversion completed!")
-        print(f"   📁 Output file: {output_file}")
-        print(f"   🚀 Ready for FMU generation with:")
+        print("\nCSV to LCI JSON conversion completed")
+        print(f"   Output file: {output_file}")
+        print("   Ready for FMU generation with:")
         print(f"      python scripts/quick_fmu_creator.py {product_name}")
         
     except Exception as e:
         if args.quiet:
             sys.stdout = sys.__stdout__
             devnull.close()
-        print(f"❌ Conversion failed: {e}")
+        print(f"Conversion failed: {e}")
         sys.exit(1)
 
 

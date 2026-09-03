@@ -63,7 +63,7 @@ python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
 python scripts/csv_to_json_translator.py example.csv
 
 # Combine multiple parameterized subsystems, with a declared output name
-# Default output name is `example1_example2_combined.json'
+# Default output name is `example1_example2.json'
 python scripts/csv_to_json_translator.py example1 example2 --output combined_system.json
 ```
 
