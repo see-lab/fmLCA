@@ -78,7 +78,17 @@ setup(
     },
     include_package_data=True,
     package_data={
-        "": ["data/inventory/*.json", "data/inventory/*.csv", "data/methods/*.json", "config/secrets/*.json"],
+        "": [
+            "data/inventory/default.json",
+            "data/inventory/example.json",
+            "data/inventory/wecc.json",
+            "data/inventory/pv_wecc_bess.json",
+            "data/inventory/pv.csv",
+            "data/inventory/bess.csv",
+            "data/methods/ipcc.json",
+            "data/methods/recipe_endpoint_ha.json",
+            "data/methods/brightway_methods_reference.json",
+        ],
     },
     project_urls={
         "Bug Reports": "https://github.com/see-lab/lca-fmu/issues",

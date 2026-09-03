@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Integration parity test: pv_bess_wecc FMU vs native parameterized LCA."""
+"""Integration parity test: pv_wecc_bess FMU vs native parameterized LCA."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ if str(SRC_DIR) not in sys.path:
 from lca_engine import run_lca  # noqa: E402
 
 
-INVENTORY = ROOT / "data" / "inventory" / "pv_bess_wecc_312.json"
+INVENTORY = ROOT / "data" / "inventory" / "pv_wecc_bess.json"
 METHOD = "IPCC 2021 climate change total excl biogenic GWP100"
 FMU_NAME = "PvBessWecc312_ParityTest"
 START_TIME = 0.0
@@ -69,7 +69,7 @@ def _extract_first_total_score(results: dict) -> float:
         err = str(results["error"])
         if _should_skip_for_missing_ecoinvent(err):
             pytest.skip(
-                "Skipping pv_bess_wecc parity test: required private Brightway/ecoinvent "
+                "Skipping pv_wecc_bess parity test: required private Brightway/ecoinvent "
                 f"database is not available in this environment ({err})."
             )
         raise AssertionError(f"run_lca failed: {err}")
@@ -82,7 +82,7 @@ def _extract_first_total_score(results: dict) -> float:
     raise AssertionError("No total_score found in impact_results")
 
 
-def _build_pv_bess_wecc_fmu() -> Path:
+def _build_pv_wecc_bess_fmu() -> Path:
     fmu_path = ROOT / "fmu" / f"{FMU_NAME}.fmu"
     if fmu_path.exists():
         return fmu_path
@@ -90,7 +90,7 @@ def _build_pv_bess_wecc_fmu() -> Path:
     cmd = [
         sys.executable,
         str(ROOT / "scripts" / "create_fmu.py"),
-        "pv_bess_wecc_312",
+        "pv_wecc_bess",
         "--method",
         "ipcc",
         "--name",
@@ -112,11 +112,11 @@ def _build_pv_bess_wecc_fmu() -> Path:
         merged = f"{completed.stdout}\n{completed.stderr}"
         if _should_skip_for_missing_ecoinvent(merged):
             pytest.skip(
-                "Skipping pv_bess_wecc parity test: FMU build requires private "
+                "Skipping pv_wecc_bess parity test: FMU build requires private "
                 f"Brightway/ecoinvent database ({merged.strip()[:300]}...)."
             )
         raise AssertionError(
-            "FMU build failed for pv_bess_wecc_312/ipcc.\n"
+            "FMU build failed for pv_wecc_bess/ipcc.\n"
             f"STDOUT:\n{completed.stdout}\n\nSTDERR:\n{completed.stderr}"
         )
 
@@ -139,7 +139,7 @@ def _prepare_run_context() -> tuple[float, np.ndarray, Path]:
         [(START_TIME, power_w), (STOP_TIME, power_w)],
         dtype=[("time", np.float64), ("u", np.float64)],
     )
-    fmu_path = _build_pv_bess_wecc_fmu()
+    fmu_path = _build_pv_wecc_bess_fmu()
     return baseline_energy_mj, input_signal, fmu_path
 
 
@@ -196,14 +196,14 @@ def _run_parity_cases(cases: list[dict[str, float]], label: str) -> list[tuple[d
 
 @pytest.mark.integration
 @pytest.mark.ecoinvent
-def test_pv_bess_wecc_smoke_native_matches_fmu() -> None:
+def test_pv_wecc_bess_smoke_native_matches_fmu() -> None:
     """Fast smoke check using one representative parameter setting."""
     _run_parity_cases([SMOKE_CASE], label="Smoke")
 
 
 @pytest.mark.integration
 @pytest.mark.ecoinvent
-def test_pv_bess_wecc_parameterized_native_matches_fmu() -> None:
+def test_pv_wecc_bess_parameterized_native_matches_fmu() -> None:
     case_rows = _run_parity_cases(PARAMETER_CASES, label="Full")
 
     max_row = max(case_rows, key=lambda r: r[3])
@@ -216,7 +216,7 @@ def test_pv_bess_wecc_parameterized_native_matches_fmu() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run pv_bess_wecc FMU vs native LCA parity checks without pytest."
+        description="Run pv_wecc_bess FMU vs native LCA parity checks without pytest."
     )
     parser.add_argument(
         "--mode",

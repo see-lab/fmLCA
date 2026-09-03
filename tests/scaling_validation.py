@@ -41,7 +41,7 @@ if str(SRC_DIR) not in sys.path:
 from lca_engine import run_lca  # noqa: E402
 
 
-DEFAULT_INVENTORY = ROOT / "data" / "inventory" / "pv_bess_wecc_312.json"
+DEFAULT_INVENTORY = ROOT / "data" / "inventory" / "pv_wecc_bess.json"
 DEFAULT_FMU = ROOT / "fmu" / "PvBessWecc312_Ipcc_v1.0.fmu"
 DEFAULT_METHOD = "IPCC 2021 climate change total excl biogenic GWP100"
 
