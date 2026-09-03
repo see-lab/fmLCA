@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "LCA-FMU"
+version = "0.1"
+authors = [
+  { name="Kathryn Hinkelman", email="kathryn.hinkelman@uvm.edu" },
+]
+description = "Co-simulation package for coupling Brigthway LCA with dynamic energy system models."
+readme = "README.md"
+requires-python = ">=3.9"
+dynamic = ["dependencies", "optional-dependencies", "scripts"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
+]
+license = "BSD-3-Clause"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/see-lab/lca-fmu"
+Issues = "https://github.com/see-lab/lca-fmu/issues"

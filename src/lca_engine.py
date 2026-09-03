@@ -25,6 +25,7 @@ try:
     from .config_manager import get_config
     from .database_manager import DatabaseManager
     from .lci_data_manager import LCIDataManager
+    from .lca_utils import get_inventory_dir, get_methods_dir
 except ImportError:
     # Fall back to absolute imports (when run directly)
     import sys
@@ -38,6 +39,7 @@ except ImportError:
     from config_manager import get_config
     from database_manager import DatabaseManager
     from lci_data_manager import LCIDataManager
+    from lca_utils import get_inventory_dir, get_methods_dir
 
 # Initialize configuration
 config = get_config()
@@ -1603,22 +1605,24 @@ Examples:
         exit(1)
     
     # Resolve LCI file path
+    inventory_dir = get_inventory_dir()
+    methods_dir = get_methods_dir()
+
     if args.lci_file:
         # Use explicit --lci-file if provided
         lci_file = args.lci_file
     elif args.lci_stem:
         # Use positional stem argument
-        lci_file = f"data/inventory/{args.lci_stem}.json"
+        lci_file = str(inventory_dir / f"{args.lci_stem}.json")
     else:
         # Default fallback
-        lci_file = "data/inventory/pipe.json"
+        lci_file = str(inventory_dir / "pipe.json")
     
     # Check if file exists
     if not Path(lci_file).exists():
         print(f"❌ Error: LCI file not found: {lci_file}")
-        print(f"\nAvailable inventory files in data/inventory/:")
+        print(f"\nAvailable inventory files in {inventory_dir}:")
         try:
-            inventory_dir = Path("data/inventory")
             if inventory_dir.exists():
                 json_files = sorted(inventory_dir.glob("*.json"))
                 for f in json_files:
@@ -1628,24 +1632,26 @@ Examples:
         exit(1)
     
     # Resolve methods file path
-    methods_file = f"data/methods/{args.methods}.json"
-    if not Path(methods_file).exists():
+    methods_file = methods_dir / f"{args.methods}.json"
+    if not methods_file.exists():
         print(f"⚠️  Methods file not found: {methods_file}")
-        print(f"Available methods files in data/methods/:")
+        print(f"Available methods files in {methods_dir}:")
         try:
-            methods_dir = Path("data/methods")
             if methods_dir.exists():
                 json_files = sorted(methods_dir.glob("*.json"))
                 for f in json_files:
                     print(f"  • {f.stem}")
         except Exception:
             pass
-        print(f"\nUsing default methods file: data/methods/methods.json")
-        methods_file = "data/methods/methods.json"
+        fallback_method_file = methods_dir / "methods.json"
+        if not fallback_method_file.exists():
+            fallback_method_file = methods_dir / "ipcc.json"
+        print(f"\nUsing default methods file: {fallback_method_file}")
+        methods_file = fallback_method_file
     
     # Load LCIA methods from JSON file with enhanced format support
     try:
-        lcia_methods, method_metadata = load_lcia_methods(methods_file)
+        lcia_methods, method_metadata = load_lcia_methods(str(methods_file))
         if lcia_methods:
             print_method_info(lcia_methods, method_metadata)
         else:

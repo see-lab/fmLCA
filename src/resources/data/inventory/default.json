@@ -1,0 +1,110 @@
+{
+  "name": "Default System",
+  "unit": "unit",
+  "location": "GLO",
+  "categories": [
+    "technosphere",
+    "default system"
+  ],
+  "type": "process",
+  "exchanges": [
+    {
+      "name": "Default System",
+      "amount": 1.0,
+      "unit": "unit",
+      "type": "production",
+      "input": [
+        "Default_System_DB",
+        "Default_1unit"
+      ]
+    },
+    {
+      "name": "Steel",
+      "amount": 10.0,
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "Production",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "35a03843634696880cb0fad8ff0b2c1d"
+      ],
+      "process_match": "market for steel, low-alloyed"
+    },
+    {
+      "name": "Grid electricity consumption",
+      "amount_ref": "energy_metadata.primary_input.value",
+      "unit": "kWh",
+      "type": "technosphere",
+      "life_cycle_stage": "Use",
+      "location": "Northeast Power Coordinating Council, US part only (US-NPCC)",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "f1aca55f8d85f86399d3016d3f4b1b2a"
+      ],
+      "process_match": "market for electricity, low voltage"
+    },
+    {
+      "name": "Transport by lorry",
+      "amount": 100.0,
+      "unit": "tkm",
+      "type": "technosphere",
+      "life_cycle_stage": "Transport",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "e3ddf371f983410c615e7100c106ce4f"
+      ],
+      "process_match": "market for transport, freight, lorry, >32 metric ton, diesel, EURO 3"
+    },
+    {
+      "name": "Waste treatment",
+      "amount": 10.0,
+      "unit": "kg",
+      "type": "technosphere",
+      "life_cycle_stage": "EOL",
+      "location": "RoW",
+      "input": [
+        "ecoinvent-3.12-cutoff",
+        "3f5b3062197b40f90e090f884deae485"
+      ],
+      "process_match": "market for process-specific burdens, inert material landfill"
+    }
+  ],
+  "life_cycle_stages": {
+    "Production": {
+      "description": "Materials and manufacturing stage",
+      "exchanges": [
+        "Steel"
+      ]
+    },
+    "Use": {
+      "description": "Use phase with energy consumption",
+      "exchanges": [
+        "Grid electricity consumption"
+      ]
+    },
+    "Transport": {
+      "description": "Transportation stage",
+      "exchanges": [
+        "Transport by lorry"
+      ]
+    },
+    "EOL": {
+      "description": "End-of-life stage",
+      "exchanges": [
+        "Waste treatment"
+      ]
+    }
+  },
+  "energy_metadata": {
+    "energy_processes": 1,
+    "primary_input": {
+      "name": "energy_input",
+      "unit": "MJ",
+      "description": "Energy input to the system",
+      "value": 100.0
+    }
+  },
+  "unlinked_exchanges": []
+}

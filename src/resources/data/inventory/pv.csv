@@ -1,0 +1,28 @@
+# Version: 2.0
+# Date: August 18 2026
+# Description: Cradle-to-grave inventory for a ground-mounted crystalline-silicon PV system.
+# Functional unit context: 7 m2 active module area - nominal irradiance 1000 W/m2 (≈7 kW instantaneous DC nameplate at STC).
+# Inverter sizing: 1000 W/m2 * 7 m2 = 7 kW DC rated * 0.89 AC/DC = 6.23 kW AC rated -> 12 kW AC @ inverter assumed (sized down for efficiency)
+# Dynamic base input for FMU: 7 kWh (1 hour at 1000 W/m2 and 7 m2 before conversion losses) per functional unit. 
+#
+# References:
+#  - de Wild-Scholten, M. (2013). Energy payback time and carbon footprint of commercial PV systems. Sol. Ene. Mat. Sol. Cel., 119, 296-305.
+#  - Götz, M, Deuber, R. Gazbour, N, Brailovsky, P.H., Nold, S., Marchand-Lasserre, M., et. al. (2026). Life Cycle Inventories of Photovoltaic Systems. IEA Task 12, IEA-PVPS T12-33:2026. 
+#
+# Notes:
+#  - ecoinvent 3.12 cutoff activities are used as foreground proxies.
+#  - Quantities below are engineering-scale approximations anchored to the references above and have not been site/spec-specific refined.
+#  - Functional unit is parameterized based on the number of PV panels (n_pv).
+#  - Grid power during use is not within this file but included externally 
+# Parameter: n_pv
+# Parameter_Description: Number of PV panels in the system
+# Parameter_Default: 1.0
+Stage,Item,Inventory Selection,Location,Amount,Unit,Database,UUID,Brightway Match Code,Brightway Match Key,Description
+Production,"market for photovoltaic panel, single-Si wafer","Photovoltaic panel, single-Si wafer {GLO}| market for photovoltaic panel, single-Si wafer | Cut-off, U",GLO,7,m2,ecoinvent-3.12-cutoff,,,,"Crystalline-Si module supply scaled to 7 m2 active area"
+Production,"inverter production, 0.5kW","Inverter, 0.5kW {RoW}| inverter production, 0.5kW | Cut-off, U",RoW,12,p,ecoinvent-3.12-cutoff,,,,"Approximate inverter capacity matching 7 kW system (14 x 0.5 kW units equivalent)"
+Production,"market for steel, low-alloyed","Steel, low-alloyed {GLO}| market for steel, low-alloyed | Cut-off, U",GLO,65,kg,ecoinvent-3.12-cutoff,,,,"Mounting structure and supports (order-of-magnitude from PV BOS literature)"
+Production,"market for aluminium, wrought alloy","Aluminium, wrought alloy {GLO}| market for aluminium, wrought alloy | Cut-off, U",GLO,30,kg,ecoinvent-3.12-cutoff,,,,"Frames/rails and balance-of-system metal components"
+Production,"wire drawing, copper","Wire drawing, copper {RoW}| wire drawing, copper | Cut-off, U",RoW,9,kg,ecoinvent-3.12-cutoff,,,,"DC/AC cabling and electrical interconnects"
+Transport,"transport, freight, sea, container ship","Transport, freight, sea, container ship {GLO}| transport, freight, sea, container ship | Cut-off, U",GLO,1300,tkm,ecoinvent-3.12-cutoff,,,,"Representative international module supply transport"
+Transport,"transport, freight, lorry, unspecified","Transport, freight, lorry, unspecified {RoW}| transport, freight, lorry, unspecified | Cut-off, U",RoW,170,tkm,ecoinvent-3.12-cutoff,,,,"Regional inland freight transport"
+End-of-life,"process-specific burdens, inert material landfill","Process-specific burdens, inert material landfill {RoW}| process-specific burdens, inert material landfill | Cut-off, U",RoW,160,kg,ecoinvent-3.12-cutoff,,,,"End-of-life disposal proxy for module/BOS residuals"

@@ -1,0 +1,18 @@
+include LICENSE
+include README.md
+include requirements.txt
+include requirements-runtime.txt
+
+recursive-include src *.py
+recursive-include src/resources *.json *.csv
+recursive-include scripts *.py
+
+# Keep source distribution lean
+prune tests
+prune demos
+prune results
+prune fmu
+prune temp
+prune build
+prune .venv
+prune venv

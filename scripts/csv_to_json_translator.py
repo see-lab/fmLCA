@@ -57,6 +57,10 @@ def convert_csv_to_lci_json_flexible(csv_files, output_file=None):
     if isinstance(csv_files, str):
         csv_files = [csv_files]
     
+    from src.lca_utils import get_inventory_dir
+
+    inventory_dir = get_inventory_dir()
+
     # Resolve all CSV file paths
     csv_paths = []
     for csv_file in csv_files:
@@ -66,7 +70,6 @@ def convert_csv_to_lci_json_flexible(csv_files, output_file=None):
         if not csv_path.exists():
             # Try as stem name (without .csv)
             stem = csv_file.replace('.csv', '')
-            inventory_dir = project_root / 'data' / 'inventory'
             
             # Search for file with .csv extension
             candidate = inventory_dir / f"{stem}.csv"

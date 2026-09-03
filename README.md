@@ -1,6 +1,6 @@
 # LCA-FMU
 
-Life Cycle Assessment platform with Functional Mock-up Unit generation for energy systems modeling.
+Life Cycle Assessment(LCA) platform with Functional Mock-up Unit (FMU) generation for dynamic energy systems modeling.
 
 Built with Brightway 2.5 and ecoinvent integration.
 
@@ -9,16 +9,16 @@ Built with Brightway 2.5 and ecoinvent integration.
 
 ## Contributors
 
-**Kathryn Hinkelman** & **Fitz Koch** - [SEE Lab](http://www.theseelab.org/), University of Vermont
+**Kathryn Hinkelman**, **Fitzwilliam Keenan-Koch**, & **Anastasija Mensikova** - [SEE Lab](http://www.theseelab.org/), University of Vermont
 
 ## Features
 
 - **Dynamic Energy Propagation** - Energy scaling throughout LCA calculations
 - **Parameterized Subsystems** - Combine multiple CSV inventories with parameters (e.g., n_pv, n_bess)
 - **Automatic Process Detection** - Zero-config CSV import with energy process recognition
-- **FMU Generation** - Create functional mockup units for co-simulation
-- **IPCC 2021 & IMPACT World+** - 728+ LCIA methods including climate change indicators
-- **Cooling Systems Analysis** - Pre-configured power plant cooling technology inventories
+- **FMU Generation** - Create functional mockup units for co-simulation using the [Functional Mockup Interface (FMI)](https://fmi-standard.org/) Standard
+- **Modelica co-simulation** - Couple LCA models with Modelica system models via Dymola, Python, or FMI-compatible runtime [tools](https://fmi-standard.org/tools/)
+- **Comprehensive impact assessment methods** - 728+ LCIA methods including climate change indicators
 
 ## Quick Start
 
@@ -106,9 +106,6 @@ Notes:
 - Source mode is not black-box compliant; the CLI prints a risk warning and requires explicit acknowledgment.
 - For ecoinvent/IP-sensitive distribution, use bytecode + enforce and validate importer compatibility before sharing.
 
-### Simulate (& co-simulate) FMUs (FUTURE ADDITION, nomenclature TBD)
-python scripts/co-simulate.py --fmu1 [name] --fmu2 [name]
-
 ## Project Structure
 
 ```
@@ -148,7 +145,7 @@ See development guidelines in `CONTRIBUTING.md`.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file.
+BSD 3-Clause License - see [LICENSE](LICENSE) file.
 
 ## Citation
 

@@ -11,12 +11,20 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding='utf-8')
 
-# Read requirements
-requirements = []
-requirements_file = this_directory / "requirements.txt"
-if requirements_file.exists():
-    with open(requirements_file, 'r') as f:
-        requirements = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+def read_requirements(filename: str) -> list[str]:
+    """Read requirements from a file, skipping comments and empty lines."""
+    requirements_file = this_directory / filename
+    if not requirements_file.exists():
+        return []
+
+    with open(requirements_file, 'r', encoding='utf-8') as f:
+        return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+
+
+# Keep runtime dependencies minimal for lean production installs.
+runtime_requirements = read_requirements("requirements-runtime.txt")
+if not runtime_requirements:
+    runtime_requirements = read_requirements("requirements.txt")
 
 setup(
     name="lca-fmu",
@@ -26,30 +34,22 @@ setup(
     description="Life Cycle Assessment with Functional Mock-up Units for energy systems",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    license="BSD-3-Clause",
     url="https://github.com/see-lab/lca-fmu",
-    py_modules=[
-        "config_manager",
-        "database_manager",
-        "fmu_generator",
-        "lca_engine",
-        "lca_utils",
-        "lci_data_manager",
-    ],
-    package_dir={"": "src", "scripts": "scripts"},
-    packages=find_packages(include=["scripts", "scripts.*"]),
+    packages=find_packages(include=["src", "src.*", "scripts", "scripts.*"]),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Environmental Science",
-        "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
-    python_requires=">=3.8",
-    install_requires=requirements,
+    python_requires=">=3.9",
+    install_requires=runtime_requirements,
     extras_require={
         "dev": [
             "pytest>=6.0",
@@ -73,21 +73,22 @@ setup(
             "lca-fmu-setup-brightway=scripts.setup_brightway:main",
             "lca-fmu-setup-ecoinvent=scripts.setup_brightway:main",
             "lca-fmu-setup-env=scripts.setup_environment:main",
-            "lca-fmu-validate=scripts.validate_simple:main",
+            "lca-fmu-validate=scripts.validate_requirements:main",
         ],
     },
     include_package_data=True,
     package_data={
-        "": [
-            "data/inventory/default.json",
-            "data/inventory/example.json",
-            "data/inventory/wecc.json",
-            "data/inventory/pv_wecc_bess.json",
-            "data/inventory/pv.csv",
-            "data/inventory/bess.csv",
-            "data/methods/ipcc.json",
-            "data/methods/recipe_endpoint_ha.json",
-            "data/methods/brightway_methods_reference.json",
+        "src": [
+            "resources/config/system_config.json",
+            "resources/data/inventory/default.json",
+            "resources/data/inventory/example.json",
+            "resources/data/inventory/wecc.json",
+            "resources/data/inventory/pv_wecc_bess.json",
+            "resources/data/inventory/pv.csv",
+            "resources/data/inventory/bess.csv",
+            "resources/data/methods/ipcc.json",
+            "resources/data/methods/recipe_endpoint_ha.json",
+            "resources/data/methods/brightway_methods_reference.json",
         ],
     },
     project_urls={
