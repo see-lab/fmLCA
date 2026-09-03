@@ -28,7 +28,7 @@ if not runtime_requirements:
 
 setup(
     name="lca-fmu",
-    version="1.0.0",
+    version="1.0.1",
     author="Kathryn Hinkelman, Fitz Koch",
     author_email="kathryn.hinkelman@colorado.edu",
     description="Life Cycle Assessment with Functional Mock-up Units for energy systems",
