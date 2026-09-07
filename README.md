@@ -1,11 +1,9 @@
-# LCA-FMU
+# fmLCA
 
-Life Cycle Assessment (LCA) platform with Functional Mock-up Unit (FMU) generation for dynamic energy systems modeling.
-
-Built with Brightway 2.5 and ecoinvent integration.
+Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). As a functional Mock-up Unit (FMU), users can evaluate comprehensive environmental impacts as IP-protected black boxes through co-simulation with a variety of FMI-compatible tools. 
 
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
-[![CI Tests](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml)
+[![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
 
 ## Contributors
 
@@ -17,6 +15,7 @@ Built with Brightway 2.5 and ecoinvent integration.
 - **Parameterized Subsystems** - Combine multiple CSV inventories with parameters (e.g., n_pv, n_bess)
 - **Automatic Process Detection** - Zero-config CSV import with energy process recognition
 - **FMU Generation** - Create functional mockup units for co-simulation using the [Functional Mockup Interface (FMI)](https://fmi-standard.org/) Standard
+- **LCA Features** - Built with [Brightway 2.5](https://docs.brightway.dev/en/latest/) and [ecoinvent](https://ecoinvent.org/) integration. 
 - **Modelica co-simulation** - Couple LCA models with Modelica system models via Dymola, Python, or FMI-compatible runtime [tools](https://fmi-standard.org/tools/)
 - **Comprehensive impact assessment methods** - 728+ LCIA methods including climate change indicators
 
@@ -41,10 +40,10 @@ pip install -r requirements.txt
 If you don't have an ecoinvent database:
 ```bash
 # Show current project status only
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --check
+python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12 --check
 
 # Import ecoinvent (LCI + LCIA)
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --system-model cutoff
+python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12 --system-model cutoff
 ```
 
 See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
@@ -52,7 +51,7 @@ See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
 ### Brightway Setup Helper
 
 ```bash
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
+python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12
 ```
 
 ### Convert CSV to JSON for LCI import
@@ -80,7 +79,7 @@ python src/lca_engine.py example --methods ipcc
 python scripts/create_fmu.py example --method ipcc
 
 # Create FMU with bytecode-only resources and strict black-box enforcement
-# This is for sharing LCA-FMUs with proprietary and confidential data (e.g., ecoinvent EULA)
+# This is for sharing LCA models as FMUs with proprietary and confidential data (e.g., ecoinvent EULA)
 python scripts/create_fmu.py example --method ipcc --export-mode bytecode --blackbox-policy enforce
 ```
 
@@ -207,7 +206,7 @@ Will be listed here when available.
 
 ## Links
 
-- [GitHub Repository](https://github.com/see-lab/lca-fmu)
+- [GitHub Repository](https://github.com/see-lab/fmLCA)
 - [SEE Lab](http://www.theseelab.org/)
 - [Brightway Documentation](https://docs.brightway.dev/)
 
