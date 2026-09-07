@@ -12,6 +12,7 @@ import argparse
 import traceback
 import shutil
 import re
+import os
 from pathlib import Path
 
 # Import Brightway components
@@ -161,99 +162,196 @@ def find_and_setup_project():
     return None
 
 
-# ---------------------------------------------------------------------------
-# Persistent project name.
-# ---------------------------------------------------------------------------
-LCA_FMU_PROJECT = "fmLCA"
-
-# Known source projects that can be copied from (ordered by preference)
-_KNOWN_SOURCE_PROJECTS = [
-    "Class 1",                     # has ecoinvent-3.12-cutoff
-    "simapro-ecoinvent-import",    # has ecoinvent-3.10-cutoff
-]
+def _get_project_names():
+    """Return Brightway project names in stable list form."""
+    return [str(p).replace("Project: ", "") for p in projects]
 
 
-def switch_to_project_with_database(target_db_name):
-    """
-    Ensure we are in a Brightway project that contains *target_db_name*.
+def _discover_projects_with_database(target_db_name):
+    """Return project names that contain the target database."""
+    matches = []
+    original_project = str(projects.current)
+    all_projects = _get_project_names()
 
-    Fast path:  switch to the persistent 'fmLCA' project (instant).
-    Slow path:  if a different DB version is needed, copy from a source
-                project that has it (one-time cost per version).
+    try:
+        for pname in all_projects:
+            try:
+                projects.set_current(pname)
+                if target_db_name in list(databases.keys()):
+                    matches.append(pname)
+            except Exception:
+                continue
+    finally:
+        try:
+            projects.set_current(original_project)
+        except Exception:
+            pass
 
-    Args:
-        target_db_name: e.g. 'ecoinvent-3.12-cutoff'
+    return matches
 
-    Returns:
-        bool – True if the current project now contains the target DB.
-    """
-    # 1. Already in the right place?
-    if target_db_name in list(databases.keys()):
-        print(f"✅ Current project already has {target_db_name}")
+
+def _order_project_candidates(candidates):
+    """Prioritize candidates using configured project preferences first."""
+    preferred = []
+    try:
+        preferred = config.get_project_search_names()
+    except Exception:
+        preferred = []
+
+    preferred_set = {p for p in preferred if p in candidates}
+    ordered = [p for p in preferred if p in preferred_set]
+    ordered.extend([p for p in candidates if p not in preferred_set])
+    return ordered
+
+
+def _current_project_has_ecoinvent_database():
+    """Return True if active project contains at least one non-biosphere ecoinvent DB."""
+    for db_name in list(databases.keys()):
+        db_lower = db_name.lower()
+        if "ecoinvent" in db_lower and "biosphere" not in db_lower:
+            return True
+    return False
+
+
+def _discover_projects_with_any_ecoinvent_database():
+    """Return project names that have at least one non-biosphere ecoinvent DB."""
+    matches = []
+    original_project = str(projects.current)
+    all_projects = _get_project_names()
+
+    try:
+        for pname in all_projects:
+            try:
+                projects.set_current(pname)
+                if _current_project_has_ecoinvent_database():
+                    matches.append(pname)
+            except Exception:
+                continue
+    finally:
+        try:
+            projects.set_current(original_project)
+        except Exception:
+            pass
+
+    return matches
+
+
+def _confirm_project_switch(current_project, target_project, target_db_name):
+    """Ask user to confirm project switch unless auto-confirm is enabled."""
+    auto_confirm = os.environ.get("FMLCA_AUTO_CONFIRM_PROJECT_SWITCH", "").strip().lower()
+    if auto_confirm in {"1", "true", "yes", "y", "on"}:
         return True
 
-    # 2. Try the persistent fmLCA project (fast path)
-    all_projects = [str(p).replace("Project: ", "") for p in projects]
-    if LCA_FMU_PROJECT in all_projects:
-        try:
-            projects.set_current(LCA_FMU_PROJECT)
-            if target_db_name in list(databases.keys()):
-                print(f"✅ Switched to persistent project '{LCA_FMU_PROJECT}' "
-                      f"(has {target_db_name})")
-                return True
-        except Exception as e:
-            print(f"⚠️ Could not use '{LCA_FMU_PROJECT}': {e}")
-
-    # 3. Slow fallback – find a source project and copy it
-    print(f"🔄 '{LCA_FMU_PROJECT}' does not have {target_db_name}, "
-          f"searching other projects…")
-
-    source_project = _find_source_project_for_db(target_db_name)
-    if not source_project:
-        print(f"❌ No project found with database '{target_db_name}'")
+    if not sys.stdin or not sys.stdin.isatty():
+        print("❌ Project switch blocked (non-interactive session)")
+        print(f"   Current project: {current_project}")
+        print(f"   Candidate project: {target_project}")
+        print(f"   Required database: {target_db_name}")
+        print("   Set FMLCA_BW_PROJECT to the intended project name, or")
+        print("   set FMLCA_AUTO_CONFIRM_PROJECT_SWITCH=true to allow auto-switching.")
         return False
 
-    print(f"📦 Found source project '{source_project}' with {target_db_name}")
+    response = input(
+        f"Switch Brightway project from '{current_project}' to '{target_project}' "
+        f"for '{target_db_name}'? [y/N]: "
+    ).strip().lower()
+    return response in {"y", "yes"}
 
-    # Copying full ecoinvent projects is expensive and can fill local disk.
-    # Prefer switching directly to the source project.
+
+def _prompt_project_choice(candidates, target_db_name):
+    """Prompt user to choose one project from candidate list."""
+    if not candidates:
+        return None
+
+    if not sys.stdin or not sys.stdin.isatty():
+        return None
+
+    print(f"⚠️ Multiple projects contain '{target_db_name}':")
+    for idx, pname in enumerate(candidates, start=1):
+        print(f"   {idx}. {pname}")
+    print("   0. Cancel")
+
+    response = input("Select Brightway project number: ").strip()
+    if not response.isdigit():
+        return None
+
+    choice = int(response)
+    if choice <= 0 or choice > len(candidates):
+        return None
+
+    return candidates[choice - 1]
+
+
+def switch_to_project_with_database(target_db_name, declared_project=None, require_confirmation=True):
+    """
+    Ensure current Brightway project contains the required database.
+
+    Selection rules:
+    - If declared_project is provided, only that project is used.
+    - Otherwise, discover all projects containing the database.
+    - If multiple candidates exist, require explicit declaration.
+    - If one candidate exists, optionally request confirmation before switching.
+
+    Args:
+        target_db_name: Required database name.
+        declared_project: Explicit project name from user/env.
+        require_confirmation: When True, prompt before switching projects.
+
+    Returns:
+        bool: True if target database is available in active project after this call.
+    """
+    current_project = str(projects.current)
+
+    if target_db_name in list(databases.keys()):
+        print(f"✅ Current project '{current_project}' already has {target_db_name}")
+        return True
+
+    all_projects = _get_project_names()
+
+    if declared_project:
+        if declared_project not in all_projects:
+            print(f"❌ Declared Brightway project not found: '{declared_project}'")
+            print(f"   Available projects: {all_projects}")
+            return False
+
+        try:
+            projects.set_current(declared_project)
+            if target_db_name in list(databases.keys()):
+                print(f"✅ Using declared project '{declared_project}' (has {target_db_name})")
+                return True
+            print(f"❌ Declared project '{declared_project}' does not contain '{target_db_name}'")
+            return False
+        except Exception as e:
+            print(f"❌ Failed to switch to declared project '{declared_project}': {e}")
+            return False
+
+    candidates = _order_project_candidates(_discover_projects_with_database(target_db_name))
+    if not candidates:
+        print(f"❌ No Brightway project found with database '{target_db_name}'")
+        return False
+
+    if len(candidates) > 1:
+        selected_project = _prompt_project_choice(candidates, target_db_name)
+        if not selected_project:
+            print(f"⚠️ Multiple projects contain '{target_db_name}': {candidates}")
+            print("   Set FMLCA_BW_PROJECT to the intended project to avoid accidental changes.")
+            return False
+        candidates = [selected_project]
+
+    target_project = candidates[0]
+    if require_confirmation and not _confirm_project_switch(current_project, target_project, target_db_name):
+        return False
+
     try:
-        projects.set_current(source_project)
+        projects.set_current(target_project)
         if target_db_name in list(databases.keys()):
-            print(f"✅ Switched to source project '{source_project}' "
-                  f"(has {target_db_name})")
+            print(f"✅ Switched to project '{target_project}' (has {target_db_name})")
             return True
-        print(f"❌ Project '{source_project}' does not contain '{target_db_name}' after switch")
+        print(f"❌ Project '{target_project}' no longer contains '{target_db_name}'")
         return False
     except Exception as e:
-        print(f"❌ Failed to switch to source project: {e}")
+        print(f"❌ Failed to switch to project '{target_project}': {e}")
         return False
-
-
-def _find_source_project_for_db(target_db_name):
-    """Find an existing project that contains *target_db_name*."""
-    # Try known-good projects first (avoids corrupt ones)
-    for pname in _KNOWN_SOURCE_PROJECTS:
-        try:
-            projects.set_current(pname)
-            if target_db_name in list(databases.keys()):
-                return pname
-        except Exception:
-            continue
-
-    # Fallback: iterate all projects
-    for p in projects:
-        pname = str(p).replace("Project: ", "")
-        if pname in _KNOWN_SOURCE_PROJECTS:
-            continue
-        try:
-            projects.set_current(pname)
-            if target_db_name in list(databases.keys()):
-                return pname
-        except Exception:
-            continue
-
-    return None
 
 
 RECIPE_ENDPOINT_SINGLE_SCORE_FACTORS = {
@@ -327,7 +425,14 @@ def _convert_stage_breakdown_to_recipe_pt(stage_breakdown, conversion_cfg):
     return converted
 
 
-def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180.0):
+def run_lca_energy(
+    lci_file,
+    lcia_methods,
+    functional_unit,
+    energy_amount_mj=180.0,
+    brightway_project=None,
+    confirm_project_switch=True,
+):
     """
     Run LCA analysis with energy-based inputs using the new modular architecture
     
@@ -336,6 +441,8 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
         lcia_methods (list): List of LCIA method names
         functional_unit (dict): Functional unit definition
         energy_amount_mj (float): Amount of energy input in MJ for primary process
+        brightway_project (str | None): Explicit Brightway project name to use
+        confirm_project_switch (bool): Ask before switching projects when auto-discovered
     
     Returns:
         dict: LCIA results
@@ -354,10 +461,81 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
                 required_db = inp[0]
                 break
         
+        declared_project = (
+            brightway_project
+            or os.environ.get("FMLCA_BW_PROJECT", "").strip()
+            or None
+        )
+
+        if declared_project and str(projects.current) != declared_project:
+            all_projects = _get_project_names()
+            if declared_project not in all_projects:
+                return {
+                    "error": (
+                        f"Declared Brightway project '{declared_project}' not found. "
+                        f"Available projects: {all_projects}"
+                    )
+                }
+            try:
+                projects.set_current(declared_project)
+                print(f"✅ Activated declared Brightway project: {declared_project}")
+            except Exception as exc:
+                return {"error": f"Failed to activate declared Brightway project '{declared_project}': {exc}"}
+
         if required_db:
             print(f"🔍 LCI file requires database: {required_db}")
-            if not switch_to_project_with_database(required_db):
+            if not switch_to_project_with_database(
+                required_db,
+                declared_project=declared_project,
+                require_confirmation=confirm_project_switch,
+            ):
                 return {"error": f"No Brightway project found with database '{required_db}'"}
+        elif not _current_project_has_ecoinvent_database():
+            print("🔍 LCI file does not declare an explicit ecoinvent database")
+            print("   Searching Brightway projects for any compatible ecoinvent database...")
+
+            ecoinvent_projects = _order_project_candidates(
+                _discover_projects_with_any_ecoinvent_database()
+            )
+            if not ecoinvent_projects:
+                return {
+                    "error": "No Brightway project found with a compatible ecoinvent database"
+                }
+
+            if len(ecoinvent_projects) > 1 and not declared_project:
+                selected_project = _prompt_project_choice(
+                    ecoinvent_projects,
+                    "a compatible ecoinvent database",
+                )
+                if not selected_project:
+                    return {
+                        "error": (
+                            "Multiple Brightway projects contain ecoinvent databases. "
+                            "Declare one explicitly using FMLCA_BW_PROJECT or brightway_project."
+                        ),
+                        "candidate_projects": ecoinvent_projects,
+                    }
+                ecoinvent_projects = [selected_project]
+
+            target_project = ecoinvent_projects[0]
+            current_project = str(projects.current)
+            if target_project != current_project:
+                if confirm_project_switch and not _confirm_project_switch(
+                    current_project,
+                    target_project,
+                    "an ecoinvent database",
+                ):
+                    return {
+                        "error": (
+                            f"Project switch cancelled. Current project '{current_project}' does not "
+                            "contain a compatible ecoinvent database."
+                        )
+                    }
+                try:
+                    projects.set_current(target_project)
+                    print(f"✅ Switched to project '{target_project}' (contains ecoinvent database)")
+                except Exception as exc:
+                    return {"error": f"Failed to switch to project '{target_project}': {exc}"}
         
         # Initialize managers
         db_manager = DatabaseManager()
@@ -572,11 +750,26 @@ def run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj=180
         return {"error": str(e), "traceback": traceback.format_exc()}
 
 
-def run_lca(lci_file, lcia_methods, parameter_values=None, functional_unit=None, energy_amount_mj=180.0):
+def run_lca(
+    lci_file,
+    lcia_methods,
+    parameter_values=None,
+    functional_unit=None,
+    energy_amount_mj=180.0,
+    brightway_project=None,
+    confirm_project_switch=True,
+):
     """Run LCA with optional parameter overrides passed as direct input."""
     functional_unit = functional_unit or {}
     if not parameter_values:
-        return run_lca_energy(lci_file, lcia_methods, functional_unit, energy_amount_mj)
+        return run_lca_energy(
+            lci_file,
+            lcia_methods,
+            functional_unit,
+            energy_amount_mj,
+            brightway_project=brightway_project,
+            confirm_project_switch=confirm_project_switch,
+        )
 
     with open(lci_file, 'r', encoding='utf-8') as f:
         lci_data = json.load(f)
@@ -590,7 +783,14 @@ def run_lca(lci_file, lcia_methods, parameter_values=None, functional_unit=None,
     try:
         with temp_file:
             json.dump(lci_data, temp_file, indent=2)
-        return run_lca_energy(temp_file.name, lcia_methods, functional_unit, energy_amount_mj)
+        return run_lca_energy(
+            temp_file.name,
+            lcia_methods,
+            functional_unit,
+            energy_amount_mj,
+            brightway_project=brightway_project,
+            confirm_project_switch=confirm_project_switch,
+        )
     finally:
         try:
             Path(temp_file.name).unlink(missing_ok=True)

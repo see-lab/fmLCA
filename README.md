@@ -54,6 +54,29 @@ See [Ecoinvent Setup Guide](https://github.com/see-lab/fmLCA/blob/main/docs/ECOI
 python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12
 ```
 
+### Safe Brightway Project Selection
+
+LCA execution now avoids hardcoded Brightway project names and will search existing projects for the required database.
+
+To prevent accidental writes to the wrong project, declare the intended project explicitly:
+
+```powershell
+$env:FMLCA_BW_PROJECT = "fmLCA"
+```
+
+You can also control project-switch prompts:
+
+```powershell
+# Optional: allow automatic switching in non-interactive runs
+$env:FMLCA_AUTO_CONFIRM_PROJECT_SWITCH = "true"
+```
+
+Behavior summary:
+- If the current project already contains the required ecoinvent database, no switch is made.
+- If `FMLCA_BW_PROJECT` is set, only that project is used.
+- If multiple projects contain the required database and no project is declared, execution stops and asks for explicit project declaration.
+- If exactly one matching project is found, the engine can prompt before switching unless auto-confirm is enabled.
+
 ### Convert CSV to JSON for LCI import
 
 ```bash
@@ -72,16 +95,36 @@ python scripts/csv_to_json_translator.py example1 example2 --output combined_sys
 python src/lca_engine.py example --methods ipcc
 ```
 
+Python API usage with explicit project declaration:
+
+```python
+from src.lca_engine import run_lca_energy
+
+results = run_lca_energy(
+	lci_file="data/inventory/example.json",
+	lcia_methods=[("IPCC 2021", "climate change", "global warming potential (GWP100)")],
+	functional_unit={},
+	energy_amount_mj=180.0,
+	brightway_project="fmLCA",
+	confirm_project_switch=True,
+)
+```
+
 ### Generate FMU
 
 ```bash
 # Create FMU for co-simulation
 python scripts/create_fmu.py example --method ipcc
 
+# Explicit Brightway project selection (recommended for multi-project environments)
+python scripts/create_fmu.py example --method ipcc --bw-project fmLCA
+
 # Create FMU with bytecode-only resources and strict black-box enforcement
 # This is for sharing LCA models as FMUs with proprietary and confidential data (e.g., ecoinvent EULA)
 python scripts/create_fmu.py example --method ipcc --export-mode bytecode --blackbox-policy enforce
 ```
+
+If your local Brightway project name differs from `fmLCA`, set `FMLCA_BW_PROJECT` or pass `--bw-project <your-project-name>`.
 
 ### Simulate FMUs and run sequential co-simulation
 

@@ -61,6 +61,7 @@ from pathlib import Path
 
 # Add src to path for library imports
 ROOT = Path(__file__).parent.parent.resolve()
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from lca_utils import safe_classname, ensure_dir_exists
@@ -131,6 +132,8 @@ def run_lca_analysis(
     energy_mj: float,
     keywords: list,
     parameter_values: dict[str, float] | None = None,
+    brightway_project: str | None = None,
+    confirm_project_switch: bool = True,
 ) -> dict:
     """
     Run LCA analysis using the LCA engine.
@@ -147,11 +150,11 @@ def run_lca_analysis(
         RuntimeError: If LCA analysis fails
     """
     # Lazy import keeps '-h/--help' fast and avoids Brightway startup warnings.
-    # Prefer package-qualified import for installed distributions.
+    # Prefer local module import first to avoid collisions with unrelated installed "src" packages.
     try:
-        from src.lca_engine import run_lca
-    except ImportError:
         from lca_engine import run_lca
+    except ImportError:
+        from src.lca_engine import run_lca
 
     # Load LCI file to display metadata
     try:
@@ -177,13 +180,24 @@ def run_lca_analysis(
     
     # Run LCA analysis
     try:
-        results = run_lca(
-            lci_file=str(lci_file),
-            lcia_methods=keywords,
-            parameter_values=parameter_values,
-            functional_unit={},
-            energy_amount_mj=energy_mj
-        )
+        run_kwargs = {
+            "lci_file": str(lci_file),
+            "lcia_methods": keywords,
+            "parameter_values": parameter_values,
+            "functional_unit": {},
+            "energy_amount_mj": energy_mj,
+            "brightway_project": brightway_project,
+            "confirm_project_switch": confirm_project_switch,
+        }
+        try:
+            results = run_lca(**run_kwargs)
+        except TypeError as exc:
+            # Backward-compatible retry for older run_lca signatures.
+            if "unexpected keyword argument" not in str(exc):
+                raise
+            run_kwargs.pop("brightway_project", None)
+            run_kwargs.pop("confirm_project_switch", None)
+            results = run_lca(**run_kwargs)
         
         if "error" in results:
             err = str(results.get("error", "Unknown LCA error"))
@@ -230,6 +244,8 @@ def _build_parameter_model(
     baseline_factors: dict[str, Any],
     baseline_stage_impacts: dict[str, float],
     parameter_defaults: dict[str, float],
+    brightway_project: str | None = None,
+    confirm_project_switch: bool = True,
 ) -> dict[str, Any]:
     """Build a linear parameter model from additional LCA runs around defaults."""
     if not parameter_defaults:
@@ -272,6 +288,8 @@ def _build_parameter_model(
             unitary_energy_mj,
             method_cfg["keywords"],
             parameter_values=overrides,
+            brightway_project=brightway_project,
+            confirm_project_switch=confirm_project_switch,
         )
         varied_factors = extract_emission_factors(varied_results, method_cfg, unitary_energy_mj)
         varied_stage = extract_stage_impacts(varied_results, method_cfg)
@@ -558,6 +576,22 @@ def main():
             "and may increase external disclosure risk if redistributed."
         )
     )
+    parser.add_argument(
+        "--bw-project",
+        default=None,
+        help=(
+            "Explicit Brightway project to use for LCA lookup. "
+            "Overrides auto-discovery and prevents accidental use of another project."
+        )
+    )
+    parser.add_argument(
+        "--no-confirm-project-switch",
+        action="store_true",
+        help=(
+            "Disable interactive confirmation before automatic Brightway project switching. "
+            "Use in CI/non-interactive runs with caution."
+        )
+    )
 
     args = parser.parse_args()
 
@@ -694,6 +728,8 @@ def main():
             lci_path,
             unitary_energy_mj,
             method_cfg["keywords"],
+            brightway_project=args.bw_project,
+            confirm_project_switch=not args.no_confirm_project_switch,
         )
 
         # ── Step 2: Extract factors and stage impacts ────────────────────────
@@ -710,6 +746,8 @@ def main():
             baseline_factors=factors,
             baseline_stage_impacts=stage_impacts,
             parameter_defaults=parameter_defaults,
+            brightway_project=args.bw_project,
+            confirm_project_switch=not args.no_confirm_project_switch,
         )
         kappa = float(parameter_model.get("stability", {}).get("kappa", 1.0))
         ill_conditioned = bool(parameter_model.get("stability", {}).get("ill_conditioned", False))
