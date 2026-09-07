@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Validate ReCiPe single-score stage impacts for storage technologies.
 
-Compares LCA-FMU native ReCiPe outputs against SimaPro *-simapro-recipe.csv
+Compares fmLCA native ReCiPe outputs against SimaPro *-simapro-recipe.csv
 Single score references for:
 - bess310
 - propane
 - sandTes
 
 Percent difference is computed as:
-    (LCA-FMU - SimaPro) / SimaPro * 100
+    (fmLCA - SimaPro) / SimaPro * 100
 """
 
 from __future__ import annotations
@@ -358,7 +358,7 @@ def plot_points(points: list[dict[str, Any]], output_png: Path, output_svg: Path
     ax.set_xlim(plot_min, plot_max)
     ax.set_ylim(plot_min, plot_max)
     ax.set_xlabel("SimaPro ReCiPe H/A (Pt)")
-    ax.set_ylabel("Brightway ReCiPe H/A via LCA-FMU (Pt)")
+    ax.set_ylabel("Brightway ReCiPe H/A via fmLCA (Pt)")
     ax.grid(False)
     ax.minorticks_on()
     ax.tick_params(which="major", direction="in")

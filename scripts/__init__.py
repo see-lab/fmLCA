@@ -1,1 +1,1 @@
-"""CLI script modules for LCA-FMU console entry points."""
+"""CLI script modules for fmLCA console entry points."""

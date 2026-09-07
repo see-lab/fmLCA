@@ -24,8 +24,8 @@ Create and simulate dynamic Life Cycle Assessment (LCA) models with the Function
 ### Installation
 
 ```bash
-git clone https://github.com/see-lab/lca-fmu.git
-cd lca-fmu
+git clone https://github.com/see-lab/fmLCA.git
+cd fmLCA
 python -m venv venv
 source venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt

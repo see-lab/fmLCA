@@ -82,12 +82,12 @@ jobs:
 
       - name: Smoke-test CLI entry points
         run: |
-          lca-fmu-create --help
-          lca-fmu-csv2json --help
-          lca-fmu-setup-brightway --help
-          lca-fmu-setup-ecoinvent --help
-          lca-fmu-setup-env --help
-          lca-fmu-validate
+          fmlca-create --help
+          fmlca-csv2json --help
+          fmlca-setup-brightway --help
+          fmlca-setup-ecoinvent --help
+          fmlca-setup-env --help
+          fmlca-validate
 
   ecoinvent-optional:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'

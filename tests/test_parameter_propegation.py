@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for parameterized LCA-FMU systems
+Test script for parameterized fmLCA systems
 
 Demonstrates:
 1. Single CSV with parameters

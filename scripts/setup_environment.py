@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Environment Setup and Troubleshooting Script for LCA-FMU Platform
+Environment Setup and Troubleshooting Script for fmLCA Platform
 Helps diagnose and fix common installation issues, especially on macOS.
 
 Usage:
@@ -159,15 +159,15 @@ def install_all_requirements():
         return False
 
 def setup_conda_environment():
-    """Set up conda environment for LCA-FMU"""
+    """Set up conda environment for fmLCA"""
     print("\n🐍 Setting up conda environment...")
     
     info = detect_environment()
     
     if not info['is_conda']:
         print("ℹ️  Not in a conda environment. Please activate conda first.")
-        print("    conda create -n lca-fmu python=3.11")
-        print("    conda activate lca-fmu")
+        print("    conda create -n fmlca python=3.11")
+        print("    conda activate fmlca")
         return False
     
     try:
@@ -228,7 +228,7 @@ def validate_installation():
     return success_count == len(tests)
 
 def main():
-    parser = argparse.ArgumentParser(description="Setup LCA-FMU environment")
+    parser = argparse.ArgumentParser(description="Setup fmLCA environment")
     parser.add_argument("--fix-numpy", action="store_true", help="Fix NumPy BLAS issues")
     parser.add_argument("--install-all", action="store_true", help="Install all requirements")
     parser.add_argument("--conda", action="store_true", help="Setup conda environment")
@@ -236,7 +236,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🚀 LCA-FMU Environment Setup")
+    print("🚀 fmLCA Environment Setup")
     print("=" * 50)
     
     # Print environment info
@@ -268,8 +268,8 @@ def main():
     if info['is_apple_silicon']:
         print("1. 🍎 Apple Silicon Mac detected")
         print("   Recommendation: Use conda for best compatibility")
-        print("   conda create -n lca-fmu python=3.11")
-        print("   conda activate lca-fmu")
+        print("   conda create -n fmlca python=3.11")
+        print("   conda activate fmlca")
         print("   python scripts/setup_environment.py --conda")
         
     elif info['platform'] == 'Darwin':

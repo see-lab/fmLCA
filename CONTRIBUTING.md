@@ -1,6 +1,6 @@
-# Contributing to LCA-FMU
+# Contributing to fmLCA
 
-Thank you for your interest in contributing to LCA-FMU! This project is maintained by the SEE Lab at the University of Vermont.
+Thank you for your interest in contributing to fmLCA! This project is maintained by the SEE Lab at the University of Vermont.
 
 ## 🚀 Getting Started
 
@@ -16,8 +16,8 @@ Thank you for your interest in contributing to LCA-FMU! This project is maintain
 1. Fork the repository on GitHub
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/lca-fmu.git
-   cd lca-fmu
+   git clone https://github.com/YOUR-USERNAME/fmLCA.git
+   cd fmLCA
    ```
 
 3. Create a virtual environment:
@@ -174,4 +174,4 @@ For feature requests, please provide:
 By contributing, you agree that your contributions will be licensed under the BSD 3-Clause License.
 ---
 
-Thank you for contributing to LCA-FMU! Your efforts help advance sustainable energy systems research. 🌱
+Thank you for contributing to fmLCA! Your efforts help advance sustainable energy systems research. 🌱

@@ -2,7 +2,7 @@
 """Validate staged impacts for bess, propane, and sandTes against SimaPro references.
 
 Computes stage-wise percent difference as:
-    (LCA-FMU - SimaPro) / SimaPro * 100
+    (fmLCA - SimaPro) / SimaPro * 100
 
 Produces one scatter marker per product+stage pair and plots a y=x reference line.
 The log-log axes keep low-magnitude stage impacts visible (e.g., EOL).
@@ -341,7 +341,7 @@ def plot_points(points: list[dict[str, Any]], output_png: Path, output_svg: Path
     ax.set_xlim(plot_min, plot_max)
     ax.set_ylim(plot_min, plot_max)
     ax.set_xlabel("SimaPro Score (kg CO2-eq)")
-    ax.set_ylabel("Brightway Score via LCA-FMU (kg CO2-eq)")
+    ax.set_ylabel("Brightway Score via fmLCA (kg CO2-eq)")
     ax.grid(False)
     ax.minorticks_on()
     ax.tick_params(which="major", direction="in")

@@ -1,6 +1,6 @@
 # Tests Directory
 
-Pytest-based unit and integration tests for LCA-FMU.
+Pytest-based unit and integration tests for fmLCA.
 
 ## Structure
 
@@ -43,7 +43,7 @@ CI note:
 - GitHub Actions runs three required jobs:
 	- unit tests: `python -m pytest tests/ -m "not integration and not ecoinvent"`
 	- integration tests: `python -m pytest tests/ -m integration`
-	- CLI smoke tests: install package, run CLI help for setup/build tools, and run `lca-fmu-validate`
+	- CLI smoke tests: install package, run CLI help for setup/build tools, and run `fmlca-validate`
 - `ecoinvent` tests run only in optional manual/scheduled CI because they require private dataset credentials and Brightway project setup.
 
 ## Regression Summary Report

@@ -1,1 +1,1 @@
-"""Bundled runtime resources for installed lca-fmu distributions."""
+"""Bundled runtime resources for installed fmLCA distributions."""

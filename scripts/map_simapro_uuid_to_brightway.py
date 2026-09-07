@@ -85,7 +85,7 @@ def write_inventory_csv(path: Path, metadata_lines: List[str], fieldnames: List[
 
 def ensure_project_for_db(target_db: str) -> None:
     config = get_config()
-    target_project = config.system_config.get("system", {}).get("default_project", "LCA-FMU")
+    target_project = config.system_config.get("system", {}).get("default_project", "fmLCA")
 
     all_projects = [str(p).replace("Project: ", "") for p in bd.projects]
     if target_project in all_projects:

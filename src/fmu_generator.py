@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fmu_generator.py - FMU generation logic for LCA-FMU
+fmu_generator.py - FMU generation logic for fmLCA
 
 Library module for FMU generation. Import this module, do not run directly.
 
@@ -18,7 +18,7 @@ Key features:
 - Fix FMU XML metadata
 - Validate FMUs with fmpy
 
-Part of the LCA-FMU core library.
+Part of the fmLCA core library.
 """
 
 import subprocess

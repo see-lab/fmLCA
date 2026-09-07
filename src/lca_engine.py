@@ -162,9 +162,9 @@ def find_and_setup_project():
 
 
 # ---------------------------------------------------------------------------
-# Persistent project name – created once via scripts/setup_lca_fmu_project.py
+# Persistent project name.
 # ---------------------------------------------------------------------------
-LCA_FMU_PROJECT = "LCA-FMU"
+LCA_FMU_PROJECT = "fmLCA"
 
 # Known source projects that can be copied from (ordered by preference)
 _KNOWN_SOURCE_PROJECTS = [
@@ -177,7 +177,7 @@ def switch_to_project_with_database(target_db_name):
     """
     Ensure we are in a Brightway project that contains *target_db_name*.
 
-    Fast path:  switch to the persistent 'LCA-FMU' project (instant).
+    Fast path:  switch to the persistent 'fmLCA' project (instant).
     Slow path:  if a different DB version is needed, copy from a source
                 project that has it (one-time cost per version).
 
@@ -192,7 +192,7 @@ def switch_to_project_with_database(target_db_name):
         print(f"✅ Current project already has {target_db_name}")
         return True
 
-    # 2. Try the persistent LCA-FMU project (fast path)
+    # 2. Try the persistent fmLCA project (fast path)
     all_projects = [str(p).replace("Project: ", "") for p in projects]
     if LCA_FMU_PROJECT in all_projects:
         try:
