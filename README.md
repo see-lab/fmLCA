@@ -1,6 +1,6 @@
 # fmLCA
 
-Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). As a functional Mock-up Unit (FMU), users can evaluate comprehensive environmental impacts as IP-protected black boxes through co-simulation with a variety of FMI-compatible tools. 
+Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). As a functional Mock-up Unit (FMU), users can securely evaluate comprehensive environmental impacts through co-simulation with a variety of FMI-compatible tools. 
 
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
 [![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
