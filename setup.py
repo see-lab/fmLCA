@@ -28,10 +28,10 @@ if not runtime_requirements:
 
 setup(
     name="fmLCA",
-    version="1.0.1",
-    author="Kathryn Hinkelman, Fitz Koch",
-    author_email="kathryn.hinkelman@colorado.edu",
-    description="Life Cycle Assessment with Functional Mock-up Units for energy systems",
+    version="0.0.1",
+    author="Kathryn Hinkelman",
+    author_email="kathryn.hinkelman@uvm.edu",
+    description="Co-simulate dynamic Life Cycle Assessment and energy system models as Functional Mock-up Units",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="BSD-3-Clause",
