@@ -2,12 +2,12 @@
 
 Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). As a functional Mock-up Unit (FMU), users can securely evaluate comprehensive environmental impacts through co-simulation with a variety of FMI-compatible tools. 
 
-[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
-[![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/see-lab/fmLCA/blob/main/LICENSE)
+[![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
 
 ## Contributors
 
-**Kathryn Hinkelman**, **Fitzwilliam Keenan-Koch**, & **Anastasija Mensikova** - [SEE Lab](http://www.theseelab.org/), University of Vermont
+**Kathryn Hinkelman**, **Fitzwilliam Keenan-Koch**, & **Anastasija Mensikova** - [SEE Lab](https://www.theseelab.org/), University of Vermont
 
 ## Features
 
@@ -46,7 +46,7 @@ python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12 --check
 python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12 --system-model cutoff
 ```
 
-See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
+See [Ecoinvent Setup Guide](https://github.com/see-lab/fmLCA/blob/main/docs/ECOINVENT_SETUP.md) for detailed instructions.
 
 ### Brightway Setup Helper
 
@@ -185,18 +185,18 @@ python -m pytest tests/
 
 ## Documentation
 
-- **[Release Tracking](docs/RELEASE_TRACKING.md)** - Update status and remaining tasks for alpha deployment
+- **[Release Tracking](https://github.com/see-lab/fmLCA/blob/main/docs/RELEASE_TRACKING.md)** - Update status and remaining tasks for alpha deployment
 - More to come later...
 
 ## Contributing
 
 Contributions welcome! Fork the repo, create a feature branch, test your changes, and submit a PR.
 
-See development guidelines in `CONTRIBUTING.md`.
+See development guidelines in [CONTRIBUTING.md](https://github.com/see-lab/fmLCA/blob/main/CONTRIBUTING.md).
 
 ## License
 
-BSD 3-Clause License - see [LICENSE](LICENSE) file.
+BSD 3-Clause License - see [LICENSE](https://github.com/see-lab/fmLCA/blob/main/LICENSE) file.
 
 ## Citation
 
@@ -207,7 +207,7 @@ Will be listed here when available.
 ## Links
 
 - [GitHub Repository](https://github.com/see-lab/fmLCA)
-- [SEE Lab](http://www.theseelab.org/)
+- [SEE Lab](https://www.theseelab.org/)
 - [Brightway Documentation](https://docs.brightway.dev/)
 
 ---
