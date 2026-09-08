@@ -40,7 +40,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-def convert_csv_to_lci_json_flexible(csv_files, output_file=None):
+def convert_csv_to_lci_json(csv_files, output_file=None):
     """
     Convert CSV inventory data to LCI JSON format using flexible configuration
     
@@ -204,7 +204,7 @@ Metadata/comments:
     try:
         # Use flexible conversion mode (supports single or multiple files)
         print("Using flexible conversion mode")
-        lci_data = convert_csv_to_lci_json_flexible(args.csv_files, args.json_file)
+        lci_data = convert_csv_to_lci_json(args.csv_files, args.json_file)
         
         if lci_data is None:
             print("Conversion failed")
