@@ -119,7 +119,7 @@ system_result, lca_result = sequential_cosim(system_fmu=Path("fmu/PV_System_WECC
 
 ## Advanced Options
 
-- Dymola preset: `python scripts/create_fmu.py grid --method ipcc --target-tool dymola --accept-ip-risk`.
+- Dymola preset: `python scripts/create_fmu.py grid --method ipcc --target-tool dymola`.
 - Strict distribution mode: `python scripts/create_fmu.py grid --method ipcc --target-tool dymola --export-mode bytecode --blackbox-policy enforce`.
 - Default safety posture: bytecode export + black-box enforce; run `python scripts/create_fmu.py -h` for all policy/export options.
 
