@@ -564,6 +564,8 @@ def build_lca_fmu(
     verify_linearity: bool = True,
     move_to_output_dir: bool = True,
     verbose: bool = True,
+    brightway_project: str | None = None,
+    confirm_project_switch: bool = True,
 ) -> BuildResult:
     options = BuildOptions(
         method=method,  # type: ignore[arg-type]
@@ -581,6 +583,8 @@ def build_lca_fmu(
         verify_linearity=verify_linearity,
         move_to_output_dir=move_to_output_dir,
         verbose=verbose,
+        brightway_project=brightway_project,
+        confirm_project_switch=confirm_project_switch,
     )
     return build_lca_fmu_internal(Path(lci_file), options)
 
