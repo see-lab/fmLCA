@@ -84,7 +84,7 @@ def _build_example_fmu() -> Path:
             f"STDOUT:\n{completed.stdout}\n\nSTDERR:\n{completed.stderr}"
         )
 
-    fmu_path = ROOT / "fmu" / "Example_Ipcc_v1.0.fmu"
+    fmu_path = ROOT / "fmu" / "Example_Ipcc_v0.0.1.fmu"
     if not fmu_path.exists():
         raise AssertionError(f"Expected FMU was not created: {fmu_path}")
     return fmu_path

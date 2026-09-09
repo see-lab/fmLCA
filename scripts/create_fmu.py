@@ -42,7 +42,7 @@ Examples
     python scripts/create_fmu.py example
     python scripts/create_fmu.py example --method ipcc
     python scripts/create_fmu.py example --method recipe_endpoint
-    python scripts/create_fmu.py example --name "Example_Climate" --version 2.0
+    python scripts/create_fmu.py example --name "Example_Climate" --version 0.0.1
 
 Output
 ------
@@ -75,6 +75,7 @@ from fmu_generator import (
     audit_fmu_blackbox,
     validate_fmu
 )
+from fmu_api import BuildOptions, FmuBuildError, build_lca_fmu_internal
 
 
 def configure_console_encoding() -> None:
@@ -154,7 +155,7 @@ def run_lca_analysis(
     try:
         from lca_engine import run_lca
     except ImportError:
-        from src.lca_engine import run_lca
+        from fmlca.lca_engine import run_lca
 
     # Load LCI file to display metadata
     try:
@@ -532,8 +533,8 @@ def main():
     )
     parser.add_argument(
         "--version",
-        default="1.0",
-        help="Version string embedded in the FMU name (default: 1.0)"
+        default="0.0.1",
+        help="Version string embedded in the FMU name (default: 0.0.1)"
     )
     parser.add_argument(
         "--dry-run",
@@ -614,9 +615,11 @@ def main():
             args.default_step_size = 60.0
             print("   • default_step_size set to 60.0 s")
 
-        print("   Runtime guidance:")
-        print("   • If InstantiateModel fails, align Dymola's Python runtime with FMU build environment.")
-        print("   • If simulation is event-heavy, increase communication step size in importer settings.")
+    lci_path = Path(args.lci_stem)
+    if not lci_path.suffix:
+        lci_path = ROOT / "data" / "inventory" / (args.lci_stem + ".json")
+    if not lci_path.is_absolute():
+        lci_path = ROOT / lci_path
 
     if args.default_step_size <= 0.0:
         parser.error("--default-step-size must be > 0")
@@ -627,255 +630,58 @@ def main():
             "Use --blackbox-policy warn/off for source mode, or switch to --export-mode bytecode."
         )
 
+    if args.dry_run:
+        print("🧪 DRY RUN MODE - configuration validated")
+        print(f"LCI path: {lci_path}")
+        print(f"Method: {args.method}")
+        print(f"Target tool: {args.target_tool}")
+        print(f"Export mode: {args.export_mode}")
+        print(f"Black-box policy: {args.blackbox_policy}")
+        return
+
     source_export_nonblackbox = (
         args.export_mode == "source"
         and args.blackbox_policy in {"warn", "off"}
     )
+    output_dir = DIST_FMU_PROPRIETARY if (source_export_nonblackbox or args.target_tool == "dymola") else DIST_FMU
 
-    if source_export_nonblackbox:
-        print("\n⚠️  IP / EULA risk notice")
-        print("   Source-mode FMUs include readable Python resources and are NOT black-box compliant.")
-        print("   Do not redistribute externally unless your license/compliance review allows it.")
+    options = BuildOptions(
+        method=args.method,
+        version=args.version,
+        name=args.name,
+        output_dir=output_dir,
+        target_tool=args.target_tool,
+        export_mode=args.export_mode,
+        blackbox_policy=args.blackbox_policy,
+        default_step_size=args.default_step_size,
+        parameter_values=None,
+        functional_unit={},
+        energy_amount_mj=None,
+        validate=True,
+        verify_linearity=True,
+        move_to_output_dir=True,
+        verbose=True,
+        brightway_project=args.bw_project,
+        confirm_project_switch=not args.no_confirm_project_switch,
+    )
 
-        if not args.accept_ip_risk:
-            if sys.stdin is not None and sys.stdin.isatty():
-                print("\nType 'I ACCEPT' to continue export with source-mode disclosure risk.")
-                response = input("> ").strip()
-                if response != "I ACCEPT":
-                    parser.error("Export cancelled: IP risk acknowledgment not provided.")
-            else:
-                parser.error(
-                    "Source-mode export requires explicit acknowledgment. "
-                    "Re-run with --accept-ip-risk to proceed."
-                )
-
-    # ── Resolve LCI file ─────────────────────────────────────────────────────
-    lci_path = Path(args.lci_stem)
-    if not lci_path.suffix:
-        lci_path = ROOT / "data" / "inventory" / (args.lci_stem + ".json")
-    if not lci_path.is_absolute():
-        lci_path = ROOT / lci_path
-    if not lci_path.exists():
-        parser.error(f"LCI file not found: {lci_path}")
-
-    method_cfg = METHOD_CONFIG[args.method]
-
-    # ── Generate names ───────────────────────────────────────────────────────
-    stem = lci_path.stem
-    method_label = args.method.replace("_", " ").title().replace(" ", "_")
-    fmu_name = args.name or f"{safe_classname(stem)}_{method_label}_v{args.version}"
-    class_name = safe_classname(fmu_name)
-
-    # Resolve LCI once so we can derive unitary use-phase slope from the
-    # inventory's own energy reference quantity.
     try:
-        with open(lci_path, "r", encoding="utf-8") as f:
-            lci_data = json.load(f)
+        result = build_lca_fmu_internal(lci_path, options)
+    except FmuBuildError as exc:
+        print(f"\n❌ Error: {exc}")
+        raise SystemExit(1) from exc
     except Exception as exc:
-        parser.error(f"Failed to read LCI JSON '{lci_path}': {exc}")
+        print(f"\n❌ Unexpected error: {exc}")
+        raise SystemExit(1) from exc
 
-    base_energy_mj = _resolve_lci_base_energy_mj(lci_data, default=1.0)
-    unitary_energy_mj, base_energy_unit = _resolve_one_base_unit_mj(lci_data, default_mj=1.0)
-    parameter_defaults = _resolve_lci_parameters(lci_data)
-
-    # ── Dry run mode ─────────────────────────────────────────────────────────
-    if args.dry_run:
-        print("🧪 DRY RUN MODE - Testing configuration")
-
-        try:
-            print(f"✅ LCI file valid: {lci_data.get('name', 'Unknown process')}")
-        except Exception as e:
-            print(f"❌ LCI file error: {e}")
-            sys.exit(1)
-
-        print(f"✅ Method configuration: {args.method} -> {method_cfg['output_label']}")
-        print(f"✅ Target tool: {args.target_tool}")
-        print(f"✅ FMU name: {fmu_name}")
-        print(f"✅ Class name: {class_name}")
-        print(f"✅ Export mode: {args.export_mode}")
-        print(f"✅ Black-box policy: {args.blackbox_policy}")
-        print(f"✅ Default step size: {args.default_step_size} s")
-        print(f"✅ Output variable: {method_cfg['output_var']} [{method_cfg['output_unit']}]")
-        print(f"✅ LCI base energy metadata: {base_energy_mj} {base_energy_unit}")
-        print(f"✅ FMU slope basis: 1 {base_energy_unit} ({unitary_energy_mj} MJ)")
-        if parameter_defaults:
-            print(f"✅ LCI parameters: {parameter_defaults}")
-        else:
-            print("✅ LCI parameters: none")
-        print("✅ Dry run completed successfully - ready for FMU creation")
-        sys.exit(0)
-
-    # ── Setup paths ──────────────────────────────────────────────────────────
-    # Safeguard: keep non-black-box or Dymola-targeted exports in fmu/proprietary.
-    is_proprietary_export = source_export_nonblackbox or args.target_tool == "dymola"
-    output_dir = DIST_FMU_PROPRIETARY if is_proprietary_export else DIST_FMU
-    ensure_dir_exists(output_dir)
-
-    simulatable_path = output_dir / f"{fmu_name}_Simulatable.fmu"
-    final_path = output_dir / f"{fmu_name}.fmu"
-
-    print(f"\n🚀  Creating FMU: {fmu_name}")
-    print(f"    LCI file   : {lci_path}")
-    print(f"    Method     : {args.method}  →  {method_cfg['output_var']}  [{method_cfg['output_unit']}]")
-    if is_proprietary_export:
-        print(f"    Output dir : {DIST_FMU_PROPRIETARY} (proprietary safeguard)")
-
-    try:
-        # ── Step 1: Run LCA analysis ─────────────────────────────────────────
-        # Use exactly 1 inventory base energy unit as the dynamic basis so
-        # slope extraction is independent of absolute inventory magnitude.
-        lca_results = run_lca_analysis(
-            lci_path,
-            unitary_energy_mj,
-            method_cfg["keywords"],
-            brightway_project=args.bw_project,
-            confirm_project_switch=not args.no_confirm_project_switch,
-        )
-
-        # ── Step 2: Extract factors and stage impacts ────────────────────────
-        print(f"\n{'='*60}")
-        print(f"  Step 2 – Extracting emission factors and stage impacts")
-        print(f"{'='*60}")
-
-        factors = extract_emission_factors(lca_results, method_cfg, unitary_energy_mj)
-        stage_impacts = extract_stage_impacts(lca_results, method_cfg)
-        parameter_model = _build_parameter_model(
-            lci_path=lci_path,
-            method_cfg=method_cfg,
-            unitary_energy_mj=unitary_energy_mj,
-            baseline_factors=factors,
-            baseline_stage_impacts=stage_impacts,
-            parameter_defaults=parameter_defaults,
-            brightway_project=args.bw_project,
-            confirm_project_switch=not args.no_confirm_project_switch,
-        )
-        kappa = float(parameter_model.get("stability", {}).get("kappa", 1.0))
-        ill_conditioned = bool(parameter_model.get("stability", {}).get("ill_conditioned", False))
-        print(f"  ℹ️  Sensitivity conditioning (kappa): {kappa:.3e}")
-        if ill_conditioned:
-            print("  ⚠️  Sensitivity system is ill-conditioned; parameter scaling may be numerically fragile.")
-
-        # ── Step 3: Generate and build FMU ───────────────────────────────────
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_dir = Path(tmp_dir)
-
-            # Generate Python class code
-            class_code = generate_fmu_class_code(
-                class_name=class_name,
-                fmu_name=fmu_name,
-                method_config=method_cfg,
-                factors=factors,
-                stage_impacts=stage_impacts,
-                parameter_model=parameter_model,
-                lci_path=lci_path
-            )
-
-            # Write to temporary file
-            python_file = tmp_dir / f"{class_name}.py"
-            python_file.write_text(class_code, encoding="utf-8")
-            print(f"\n{'='*60}")
-            print(f"  Step 3 – Generated FMU class code")
-            print(f"    Class: {class_name}")
-            print(f"    File:  {python_file.name}")
-            print(f"{'='*60}")
-
-            # Build FMU with pythonfmu
-            build_fmu_with_pythonfmu(python_file, simulatable_path)
-
-        # ── Step 4: Fix FMU metadata ─────────────────────────────────────────
-        fix_fmu_metadata(
-            fmu_path=simulatable_path,
-            output_path=final_path,
-            output_var="y",
-            output_unit=method_cfg["output_unit"],
-            output_description=f"Cumulative {method_cfg['output_label']}",
-            input_var="u",
-            input_unit="W",
-            default_step_size=args.default_step_size,
-        )
-
-        # ── Step 5: Optional bytecode packaging ──────────────────────────────
-        if args.export_mode == "bytecode":
-            package_fmu_as_bytecode(final_path)
-
-        # ── Step 6: Black-box compliance audit ──────────────────────────────
-        blackbox_ok = True
-        blackbox_msg = "Black-box audit skipped"
-        if args.blackbox_policy != "off":
-            blackbox_ok, blackbox_msg = audit_fmu_blackbox(final_path)
-            if blackbox_ok:
-                print(f"\n  ✅ {blackbox_msg}")
-            else:
-                level = "❌" if args.blackbox_policy == "enforce" else "⚠️"
-                print(f"\n  {level} {blackbox_msg}")
-
-            if not blackbox_ok and args.blackbox_policy == "enforce":
-                # Prevent accidental distribution of non-compliant FMUs.
-                try:
-                    final_path.unlink()
-                    print(f"  🧹 Removed non-compliant FMU: {final_path.name}")
-                except Exception as exc:
-                    print(f"  ⚠️  Could not remove non-compliant FMU: {exc}")
-
-                raise RuntimeError(
-                    "Black-box compliance check failed. "
-                    "Use --blackbox-policy warn/off only for local testing."
-                )
-
-        # ── Step 7: Validate FMU ─────────────────────────────────────────────
-        is_valid, msg = validate_fmu(final_path)
-
-        # ── Step 7b: Parameter linearity check ───────────────────────────────
-        linear_ok, linear_msg = verify_fmu_parameter_linearity(final_path, parameter_defaults)
-        if linear_ok:
-            print(f"  ✅ {linear_msg}")
-        else:
-            raise RuntimeError(linear_msg)
-
-        # ── Step 8: Clean up intermediate file ───────────────────────────────
-        try:
-            simulatable_path.unlink()
-            print(f"\n  🧹 Removed intermediate: {simulatable_path.name}")
-        except Exception as exc:
-            print(f"\n  ⚠️  Could not remove intermediate file: {exc}")
-
-        # ── Summary ──────────────────────────────────────────────────────────
-        print(f"\n{'='*60}")
-        if is_valid:
-            print(f"  🎉  FMU creation complete!")
-        else:
-            print(f"  ⚠️   FMU created but validation had issues: {msg}")
-        print(f"  📁  Output : {final_path}")
-        print(f"  🖥️   Platform: Windows 64-bit, Linux 64-bit")
-        print(f"  🎯  Target tool     : {args.target_tool}")
-        print(f"  📦  Export mode     : {args.export_mode}")
-        print(f"  🔐  Black-box policy: {args.blackbox_policy}")
-        print(f"  🔎  Black-box audit : {'PASS' if blackbox_ok else 'FAIL'}")
-        print(f"  📐  Parameter linearity: {'PASS' if linear_ok else 'FAIL'}")
-        print(f"  🧮  Conditioning kappa : {kappa:.3e}")
-        print(f"")
-        print(f"  🔄  Cumulative Impact Tracking:")
-        print(f"     • Input  : u [W]  (power_input_w)")
-        print(f"     • Output : y [{method_cfg['output_unit']}]  ({method_cfg['output_var']}_cumulative)")
-        if parameter_defaults:
-            print(f"     • Parameters: {', '.join(sorted(parameter_defaults.keys()))}")
-        print(f"")
-        print(f"  📊  Life Cycle Stages:")
-        print(f"     • Production : {stage_impacts['production']:.4e} {method_cfg['output_unit']} (t=start)")
-        print(f"     • Transport  : {stage_impacts['transport']:.4e} {method_cfg['output_unit']} (t=start)")
-        base_unit_rate = factors['energy_factor'] * unitary_energy_mj
-        print(f"     • Use rate   : {base_unit_rate:.4e} {method_cfg['output_unit']}/{base_energy_unit} (derived from 1 {base_energy_unit})")
-        print(f"                   {factors['energy_factor']/1.0e6:.4e} {method_cfg['output_unit']}/J (used in FMU u*dt)")
-        print(f"     • End-of-Life: {stage_impacts['eol']:.4e} {method_cfg['output_unit']} (t=stop)")
-        print(f"{'='*60}\n")
-
-        sys.exit(0 if is_valid else 1)
-
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    print(f"\n{'='*60}")
+    print("  FMU creation complete")
+    print(f"  Output: {result.final_fmu_path}")
+    print(f"  Method: {result.method}")
+    print(f"  Validation: {'PASS' if (result.validation_ok in (None, True)) else 'FAIL'}")
+    print(f"  Black-box: {'PASS' if (result.blackbox_ok in (None, True)) else 'FAIL'}")
+    print(f"  Linearity: {'PASS' if (result.linearity_ok in (None, True)) else 'FAIL'}")
+    print(f"{'='*60}\n")
 
 
 if __name__ == "__main__":

@@ -57,7 +57,7 @@ def convert_csv_to_lci_json(csv_files, output_file=None):
     if isinstance(csv_files, str):
         csv_files = [csv_files]
     
-    from src.lca_utils import get_inventory_dir
+    from fmlca.lca_utils import get_inventory_dir
 
     inventory_dir = get_inventory_dir()
 
@@ -98,8 +98,8 @@ def convert_csv_to_lci_json(csv_files, output_file=None):
     print(f"   Output: {output_file}")
     
     # Initialize managers
-    from src.config_manager import get_config
-    from src.lci_data_manager import LCIDataManager
+    from fmlca.config_manager import get_config
+    from fmlca.lci_data_manager import LCIDataManager
 
     config = get_config()
     lci_manager = LCIDataManager()
@@ -137,7 +137,7 @@ def test_with_lca_analysis(json_file, product_name):
     """Test the generated JSON with the LCA system"""
     try:
         # Import LCA system components
-        from src.lca_engine import run_lca_energy
+        from fmlca.lca_engine import run_lca_energy
         
         # Test with default methods
         methods = ["IPCC 2021 climate change total excl biogenic GWP100"]
@@ -228,7 +228,7 @@ Metadata/comments:
         
         # Validation
         if args.validate:
-            from src.lci_data_manager import validate_inventory_format
+            from fmlca.lci_data_manager import validate_inventory_format
 
             print("   Validating JSON structure...")
             is_valid = validate_inventory_format(lci_data)

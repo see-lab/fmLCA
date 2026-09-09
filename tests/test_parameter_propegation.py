@@ -17,7 +17,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.lci_data_manager import LCIDataManager
+from fmlca.lci_data_manager import LCIDataManager
 
 
 def test_single_parameterized_csv():
@@ -51,7 +51,7 @@ def test_single_parameterized_csv():
         if exchange.get('type') != 'production':
             print(f"   - {exchange['name']}: {exchange.get('amount')} {exchange.get('unit')}")
     
-    return True
+    # Pytest tests should not return values; reaching here means success.
 
 
 def test_multiple_parameterized_csv():
@@ -92,7 +92,7 @@ def test_multiple_parameterized_csv():
             print(f"   - {exchange['name']} ({exchange.get('subsystem', 'N/A')})")
             print(f"     Amount: {exchange['amount']}")
     
-    return True
+    # Pytest tests should not return values; reaching here means success.
 
 
 def test_parameter_propagation():
@@ -136,7 +136,7 @@ def test_parameter_propagation():
     
     print(f"✅ All subsystem exchanges correctly linked to parameters")
     
-    return True
+    # Pytest tests should not return values; reaching here means success.
 
 
 def test_json_output_structure():
@@ -169,7 +169,7 @@ def test_json_output_structure():
     parameterized_count = sum(1 for ex in data['exchanges'] if isinstance(ex.get('amount'), str))
     print(f"✅ {parameterized_count} exchanges have parameterized amounts")
     
-    return True
+    # Pytest tests should not return values; reaching here means success.
 
 
 def main():
@@ -188,7 +188,8 @@ def main():
     results = []
     for test_name, test_func in tests:
         try:
-            success = test_func()
+            test_func()
+            success = True
             results.append((test_name, success, None))
         except Exception as e:
             results.append((test_name, False, str(e)))

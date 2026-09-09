@@ -9,7 +9,7 @@ import pytest
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.lca_engine import run_lca
+from fmlca.lca_engine import run_lca
 
 LCI_FILE = project_root / "data" / "inventory" / "example.json"
 METHODS = ["IPCC 2021 climate change total excl biogenic GWP100"]

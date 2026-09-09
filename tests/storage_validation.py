@@ -32,7 +32,7 @@ DEFAULT_METHODS = ROOT / "data" / "methods" / "ipccv1.03.json"
 DEFAULT_OUT_PNG = ROOT / "results" / "storage_validation_percent_diff.png"
 DEFAULT_OUT_SVG = ROOT / "results" / "storage_validation_percent_diff.svg"
 DEFAULT_OUT_CSV = ROOT / "results" / "storage_validation_percent_diff.csv"
-DEFAULT_PRODUCTS = ["bess", "propane", "sandTes"]
+DEFAULT_PRODUCTS = ["bess310", "propane", "sandTes"]
 
 STAGE_ORDER = ["Total Impacts", "Production", "Transport", "Use", "EOL"]
 STAGE_MARKERS = {
@@ -150,7 +150,7 @@ def read_simapro_stage_scores(path: Path) -> dict[str, float]:
 
 
 def run_lca_stage_scores(inventory_json: Path, method_tuple: tuple[str, ...]) -> dict[str, float]:
-    from src.lca_engine import run_lca_energy
+    from fmlca.lca_engine import run_lca_energy
 
     energy_mj = get_inventory_energy_mj(inventory_json)
     result = run_lca_energy(str(inventory_json), [method_tuple], {}, energy_mj)

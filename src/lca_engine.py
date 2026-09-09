@@ -13,6 +13,7 @@ import traceback
 import shutil
 import re
 import os
+import sys
 from pathlib import Path
 
 # Import Brightway components
@@ -45,11 +46,12 @@ except ImportError:
 # Initialize configuration
 config = get_config()
 
-# Projects directory and set up
-print("🚀 LCA Analysis Engine - Energy Applications")
-print(f"📁 Current project: {projects.current}")
-print(f"🗂️  Projects directory: {projects.dir}")
-print(f"📋 Available projects: {[str(p) for p in projects]}")
+def print_startup_banner():
+    """Print Brightway project context for CLI usage."""
+    print("🚀 LCA Analysis Engine - Energy Applications")
+    print(f"📁 Current project: {projects.current}")
+    print(f"🗂️  Projects directory: {projects.dir}")
+    print(f"📋 Available projects: {[str(p) for p in projects]}")
 
 # ── LCIA Methods Loading ──────────────────────────────────────────────────────
 
@@ -310,20 +312,22 @@ def switch_to_project_with_database(target_db_name, declared_project=None, requi
 
     if declared_project:
         if declared_project not in all_projects:
-            print(f"❌ Declared Brightway project not found: '{declared_project}'")
+            print(f"⚠️ Declared Brightway project not found: '{declared_project}'")
             print(f"   Available projects: {all_projects}")
-            return False
+            print("   Falling back to project discovery.")
+            declared_project = None
 
-        try:
-            projects.set_current(declared_project)
-            if target_db_name in list(databases.keys()):
-                print(f"✅ Using declared project '{declared_project}' (has {target_db_name})")
-                return True
-            print(f"❌ Declared project '{declared_project}' does not contain '{target_db_name}'")
-            return False
-        except Exception as e:
-            print(f"❌ Failed to switch to declared project '{declared_project}': {e}")
-            return False
+        if declared_project:
+            try:
+                projects.set_current(declared_project)
+                if target_db_name in list(databases.keys()):
+                    print(f"✅ Using declared project '{declared_project}' (has {target_db_name})")
+                    return True
+                print(f"⚠️ Declared project '{declared_project}' does not contain '{target_db_name}'")
+                print("   Falling back to project discovery.")
+            except Exception as e:
+                print(f"⚠️ Failed to switch to declared project '{declared_project}': {e}")
+                print("   Falling back to project discovery.")
 
     candidates = _order_project_candidates(_discover_projects_with_database(target_db_name))
     if not candidates:
@@ -1759,6 +1763,8 @@ def save_results_csv(results, output_file="lca_results.csv"):
 
 # Main execution
 if __name__ == "__main__":
+    print_startup_banner()
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(
         description='Run LCA analysis with configurable methods',

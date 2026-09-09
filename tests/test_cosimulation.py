@@ -19,7 +19,7 @@ from scripts import run_fmu
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_FMU = ROOT / "fmu" / "PV_System_WECC.fmu"
-LCA_FMU = ROOT / "fmu" / "PvWecc_Ipcc_v1.0.fmu"
+LCA_FMU = ROOT / "fmu" / "PvWecc_Ipcc_v0.0.1.fmu"
 PLOT_OUT = ROOT / "results" / "test_cosimulation.png"
 
 pytestmark = pytest.mark.integration

@@ -1,5 +1,4 @@
-"""
-LCA Analysis System - Energy Applications
+"""Compatibility exports for legacy src imports.
 
 A comprehensive Life Cycle Assessment analysis system with support for:
 - Energy-based input parameters (MJ)
@@ -10,12 +9,29 @@ A comprehensive Life Cycle Assessment analysis system with support for:
 - Centralized LCIA methods management
 
 Author: LCA Analysis System
-Version: 2.0.0 - Energy Applications
+Version: 0.0.1 - Energy Applications
+Canonical public package: fmlca.
 """
 
-__version__ = "2.0.0"
+__version__ = "0.0.1"
 __author__ = "LCA Analysis System"
 __description__ = "Energy-Based Life Cycle Assessment Analysis with Flexible FMU Co-simulation Support"
+
+from .fmu_api import (
+	BlackboxComplianceError,
+	BuildOptions,
+	BuildResult,
+	FmuBuildError,
+	FmuPackagingError,
+	FmuValidationError,
+	LcaRunError,
+	LciFileNotFoundError,
+	MethodConfigError,
+	ParameterLinearityError,
+	build_lca_fmu,
+	build_lca_fmu_internal,
+	create_fmu,
+)
 
 # Note: Avoid importing from modules that have their own imports to prevent circular dependencies
 # Individual modules can be imported directly when needed
@@ -28,4 +44,18 @@ __description__ = "Energy-Based Life Cycle Assessment Analysis with Flexible FMU
 # - lca_utils: Utility functions (paths, units, file I/O)
 # - fmu_generator: FMU generation core logic
 
-__all__ = []
+__all__ = [
+	"build_lca_fmu",
+	"build_lca_fmu_internal",
+	"create_fmu",
+	"BuildOptions",
+	"BuildResult",
+	"FmuBuildError",
+	"LciFileNotFoundError",
+	"MethodConfigError",
+	"LcaRunError",
+	"FmuPackagingError",
+	"BlackboxComplianceError",
+	"FmuValidationError",
+	"ParameterLinearityError",
+]

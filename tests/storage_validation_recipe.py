@@ -190,7 +190,7 @@ def run_lca_single_score_pt(
     inventory_json: Path,
     method_list: list[Any],
 ) -> tuple[dict[str, float], bool, list[str]]:
-    from src.lca_engine import run_lca_energy
+    from fmlca.lca_engine import run_lca_energy
 
     energy_mj = get_inventory_energy_mj(inventory_json)
     result = run_lca_energy(str(inventory_json), method_list, {}, energy_mj)

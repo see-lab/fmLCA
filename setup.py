@@ -27,7 +27,7 @@ if not runtime_requirements:
     runtime_requirements = read_requirements("requirements.txt")
 
 setup(
-    name="fmLCA",
+    name="fmlca",
     version="0.0.1",
     author="Kathryn Hinkelman",
     author_email="kathryn.hinkelman@uvm.edu",
@@ -36,7 +36,8 @@ setup(
     long_description_content_type="text/markdown",
     license="BSD-3-Clause",
     url="https://github.com/see-lab/fmLCA",
-    packages=find_packages(include=["src", "src.*", "scripts", "scripts.*"]),
+    packages=find_packages(include=["src", "src.*", "scripts", "scripts.*", "fmlca", "fmlca.*"]),
+    py_modules=["fmLCA"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",

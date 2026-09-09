@@ -60,7 +60,7 @@ def parse_args() -> CosimConfig:
     parser.add_argument(
         "--brightway-fmu",
         type=Path,
-        default=ROOT / "fmu" / "Grid_Ipcc_v1.0.fmu",
+        default=ROOT / "fmu" / "Grid_Ipcc_v0.0.1.fmu",
         help="Path to target Brightway FMU",
     )
     parser.add_argument(

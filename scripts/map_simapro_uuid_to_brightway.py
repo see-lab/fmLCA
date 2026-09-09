@@ -24,7 +24,7 @@ import bw2data as bd
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.config_manager import get_config
+from fmlca.config_manager import get_config
 
 
 def resolve_csv_input(csv_arg: str) -> Path:
@@ -85,7 +85,7 @@ def write_inventory_csv(path: Path, metadata_lines: List[str], fieldnames: List[
 
 def ensure_project_for_db(target_db: str) -> None:
     config = get_config()
-    target_project = config.system_config.get("system", {}).get("default_project", "fmLCA")
+    target_project = config.system_config.get("system", {}).get("default_project", "fmlca")
 
     all_projects = [str(p).replace("Project: ", "") for p in bd.projects]
     if target_project in all_projects:
