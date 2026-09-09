@@ -65,7 +65,7 @@ def test_sequential_cosim_real_fmus_1day(cosim_fmu_paths: tuple[Path, Path]) -> 
     assert np.all(np.isfinite(impact_y))
     assert np.all(np.diff(time_s) >= 0.0)
 
-    energy_mwh = float(np.trapezoid(power_u, time_s) / 3.6e9)
+    energy_mwh = float(getattr(np, "trapezoid", np.trapz)(power_u, time_s) / 3.6e9)
     print("1-day co-simulation verification")
     print(f"System FMU: {system_fmu}")
     print(f"LCA FMU: {lca_fmu}")
