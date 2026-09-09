@@ -625,6 +625,20 @@ def main():
         )
 
     if args.dry_run:
+        if not lci_path.exists():
+            parser.error(f"LCI file not found: {lci_path}")
+
+        try:
+            with open(lci_path, "r", encoding="utf-8") as f:
+                lci_data = json.load(f)
+        except Exception as exc:
+            parser.error(f"Failed to read LCI JSON '{lci_path}': {exc}")
+
+        from lci_data_manager import validate_inventory_format
+
+        if not validate_inventory_format(lci_data):
+            parser.error(f"Invalid LCI JSON structure: {lci_path}")
+
         print("🧪 DRY RUN MODE - configuration validated")
         print(f"LCI path: {lci_path}")
         print(f"Method: {args.method}")
