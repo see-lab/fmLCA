@@ -15,9 +15,9 @@ Notes:
 
 Usage:
     python scripts/run_fmu.py
-    python scripts/run_fmu.py --fmu fmu/Grid_Ipcc_v0.0.1.fmu
+    python scripts/run_fmu.py --fmu fmu/Grid_Ipcc_v1.0.fmu
     python scripts/run_fmu.py --start-time 0 --stop-time 3600 --step-size 60 --u0 100
-    python scripts/run_fmu.py --mode cosim --system-fmu fmu/PV_System_WECC.fmu --lca-fmu fmu/PvWecc_Ipcc_v0.0.1.fmu
+    python scripts/run_fmu.py --mode cosim --system-fmu fmu/PV_System_WECC.fmu --lca-fmu fmu/PvWecc_Ipcc_v1.0.fmu
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ from fmpy import simulate_fmu
 # ── Defaults (clear simulation parameters) ──────────────────────────────────
 
 ROOT = Path(__file__).parent.parent.resolve()
-DEFAULT_FMU = ROOT / "fmu" / "Example_Ipcc_v0.0.1.fmu"
+DEFAULT_FMU = ROOT / "fmu" / "Example_Ipcc_v1.0.fmu"
 
 
 @dataclass(frozen=True)
