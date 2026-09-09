@@ -100,7 +100,7 @@ def _arg_was_provided(option_name: str) -> bool:
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
-DIST_FMU = ROOT / "fmu"
+DIST_FMU = Path.cwd() / "fmu"
 DIST_FMU_PROPRIETARY = DIST_FMU / "proprietary"
 
 # Supported LCIA methods
