@@ -13,7 +13,7 @@ simulate_fmu = fmpy.simulate_fmu
 
 
 ROOT = Path(__file__).resolve().parents[1]
-GRID_FMU = ROOT / "fmu" / "Grid_Ipcc_v0.0.1.fmu"
+GRID_FMU = ROOT / "fmu" / "Grid_Ipcc_v1.0.fmu"
 
 pytestmark = pytest.mark.integration
 
