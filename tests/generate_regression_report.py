@@ -42,7 +42,7 @@ PLOT_DIR = REPORT_DIR / "plots"
 
 PROFILE_REF_FILE = REFERENCE_DIR / "example_fmu_profiles.txt"
 NATIVE_REF_FILE = REFERENCE_DIR / "example_ipcc_native_vs_fmu.txt"
-FMU_PATH = ROOT / "fmu" / "Example_Ipcc_v1.0.fmu"
+FMU_PATH = ROOT / "fmu" / "Example_Ipcc_v0.0.1.fmu"
 
 
 @dataclass

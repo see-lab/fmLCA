@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-lca_utils.py - Shared utility functions for LCA-FMU
+lca_utils.py - Shared utility functions for fmLCA
 
 Provides common utilities used across multiple modules:
 - Name sanitization (class names, file names)
@@ -8,7 +8,7 @@ Provides common utilities used across multiple modules:
 - Unit conversions (MJ ↔ kWh)
 - File I/O helpers (JSON loading/saving)
 
-Part of the LCA-FMU core library.
+Part of the fmLCA core library.
 """
 
 import json
@@ -104,7 +104,7 @@ def get_src_dir() -> Path:
 
 def get_data_dir() -> Path:
     """Get the data directory path, preferring repo layout then bundled assets."""
-    env_root = os.environ.get("LCA_FMU_ROOT")
+    env_root = os.environ.get("FMLCA_ROOT")
     if env_root:
         env_data = Path(env_root).expanduser().resolve() / "data"
         if env_data.exists():
@@ -141,7 +141,7 @@ def get_fmu_dir() -> Path:
 
 def get_config_dir() -> Path:
     """Get the config directory path, preferring repo layout then bundled assets."""
-    env_root = os.environ.get("LCA_FMU_ROOT")
+    env_root = os.environ.get("FMLCA_ROOT")
     if env_root:
         env_config = Path(env_root).expanduser().resolve() / "config"
         if (env_config / "system_config.json").exists():

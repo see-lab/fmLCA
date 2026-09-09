@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lca-fmu"
-version = "1.0.0"
+name = "fmlca"
+version = "0.0.1"
 authors = [
   { name="Kathryn Hinkelman", email="kathryn.hinkelman@uvm.edu" },
 ]
@@ -26,5 +26,5 @@ license = "BSD-3-Clause"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Homepage = "https://github.com/see-lab/lca-fmu"
-Issues = "https://github.com/see-lab/lca-fmu/issues"
+Homepage = "https://github.com/see-lab/fmLCA"
+Issues = "https://github.com/see-lab/fmLCA/issues"

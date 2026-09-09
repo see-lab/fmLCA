@@ -2,7 +2,7 @@
 """Validate staged impacts for bess, propane, and sandTes against SimaPro references.
 
 Computes stage-wise percent difference as:
-    (LCA-FMU - SimaPro) / SimaPro * 100
+    (fmLCA - SimaPro) / SimaPro * 100
 
 Produces one scatter marker per product+stage pair and plots a y=x reference line.
 The log-log axes keep low-magnitude stage impacts visible (e.g., EOL).
@@ -32,7 +32,7 @@ DEFAULT_METHODS = ROOT / "data" / "methods" / "ipccv1.03.json"
 DEFAULT_OUT_PNG = ROOT / "results" / "storage_validation_percent_diff.png"
 DEFAULT_OUT_SVG = ROOT / "results" / "storage_validation_percent_diff.svg"
 DEFAULT_OUT_CSV = ROOT / "results" / "storage_validation_percent_diff.csv"
-DEFAULT_PRODUCTS = ["bess", "propane", "sandTes"]
+DEFAULT_PRODUCTS = ["bess310", "propane", "sandTes"]
 
 STAGE_ORDER = ["Total Impacts", "Production", "Transport", "Use", "EOL"]
 STAGE_MARKERS = {
@@ -150,7 +150,7 @@ def read_simapro_stage_scores(path: Path) -> dict[str, float]:
 
 
 def run_lca_stage_scores(inventory_json: Path, method_tuple: tuple[str, ...]) -> dict[str, float]:
-    from src.lca_engine import run_lca_energy
+    from fmlca.lca_engine import run_lca_energy
 
     energy_mj = get_inventory_energy_mj(inventory_json)
     result = run_lca_energy(str(inventory_json), [method_tuple], {}, energy_mj)
@@ -341,7 +341,7 @@ def plot_points(points: list[dict[str, Any]], output_png: Path, output_svg: Path
     ax.set_xlim(plot_min, plot_max)
     ax.set_ylim(plot_min, plot_max)
     ax.set_xlabel("SimaPro Score (kg CO2-eq)")
-    ax.set_ylabel("Brightway Score via LCA-FMU (kg CO2-eq)")
+    ax.set_ylabel("Brightway Score via fmLCA (kg CO2-eq)")
     ax.grid(False)
     ax.minorticks_on()
     ax.tick_params(which="major", direction="in")

@@ -99,7 +99,7 @@ def _build_wecc_fmu(lci_stem: str) -> Path:
             f"STDOUT:\n{completed.stdout}\n\nSTDERR:\n{completed.stderr}"
         )
 
-    default_path = ROOT / "fmu" / "Wecc-static_Ipcc_v1.0.fmu"
+    default_path = ROOT / "fmu" / "Wecc-static_Ipcc_v0.0.1.fmu"
     if default_path.exists():
         return default_path
 

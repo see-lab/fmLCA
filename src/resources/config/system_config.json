@@ -1,6 +1,6 @@
 {
     "system": {
-        "default_project": "LCA-FMU",
+        "default_project": "fmlca",
         "temp_database_prefix": "LCA_Temp_DB",
         "supported_databases": [
             {
@@ -16,7 +16,7 @@
             }
         ],
         "project_search_names": [
-            "LCA-FMU"
+            "fmlca"
         ]
     },
     "energy_applications": {

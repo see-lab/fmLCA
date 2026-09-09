@@ -27,16 +27,17 @@ if not runtime_requirements:
     runtime_requirements = read_requirements("requirements.txt")
 
 setup(
-    name="lca-fmu",
-    version="1.0.0",
-    author="Kathryn Hinkelman, Fitz Koch",
-    author_email="kathryn.hinkelman@colorado.edu",
-    description="Life Cycle Assessment with Functional Mock-up Units for energy systems",
+    name="fmlca",
+    version="0.0.1",
+    author="Kathryn Hinkelman",
+    author_email="kathryn.hinkelman@uvm.edu",
+    description="Co-simulate dynamic Life Cycle Assessment and energy system models as Functional Mock-up Units",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="BSD-3-Clause",
-    url="https://github.com/see-lab/lca-fmu",
-    packages=find_packages(include=["src", "src.*", "scripts", "scripts.*"]),
+    url="https://github.com/see-lab/fmLCA",
+    packages=find_packages(include=["src", "src.*", "scripts", "scripts.*", "fmlca", "fmlca.*"]),
+    py_modules=["fmLCA"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
@@ -68,12 +69,12 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "lca-fmu-create=scripts.create_fmu:main",
-            "lca-fmu-csv2json=scripts.csv_to_json_translator:main",
-            "lca-fmu-setup-brightway=scripts.setup_brightway:main",
-            "lca-fmu-setup-ecoinvent=scripts.setup_brightway:main",
-            "lca-fmu-setup-env=scripts.setup_environment:main",
-            "lca-fmu-validate=scripts.validate_requirements:main",
+            "fmlca-create=scripts.create_fmu:main",
+            "fmlca-csv2json=scripts.csv_to_json_translator:main",
+            "fmlca-setup-brightway=scripts.setup_brightway:main",
+            "fmlca-setup-ecoinvent=scripts.setup_brightway:main",
+            "fmlca-setup-env=scripts.setup_environment:main",
+            "fmlca-validate=scripts.validate_requirements:main",
         ],
     },
     include_package_data=True,
@@ -92,7 +93,7 @@ setup(
         ],
     },
     project_urls={
-        "Bug Reports": "https://github.com/see-lab/lca-fmu/issues",
-        "Source": "https://github.com/see-lab/lca-fmu",
+        "Bug Reports": "https://github.com/see-lab/fmLCA/issues",
+        "Source": "https://github.com/see-lab/fmLCA",
     },
 )

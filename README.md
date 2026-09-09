@@ -1,164 +1,171 @@
-# LCA-FMU
+# fmlca
 
-Life Cycle Assessment (LCA) platform with Functional Mock-up Unit (FMU) generation for dynamic energy systems modeling.
+Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). fmlca supports CLI and Python API workflows for inventory conversion, LCA runs, FMU generation, and sequential co-simulation.
 
-Built with Brightway 2.5 and ecoinvent integration.
-
-[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
-[![CI Tests](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml/badge.svg)](https://github.com/see-lab/lca-fmu/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/see-lab/fmLCA/blob/main/LICENSE)
+[![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
 
 ## Contributors
 
-**Kathryn Hinkelman**, **Fitzwilliam Keenan-Koch**, & **Anastasija Mensikova** - [SEE Lab](http://www.theseelab.org/), University of Vermont
+**Kathryn Hinkelman**, **Fitzwilliam Keenan-Koch**, and **Anastasija Mensikova** - [SEE Lab](https://www.theseelab.org/), University of Vermont
 
 ## Features
 
-- **Dynamic Energy Propagation** - Energy scaling throughout LCA calculations
-- **Parameterized Subsystems** - Combine multiple CSV inventories with parameters (e.g., n_pv, n_bess)
-- **Automatic Process Detection** - Zero-config CSV import with energy process recognition
-- **FMU Generation** - Create functional mockup units for co-simulation using the [Functional Mockup Interface (FMI)](https://fmi-standard.org/) Standard
-- **Modelica co-simulation** - Couple LCA models with Modelica system models via Dymola, Python, or FMI-compatible runtime [tools](https://fmi-standard.org/tools/)
-- **Comprehensive impact assessment methods** - 728+ LCIA methods including climate change indicators
+- Dynamic energy propagation through LCA calculations
+- Parameterized subsystem composition from CSV inventories
+- FMU generation for FMI-compatible co-simulation
+- Brightway + ecoinvent based impact assessment workflows
+- CLI and Python API support for end-to-end pipelines
 
-## Quick Start
-
-### Installation
+## Installation
 
 ```bash
-git clone https://github.com/see-lab/lca-fmu.git
-cd lca-fmu
+git clone https://github.com/see-lab/fmLCA.git
+cd fmLCA
 python -m venv venv
 source venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
 ```
 
-**Requirements:**
+Requirements:
 - Python 3.9-3.13
-- Ecoinvent 3.8+ database (see `scripts/setup_brightway.py`)
+- ecoinvent 3.8+ database
 
+## Brightway And Ecoinvent Setup
 
-**Setting up Ecoinvent:**
-If you don't have an ecoinvent database:
 ```bash
-# Show current project status only
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --check
+# Check status
+python scripts/setup_brightway.py --name fmlca --ecoinvent 3.12 --check
 
 # Import ecoinvent (LCI + LCIA)
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12 --system-model cutoff
+python scripts/setup_brightway.py --name fmlca --ecoinvent 3.12 --system-model cutoff
 ```
 
-See [Ecoinvent Setup Guide](docs/ECOINVENT_SETUP.md) for detailed instructions.
-
-### Brightway Setup Helper
-
+For complete setup options, run:
 ```bash
-python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
+python scripts/setup_brightway.py -h
 ```
 
-### Convert CSV to JSON for LCI import
+Detailed guidance: [Ecoinvent Setup Guide](https://github.com/see-lab/fmLCA/blob/main/docs/ECOINVENT_SETUP.md)
+
+## Safe Project Selection
+
+Set the target Brightway project explicitly in multi-project environments:
+
+```powershell
+$env:FMLCA_BW_PROJECT = "fmlca"
+```
+
+Optional non-interactive project switching:
+
+```powershell
+$env:FMLCA_AUTO_CONFIRM_PROJECT_SWITCH = "true"
+```
+
+## CLI Workflow (Primary Reference)
+
+Get full options for each command with `-h`.
+
+### 1) Convert CSV To Inventory JSON
 
 ```bash
-# Single file - auto-detect energy processes and convert CSV
-# Parameterized single files are the same command. Parameter metadata is auto detected.
 python scripts/csv_to_json_translator.py example.csv
-
-# Combine multiple parameterized subsystems, with a declared output name
-# Default output name is `example1_example2.json'
 python scripts/csv_to_json_translator.py example1 example2 --output combined_system.json
+python scripts/csv_to_json_translator.py -h
 ```
 
-### Run LCA Analysis
+### 2) Run LCA
 
 ```bash
 python src/lca_engine.py example --methods ipcc
+python src/lca_engine.py -h
 ```
 
-### Generate FMU
+### 3) Build FMU
 
 ```bash
-# Create FMU for co-simulation
 python scripts/create_fmu.py example --method ipcc
-
-# Create FMU with bytecode-only resources and strict black-box enforcement
-# This is for sharing LCA-FMUs with proprietary and confidential data (e.g., ecoinvent EULA)
-python scripts/create_fmu.py example --method ipcc --export-mode bytecode --blackbox-policy enforce
+python scripts/create_fmu.py example --method ipcc --bw-project fmlca
+python scripts/create_fmu.py -h
 ```
 
-Black-box compliance policy:
-- By default, create_fmu enforces black-box auditing and fails export if readable source/data payloads are present in resources/.
-- By default, create_fmu now uses bytecode export mode: implementation modules are compiled to .pyc and only a minimal loader stub remains as .py.
-- For local debugging only, use --blackbox-policy warn or --blackbox-policy off.
-
-### Dymola Export Preset (Short Guide)
-
-Use the Dymola preset when importing FMUs into Dymola:
+### 4) Run FMU / Sequential Co-simulation
 
 ```bash
-# Dymola-compatible defaults (source mode + runtime guidance)
-python scripts/create_fmu.py grid --method ipcc --target-tool dymola --accept-ip-risk
-
-# Preferred for external sharing / stronger IP protection
-python scripts/create_fmu.py grid --method ipcc --target-tool dymola --export-mode bytecode --blackbox-policy enforce
+python scripts/run_fmu.py --mode single --fmu fmu/Example_Ipcc_v0.0.1.fmu --u0 100 --step-size 60
+python scripts/run_fmu.py --mode cosim --system-fmu fmu/PV_System_WECC.fmu --lca-fmu fmu/PvWecc_Ipcc_v0.0.1.fmu --system-output gri.P.real --lca-input u --lca-output y --parameter-name n_pv --parameter-value 2.0 --output-interval 3600 --solver CVode --save-plot results/cosim.png
+python scripts/run_fmu.py -h
 ```
 
-Notes:
-- `--target-tool dymola` sets compatibility-oriented defaults unless you override them.
-- Source mode is not black-box compliant; the CLI prints a risk warning and requires explicit acknowledgment.
-- For ecoinvent/IP-sensitive distribution, use bytecode + enforce and validate importer compatibility before sharing.
+## Python API Workflow
+
+Use lowercase package import:
+
+```python
+from fmlca import csv_to_json_translator, create_fmu, lca_engine, run_fmu
+csv_to_json_translator("data/inventory/example.csv", "data/inventory/example.json")
+fmu_path = create_fmu("data/inventory/example.json", "fmu", method="ipcc", version="0.0.1")
+results = lca_engine("data/inventory/example.json", ["IPCC 2021 climate change total excl biogenic GWP100"])
+sim = run_fmu(fmu_path, stop_time=3600.0, input_u=100.0)
+```
+
+Two-FMU co-simulation API:
+
+```python
+from pathlib import Path
+from fmlca.run_fmu import sequential_cosim
+system_result, lca_result = sequential_cosim(system_fmu=Path("fmu/PV_System_WECC.fmu"), lca_fmu=Path("fmu/PvWecc_Ipcc_v0.0.1.fmu"), start_s=0.0, stop_s=3600.0, system_output="gri.P.real", lca_input="u", lca_output="y")
+```
+
+## Advanced Options
+
+- Dymola preset: `python scripts/create_fmu.py grid --method ipcc --target-tool dymola`.
+- Strict distribution mode: `python scripts/create_fmu.py grid --method ipcc --target-tool dymola --export-mode bytecode --blackbox-policy enforce`.
+- Default safety posture: bytecode export + black-box enforce; run `python scripts/create_fmu.py -h` for all policy/export options.
 
 ## Project Structure
 
 ```
 ├── src/                    # Core library modules
 ├── scripts/                # CLI tools
-├── data/                   # Inventories & LCIA methods
-│   ├── inventory/         # JSON inventories (grid, cooling, storage)
-│   └── methods/           # IPCC, IMPACT World+ methods
-├── config/                # Configuration files
-├── fmu/                   # Generated FMUs
-├── results/               # Analysis outputs
-└── tests/                 # Test suite
+├── data/                   # Inventories and LCIA methods
+│   ├── inventory/
+│   └── methods/
+├── config/                 # Configuration files
+├── fmu/                    # Generated FMUs
+├── results/                # Analysis outputs
+└── tests/                  # Test suite
 ```
 
 ## Testing
 
 ```bash
-# Test FMU logic
 python tests/test_cumulative_fmu.py
-
-# Run all tests
 python -m pytest tests/
 ```
 
-**Note:** FMU binaries require Linux/Windows.
-
 ## Documentation
 
-- **[Release Tracking](docs/RELEASE_TRACKING.md)** - Update status and remaining tasks for alpha deployment
-- More to come later...
+- [Release Tracking](https://github.com/see-lab/fmLCA/blob/main/docs/RELEASE_TRACKING.md)
 
 ## Contributing
 
-Contributions welcome! Fork the repo, create a feature branch, test your changes, and submit a PR.
-
-See development guidelines in `CONTRIBUTING.md`.
+Contributions are welcome. See [CONTRIBUTING.md](https://github.com/see-lab/fmLCA/blob/main/CONTRIBUTING.md).
 
 ## License
 
-BSD 3-Clause License - see [LICENSE](LICENSE) file.
+BSD 3-Clause License. See [LICENSE](https://github.com/see-lab/fmLCA/blob/main/LICENSE).
 
 ## Citation
 
-```
-Will be listed here when available. 
-```
+Citation details will be added here.
 
 ## Links
 
-- [GitHub Repository](https://github.com/see-lab/lca-fmu)
-- [SEE Lab](http://www.theseelab.org/)
+- [GitHub Repository](https://github.com/see-lab/fmLCA)
+- [SEE Lab](https://www.theseelab.org/)
 - [Brightway Documentation](https://docs.brightway.dev/)
 
 ---
 
-**Maintained by the SEE Lab at University of Vermont**
+Maintained by the SEE Lab at University of Vermont

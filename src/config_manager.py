@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Configuration Manager for LCA-FMU System
+Configuration Manager for fmLCA System
 
 Library module for configuration management. Import this module, do not run directly.
 

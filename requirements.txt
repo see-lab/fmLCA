@@ -1,4 +1,4 @@
-# LCA-FMU Production Platform Requirements
+# fmLCA Production Platform Requirements
 # Updated for modernized energy propagation system (2026)
 # Compatible with Python 3.9-3.13 and Apple Silicon Macs
 

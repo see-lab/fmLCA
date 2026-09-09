@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple Requirements Validation for LCA-FMU Production Platform
+Simple Requirements Validation for fmLCA Production Platform
 
 Quick validation of critical dependencies without complex imports.
 """
@@ -40,7 +40,7 @@ def check_package(name):
         return False
 
 def main():
-    print("🔍 LCA-FMU Requirements Validation")
+    print("🔍 fmLCA Requirements Validation")
     print("=" * 40)
     
     # Check Python version

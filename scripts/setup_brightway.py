@@ -6,7 +6,7 @@ This script creates or switches to a Brightway project and imports an
 ecoinvent release using Brightway's standard import workflow.
 
 Usage:
-    python scripts/setup_brightway.py --name LCA-FMU --ecoinvent 3.12
+    python scripts/setup_brightway.py --name fmLCA --ecoinvent 3.12
 
 Notes:
     - Credentials are read from config/secrets/passwords.json
