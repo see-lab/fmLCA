@@ -38,18 +38,24 @@ def test_sequential_cosim_real_fmus_1day(cosim_fmu_paths: tuple[Path, Path]) -> 
     system_fmu, lca_fmu = cosim_fmu_paths
 
     one_day_s = 24.0 * 3600.0
-    system_res, lca_res = run_fmu.sequential_cosim(
-        system_fmu=system_fmu,
-        lca_fmu=lca_fmu,
-        start_s=0.0,
-        stop_s=one_day_s,
-        system_output="gri.P.real",
-        lca_input="u",
-        lca_output="y",
-        parameter_name="n_pv",
-        parameter_value=1.0,
-        output_interval_s=900.0,
-    )
+    try:
+        system_res, lca_res = run_fmu.sequential_cosim(
+            system_fmu=system_fmu,
+            lca_fmu=lca_fmu,
+            start_s=0.0,
+            stop_s=one_day_s,
+            system_output="gri.P.real",
+            lca_input="u",
+            lca_output="y",
+            parameter_name="n_pv",
+            parameter_value=1.0,
+            output_interval_s=900.0,
+        )
+    except Exception as exc:
+        msg = str(exc).lower()
+        if "cannot be simulated on the current platform" in msg:
+            pytest.skip(f"Skipping cosimulation integration test due to FMU platform mismatch: {exc}")
+        raise
 
     assert list(system_res.dtype.names) == ["time", "gri.P.real"]
     assert list(lca_res.dtype.names) == ["time", "u", "y"]

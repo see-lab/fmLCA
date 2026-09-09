@@ -4,7 +4,7 @@ Pytest-based unit and integration tests for fmLCA.
 
 ## Structure
 
-- `test_*.py`: Collected pytest modules only.
+- `test_*.py`: Primarily pytest modules (some also provide optional standalone entrypoints).
 - `reference_results/`: Text baselines used by regression/parity tests.
 - `resources/`: Test data assets (not collected as tests).
 - `archive/`: Historical scripts kept for reference (excluded from pytest collection).
@@ -14,6 +14,27 @@ Pytest-based unit and integration tests for fmLCA.
 ```bash
 # Run the full suite locally
 python -m pytest tests/
+
+# Run a single pytest module
+python -m pytest tests/test_cosimulation.py -q
+```
+
+Important:
+- Most `test_*.py` files are pytest modules and should be run with `pytest`.
+- Running a pytest module directly (for example `python tests/test_cosimulation.py`) may exit silently because there is no script-style entrypoint.
+
+Standalone-capable files in this folder (safe to run with `python ...`):
+
+```bash
+python tests/generate_regression_report.py
+python tests/renewable_sources_cosim_sequential.py
+python tests/scaling_validation.py
+python tests/storage_validation.py
+python tests/storage_validation_recipe.py
+python tests/test_parameter_lca.py
+python tests/test_parameter_propegation.py
+python tests/test_pv_bess_wecc_native_vs_fmu.py --mode smoke
+python tests/test_renewable_sources.py --no-show
 ```
 
 Storage validation scripts:
@@ -72,6 +93,8 @@ Outputs:
 **Usage:**
 ```bash
 python tests/test_parameter_lca.py
+# or via pytest marker
+python -m pytest tests/test_parameter_lca.py -m ecoinvent
 ```
 
 - Loads `example.json` with `n_units` parameter
@@ -86,6 +109,8 @@ python tests/test_parameter_lca.py
 **Usage:**
 ```bash
 python tests/test_parameter_propegation.py
+# or as pytest tests
+python -m pytest tests/test_parameter_propegation.py
 ```
 
 **What it tests:**
