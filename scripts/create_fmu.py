@@ -570,14 +570,6 @@ def main():
         )
     )
     parser.add_argument(
-        "--accept-ip-risk",
-        action="store_true",
-        help=(
-            "Acknowledge that readable source-mode exports are not black-box compliant "
-            "and may increase external disclosure risk if redistributed."
-        )
-    )
-    parser.add_argument(
         "--bw-project",
         default=None,
         help=(
