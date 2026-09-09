@@ -615,11 +615,13 @@ def main():
             args.default_step_size = 60.0
             print("   • default_step_size set to 60.0 s")
 
+    from lca_utils import get_inventory_dir
+
     lci_path = Path(args.lci_stem)
     if not lci_path.suffix:
-        lci_path = ROOT / "data" / "inventory" / (args.lci_stem + ".json")
-    if not lci_path.is_absolute():
-        lci_path = ROOT / lci_path
+        lci_path = get_inventory_dir() / (args.lci_stem + ".json")
+    elif not lci_path.is_absolute():
+        lci_path = Path.cwd() / lci_path
 
     if args.default_step_size <= 0.0:
         parser.error("--default-step-size must be > 0")
