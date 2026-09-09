@@ -73,27 +73,7 @@ Use clear, descriptive commit messages:
 
 ## 🔬 What to Contribute
 
-### High Priority
-
-- **Additional energy technologies**: HVAC systems, storages, power generation
-- **Performance optimizations**: Faster method loading, caching strategies
-- **Test coverage**: Unit tests for edge cases
-- **Documentation improvements**: Tutorials, use case examples
-
-### Medium Priority
-
-- **Additional LCIA methods**: More impact categories, regional methods
-- **Visualization improvements**: Better plots, interactive dashboards
-- **CI/CD pipeline**: Automated testing, deployment workflows
-- **Error handling**: Better error messages, validation
-
-### Welcome Contributions
-
-- Bug fixes
-- Documentation clarifications
-- Example scripts and use cases
-- Performance benchmarks
-- Integration with other tools
+This is a young project with a small development team. We welcome all ideas and suggestions for new features, enhancements, example cases, and bug fixes. If you have ideas, please open a issue or email the PI, and we will get back to you at the earliest convenience. 
 
 ## 🐛 Reporting Issues
 
@@ -135,20 +115,6 @@ For feature requests, please provide:
 - [ ] No merge conflicts with main branch
 
 ## 🏗️ Development Notes
-
-### Key Design Principles
-
-1. **Energy metadata system**: Use `amount_ref` for dynamic energy scaling
-2. **IPCC 2021 compliance**: Prioritize IPCC 2021 methods for climate change
-3. **Brightway integration**: Maintain compatibility with Brightway 2.5 ecosystem
-4. **Platform compatibility**: FMU binaries for Linux/Windows, Python fallback for macOS
-
-### Important Files
-
-- `src/lca_engine.py`: Main LCA analysis engine
-- `scripts/create_fmu.py`: FMU generation logic
-- `data/methods/iw_damages.json`: IMPACT World+ damage indicators
-- `tests/test_cumulative_fmu_direct.py`: FMU validation (macOS compatible)
 
 ### Testing Strategy
 
