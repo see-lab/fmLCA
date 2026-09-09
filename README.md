@@ -1,6 +1,7 @@
-# fmlca
+# fmLCA
 
-Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). fmlca supports CLI and Python API workflows for inventory conversion, LCA runs, FMU generation, and sequential co-simulation.
+Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). 
+The fmLCA project supports CLI and Python API workflows for inventory conversion, LCA runs, FMU generation, and sequential co-simulation.
 
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/see-lab/fmLCA/blob/main/LICENSE)
 [![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
@@ -13,9 +14,9 @@ Create and simulate dynamic Life Cycle Assessment (LCA) models with the Function
 
 - Dynamic energy propagation through LCA calculations
 - Parameterized subsystem composition from CSV inventories
-- FMU generation for FMI-compatible co-simulation
+- Single-input single-output LCA FMUs translating power to single score impacts overtime 
+- FMU generation for FMI-compatible co-simulation with optional black-box protection
 - Brightway + ecoinvent based impact assessment workflows
-- CLI and Python API support for end-to-end pipelines
 
 ## Installation
 
@@ -45,8 +46,6 @@ For complete setup options, run:
 ```bash
 python scripts/setup_brightway.py -h
 ```
-
-Detailed guidance: [Ecoinvent Setup Guide](https://github.com/see-lab/fmLCA/blob/main/docs/ECOINVENT_SETUP.md)
 
 ## Safe Project Selection
 
@@ -158,7 +157,7 @@ BSD 3-Clause License. See [LICENSE](https://github.com/see-lab/fmLCA/blob/main/L
 
 ## Citation
 
-Citation details will be added here.
+Citation details will be added here when available.
 
 ## Links
 
