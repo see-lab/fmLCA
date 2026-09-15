@@ -20,6 +20,18 @@ The fmLCA project supports CLI and Python API workflows for inventory conversion
 
 ## Installation
 
+### Install From PyPI (API)
+
+```bash
+pip install fmlca
+```
+
+PyPI package: https://pypi.org/project/fmlca/
+
+Use this option when you want to call fmLCA from Python code.
+
+### Install From Source (CLI And Development)
+
 ```bash
 git clone https://github.com/see-lab/fmLCA.git
 cd fmLCA
@@ -61,7 +73,9 @@ Optional non-interactive project switching:
 $env:FMLCA_AUTO_CONFIRM_PROJECT_SWITCH = "true"
 ```
 
-## CLI Workflow (Primary Reference)
+## CLI Workflow (Source Checkout)
+
+The CLI examples below use scripts in this repository (for example, `scripts/...`) and are intended for source checkouts.
 
 Get full options for each command with `-h`.
 
@@ -97,6 +111,8 @@ python scripts/run_fmu.py -h
 ```
 
 ## Python API Workflow
+
+This is the recommended path when installed from PyPI (`pip install fmlca`).
 
 Use lowercase package import:
 
@@ -154,6 +170,11 @@ Contributions are welcome. See [CONTRIBUTING.md](https://github.com/see-lab/fmLC
 ## License
 
 BSD 3-Clause License. See [LICENSE](https://github.com/see-lab/fmLCA/blob/main/LICENSE).
+
+## AI Statement
+
+Generative Artificial Intelligence tools (GitHub Copilot GPT-5.3-Codex, Claude Opus 4.8) were utilized in the drafting, optimization, and refactoring of portions of this codebase. 
+All AI-assisted code has been rigorously audited, verified through unit testing, and peer-reviewed by human researchers, who maintain full accountability for the scientific validity and security of the software.
 
 ## Citation
 
