@@ -19,8 +19,6 @@ Recommended usage:
 
 Maintainers:
 - Kathryn Hinkelman
-- Fitzwilliam Keenan-Koch
-- Anastasija Mensikova
 - SEE Lab, University of Vermont
 """
 
