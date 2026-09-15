@@ -274,7 +274,7 @@ def _build_fmu(inventory_path: Path, fmu_dir: Path) -> Path:
     result = build_lca_fmu(
         lci_file=inventory_path,
         method="ipcc",
-        version="1.0",
+        version="1.0.0",
         output_dir=fmu_dir,
         name=inventory_path.stem,
         export_mode="bytecode",

@@ -42,7 +42,7 @@ Examples
     python scripts/create_fmu.py example
     python scripts/create_fmu.py example --method ipcc
     python scripts/create_fmu.py example --method recipe_endpoint
-    python scripts/create_fmu.py example --name "Example_Climate" --version 0.0.1
+    python scripts/create_fmu.py example --name "Example_Climate" --version 1.0.0
 
 Output
 ------
@@ -533,8 +533,8 @@ def main():
     )
     parser.add_argument(
         "--version",
-        default="0.0.1",
-        help="Version string embedded in the FMU name (default: 0.0.1)"
+        default="1.0.0",
+        help="Version string embedded in the FMU name (default: 1.0.0)"
     )
     parser.add_argument(
         "--dry-run",

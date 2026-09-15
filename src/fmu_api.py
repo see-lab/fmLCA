@@ -93,7 +93,7 @@ class ParameterLinearityError(FmuBuildError):
 @dataclass
 class BuildOptions:
     method: Literal["ipcc", "recipe_endpoint"] = "ipcc"
-    version: str = "0.0.1"
+    version: str = "1.0.0"
     name: str | None = None
     output_dir: Path | None = None
     target_tool: Literal["generic", "dymola"] = "generic"
@@ -550,7 +550,7 @@ def build_lca_fmu_internal(lci_path: Path, options: BuildOptions) -> BuildResult
 def build_lca_fmu(
     lci_file: str | Path,
     method: str = "ipcc",
-    version: str = "0.0.1",
+    version: str = "1.0.0",
     output_dir: str | Path | None = None,
     name: str | None = None,
     target_tool: str = "generic",
@@ -593,7 +593,7 @@ def create_fmu(
     lci_file: str | Path,
     output_dir: str | Path,
     method: str = "ipcc",
-    version: str = "0.0.1",
+    version: str = "1.0.0",
     name: str | None = None,
 ) -> Path:
     result = build_lca_fmu(
