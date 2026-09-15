@@ -53,6 +53,7 @@ data/inventory/*.json
 data/inventory/*.csv
 data/inventory/archive/
 data/inventory/projects/
+data/inventory/scaling_validation/
 !data/inventory/default.json
 !data/inventory/example.json
 !data/inventory/wecc.json
@@ -68,6 +69,7 @@ config/temp/
 temp/
 fmu/experimental
 fmu/proprietary/
+fmu/scaling_validation/
 
 # Data directory (user data, external datasets)
 data/external/
