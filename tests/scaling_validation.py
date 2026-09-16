@@ -46,7 +46,7 @@ STAGES = ("Production", "Transport", "Use", "EOL")
 START_TIME = 0.0
 STOP_TIME = 3600.0
 STEP_SIZE = 60.0
-DEFAULT_LINEAR_REGIME_MIN = 60
+DEFAULT_LINEAR_REGIME_MIN = 70
 
 
 def parse_args() -> argparse.Namespace:
@@ -356,30 +356,91 @@ def _plot_cpu_loglog(
     out_svg: Path,
     linear_regime_min: int,
 ) -> None:
+    # Prepare output locations and plotting canvas.
     out_png.parent.mkdir(parents=True, exist_ok=True)
     out_svg.parent.mkdir(parents=True, exist_ok=True)
 
     ordered = df.sort_values("n_line_items")
-    fig, ax = plt.subplots(figsize=(6.0, 6.0))
+    fig, ax = plt.subplots(figsize=(4.5, 3.0))
+
+    # Show raw benchmark points as markers only (no connecting line).
     ax.loglog(
         ordered["n_line_items"],
         ordered["native_cpu_s_median"],
-        "o-",
-        label="Native (lca_engine), median of repeats",
+        marker="o",
+        linestyle="None",
+        label="Native (lca_engine)",
     )
     ax.loglog(
         ordered["n_line_items"],
         ordered["fmu_cpu_s_median"],
-        "s-",
-        label="FMU (run_fmu path), median of repeats",
+        marker="s",
+        linestyle="None",
+        label="FMU (run_fmu path)",
     )
-    ax.set_xlabel("n line items")
-    ax.set_ylabel("CPU time (s)")
-    ax.set_title("Scaling CPU Time vs Inventory Size")
+
+    # Fit and annotate only the user-selected linear regime.
+    linear_df = ordered[ordered["n_line_items"] >= int(linear_regime_min)]
+    if len(linear_df) >= 2:
+        x = linear_df["n_line_items"].to_numpy(dtype=float)
+        x_span = np.array([x.min(), x.max()], dtype=float)
+
+        native_y = linear_df["native_cpu_s_median"].to_numpy(dtype=float)
+        native_m, native_b = np.polyfit(x, native_y, 1)
+        native_fit = native_m * x_span + native_b
+        ax.loglog(
+            x_span,
+            native_fit,
+            linestyle="--",
+            linewidth=1.2,
+            color="C0",
+            alpha=0.9,
+            label=f"Native fit ($n \\geq {int(linear_regime_min)}$)",
+        )
+
+        ax.text(
+            100,
+            150,
+            f"t = {native_m:.1f}n + {native_b:.1f}",
+            ha="left",
+            va="center",
+            color="C0",
+            fontsize=plt.rcParams.get("legend.fontsize", "medium"),
+            fontweight="bold",
+        )
+
+        fmu_y = linear_df["fmu_cpu_s_median"].to_numpy(dtype=float)
+        fmu_m, fmu_b = np.polyfit(x, fmu_y, 1)
+        fmu_fit = fmu_m * x_span + fmu_b
+        ax.loglog(
+            x_span,
+            fmu_fit,
+            linestyle="--",
+            linewidth=1.2,
+            color="C1",
+            alpha=0.9,
+            label=f"FMU fit ($n \\geq {int(linear_regime_min)}$)",
+        )
+
+        ax.text(
+            100,
+            0.3,
+            f"t = {fmu_m:.1f}n + {fmu_b:.1f}",
+            ha="left",
+            va="center",
+            color="C1",
+            fontsize=plt.rcParams.get("legend.fontsize", "medium"),
+            fontweight="bold",
+        )
+
+    # Final axes styling and export.
+    ax.set_xlabel("Number of inventory items, $n$")
+    ax.set_ylabel("CPU Time, $t$ (s)")
     ax.grid(True, which="both", linestyle=":", linewidth=0.7)
+    ax.tick_params(which="both", direction="in")
     if linear_regime_min > 0:
         ax.axvline(linear_regime_min, linestyle="--", linewidth=1.0, color="#777777")
-    ax.legend(loc="best")
+    ax.legend(loc="upper left", bbox_to_anchor=(4, 80), bbox_transform=ax.transData)
     fig.tight_layout()
     fig.savefig(out_png, dpi=180)
     fig.savefig(out_svg)
@@ -437,9 +498,11 @@ def main() -> int:
         if args.repeats < 1:
             raise ValueError("repeats must be >= 1")
 
+        # Prepare benchmark inputs and target inventory sizes.
         pool = _discover_exchange_pool()
         line_counts = _choose_line_counts(args.n_lci, args.min_lines, args.max_lines, args.seed)
 
+        # Load cached results (when enabled) for case/repeat-level reuse.
         existing_df = _load_existing_results(args.out_csv) if args.reuse_results else pd.DataFrame()
         existing_map: dict[tuple[str, int], dict[Any, Any]] = {}
         if not existing_df.empty:
@@ -460,8 +523,32 @@ def main() -> int:
         reused = 0
         executed = 0
 
+        # Evaluate each scale case, reusing cached rows whenever possible.
         for n_lines in line_counts:
             stem = f"scale{n_lines}"
+            inventory_name = f"{stem}.json"
+
+            # If all repeats for this inventory are already cached, reuse them
+            # directly and skip inventory/FMU generation work entirely.
+            if args.reuse_results:
+                cached_rows: list[dict[str, Any]] = []
+                for repeat_idx in range(1, args.repeats + 1):
+                    cache_key = (inventory_name, repeat_idx)
+                    cached = existing_map.get(cache_key)
+                    if cached is None:
+                        cached_rows = []
+                        break
+                    cached_rows.append(dict(cached))
+
+                if cached_rows:
+                    rows.extend(cached_rows)
+                    reused += len(cached_rows)
+                    print(
+                        f"case={stem:>8s} repeats=1..{args.repeats} fully reused "
+                        "(skipped inventory/FMU generation)"
+                    )
+                    continue
+
             inventory_path = args.inventory_dir / f"{stem}.json"
             if not inventory_path.exists():
                 payload = _build_inventory_payload(n_lines, pool, args.seed)
@@ -489,6 +576,7 @@ def main() -> int:
                     f"rel_err={row['rel_error']:.3e}"
                 )
 
+            # Persist full results, aggregate summaries, and emit updated plots.
         df = pd.DataFrame(rows).sort_values(["n_line_items", "repeat_idx"]).reset_index(drop=True)
         args.out_csv.parent.mkdir(parents=True, exist_ok=True)
         df.to_csv(args.out_csv, index=False)
