@@ -1,21 +1,30 @@
-"""Compatibility exports for legacy src imports.
+"""Compatibility exports for legacy `src` imports.
 
-A comprehensive Life Cycle Assessment analysis system with support for:
-- Energy-based input parameters (MJ)
-- Flexible database detection and matching
-- Configuration-driven CSV processing
-- Template-based FMU generation for co-simulation
-- Multi-database support (ecoinvent, IDEMAT, custom)
-- Centralized LCIA methods management
+This module re-exports the core FMU build API so older code paths that import
+from `src` continue to work during the transition to the canonical `fmlca`
+package namespace.
 
-Author: LCA Analysis System
-Version: 0.0.1 - Energy Applications
-Canonical public package: fmlca.
+Current source layout (selected modules):
+- `fmu_api`: typed FMU build API, options/results, and exceptions
+- `fmu_generator`: FMU generation and packaging internals
+- `lca_engine`: Brightway-backed LCA execution logic
+- `lci_data_manager`: inventory data loading and transformations
+- `database_manager`: Brightway database resolution helpers
+- `config_manager`: system/project configuration management
+- `lca_utils`: shared utility functions
+
+Recommended usage:
+- Public imports should use `fmlca` for API stability.
+- This `src` package remains as a compatibility layer.
+
+Maintainers:
+- Kathryn Hinkelman
+- SEE Lab, University of Vermont
 """
 
-__version__ = "0.0.1"
-__author__ = "LCA Analysis System"
-__description__ = "Energy-Based Life Cycle Assessment Analysis with Flexible FMU Co-simulation Support"
+__version__ = "1.0.0"
+__author__ = "SEE Lab (University of Vermont)"
+__description__ = "Compatibility exports for fmLCA core FMU build API"
 
 from .fmu_api import (
 	BlackboxComplianceError,
@@ -33,16 +42,7 @@ from .fmu_api import (
 	create_fmu,
 )
 
-# Note: Avoid importing from modules that have their own imports to prevent circular dependencies
-# Individual modules can be imported directly when needed
-
-# Available modules:
-# - lca_engine: Core LCA calculation engine
-# - config_manager: Configuration handling
-# - database_manager: Brightway database management
-# - lci_data_manager: Life cycle inventory data processing
-# - lca_utils: Utility functions (paths, units, file I/O)
-# - fmu_generator: FMU generation core logic
+# Keep imports minimal in this compatibility layer to reduce circular import risk.
 
 __all__ = [
 	"build_lca_fmu",

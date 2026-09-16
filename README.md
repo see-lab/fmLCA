@@ -20,6 +20,18 @@ The fmLCA project supports CLI and Python API workflows for inventory conversion
 
 ## Installation
 
+### Install From PyPI (API)
+
+```bash
+pip install fmlca
+```
+
+PyPI package: https://pypi.org/project/fmlca/
+
+Use this option when you want to call fmLCA from Python code.
+
+### Install From Source (CLI And Development)
+
 ```bash
 git clone https://github.com/see-lab/fmLCA.git
 cd fmLCA
@@ -61,7 +73,9 @@ Optional non-interactive project switching:
 $env:FMLCA_AUTO_CONFIRM_PROJECT_SWITCH = "true"
 ```
 
-## CLI Workflow (Primary Reference)
+## CLI Workflow (Source Checkout)
+
+The CLI examples below use scripts in this repository (for example, `scripts/...`) and are intended for source checkouts.
 
 Get full options for each command with `-h`.
 
@@ -91,19 +105,21 @@ python scripts/create_fmu.py -h
 ### 4) Run FMU / Sequential Co-simulation
 
 ```bash
-python scripts/run_fmu.py --mode single --fmu fmu/Example_Ipcc_v0.0.1.fmu --u0 100 --step-size 60
-python scripts/run_fmu.py --mode cosim --system-fmu fmu/PV_System_WECC.fmu --lca-fmu fmu/PvWecc_Ipcc_v0.0.1.fmu --system-output gri.P.real --lca-input u --lca-output y --parameter-name n_pv --parameter-value 2.0 --output-interval 3600 --solver CVode --save-plot results/cosim.png
+python scripts/run_fmu.py --mode single --fmu fmu/Example_Ipcc_v1.0.0.fmu --u0 100 --step-size 60
+python scripts/run_fmu.py --mode cosim --system-fmu fmu/PV_System_WECC.fmu --lca-fmu fmu/PvWecc_Ipcc_v1.0.0.fmu --system-output gri.P.real --lca-input u --lca-output y --parameter-name n_pv --parameter-value 2.0 --output-interval 3600 --solver CVode --save-plot results/cosim.png
 python scripts/run_fmu.py -h
 ```
 
 ## Python API Workflow
+
+This is the recommended path when installed from PyPI (`pip install fmlca`).
 
 Use lowercase package import:
 
 ```python
 from fmlca import csv_to_json_translator, create_fmu, lca_engine, run_fmu
 csv_to_json_translator("data/inventory/example.csv", "data/inventory/example.json")
-fmu_path = create_fmu("data/inventory/example.json", "fmu", method="ipcc", version="0.0.1")
+fmu_path = create_fmu("data/inventory/example.json", "fmu", method="ipcc", version="1.0.0")
 results = lca_engine("data/inventory/example.json", ["IPCC 2021 climate change total excl biogenic GWP100"])
 sim = run_fmu(fmu_path, stop_time=3600.0, input_u=100.0)
 ```
@@ -113,7 +129,7 @@ Two-FMU co-simulation API:
 ```python
 from pathlib import Path
 from fmlca.run_fmu import sequential_cosim
-system_result, lca_result = sequential_cosim(system_fmu=Path("fmu/PV_System_WECC.fmu"), lca_fmu=Path("fmu/PvWecc_Ipcc_v0.0.1.fmu"), start_s=0.0, stop_s=3600.0, system_output="gri.P.real", lca_input="u", lca_output="y")
+system_result, lca_result = sequential_cosim(system_fmu=Path("fmu/PV_System_WECC.fmu"), lca_fmu=Path("fmu/PvWecc_Ipcc_v1.0.0.fmu"), start_s=0.0, stop_s=3600.0, system_output="gri.P.real", lca_input="u", lca_output="y")
 ```
 
 ## Advanced Options
@@ -154,6 +170,11 @@ Contributions are welcome. See [CONTRIBUTING.md](https://github.com/see-lab/fmLC
 ## License
 
 BSD 3-Clause License. See [LICENSE](https://github.com/see-lab/fmLCA/blob/main/LICENSE).
+
+## AI Statement
+
+Generative Artificial Intelligence tools (GitHub Copilot GPT-5.3-Codex, Claude Opus 4.8) were utilized in the drafting, optimization, and refactoring of portions of this codebase. 
+All AI-assisted code has been rigorously audited, verified through unit testing, and peer-reviewed by human researchers, who maintain full accountability for the scientific validity and security of the software.
 
 ## Citation
 

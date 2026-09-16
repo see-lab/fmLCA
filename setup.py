@@ -28,7 +28,7 @@ if not runtime_requirements:
 
 setup(
     name="fmlca",
-    version="0.0.1",
+    version="1.0.0",
     author="Kathryn Hinkelman",
     author_email="kathryn.hinkelman@uvm.edu",
     description="Co-simulate dynamic Life Cycle Assessment and energy system models as Functional Mock-up Units",

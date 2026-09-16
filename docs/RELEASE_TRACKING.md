@@ -4,7 +4,20 @@
 
 This document summarizes user-visible changes by release.
 
+- Version 1.0.0 (September 15, 2026)
 - Version 0.0.1 (September 8, 2026)
+
+## Version 1.0.0
+
+### Information
+
+Version 1.0.0 is intentionally a minimal update and is otherwise functionally
+equivalent to Version 0.0.1.
+
+### Updates
+
+- Revised scaling validation to compare different LCA problem sizes.
+- Runtime results indicate meaningful scaling benefits for the FMU approach.
 
 ## Version 0.0.1
 
