@@ -20,7 +20,7 @@ The fmLCA project supports CLI and Python API workflows for inventory conversion
 
 ## Installation
 
-### Install From PyPI (API)
+### Install from PyPI (API)
 
 ```bash
 pip install fmlca
@@ -30,7 +30,7 @@ PyPI package: https://pypi.org/project/fmlca/
 
 Use this option when you want to call fmLCA from Python code.
 
-### Install From Source (CLI And Development)
+### Install from Source (CLI and Development)
 
 ```bash
 git clone https://github.com/see-lab/fmLCA.git
@@ -44,7 +44,7 @@ Requirements:
 - Python 3.9-3.13
 - ecoinvent 3.8+ database
 
-## Brightway And Ecoinvent Setup
+## Brightway and Ecoinvent Setup
 
 ```bash
 # Check status
@@ -79,7 +79,7 @@ The CLI examples below use scripts in this repository (for example, `scripts/...
 
 Get full options for each command with `-h`.
 
-### 1) Convert CSV To Inventory JSON
+### 1) Convert CSV to Inventory JSON
 
 ```bash
 python scripts/csv_to_json_translator.py example.csv
@@ -113,8 +113,7 @@ python scripts/run_fmu.py -h
 ## Python API Workflow
 
 This is the recommended path when installed from PyPI (`pip install fmlca`).
-
-Use lowercase package import:
+Note! Use all lowercase letters for python package import.
 
 ```python
 from fmlca import csv_to_json_translator, create_fmu, lca_engine, run_fmu
