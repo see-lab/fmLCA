@@ -3,6 +3,7 @@
 Create and simulate dynamic Life Cycle Assessment (LCA) models with the Functional Mockup Interface (FMI). 
 The fmLCA project supports CLI and Python API workflows for inventory conversion, LCA runs, FMU generation, and sequential co-simulation.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23019345.svg)](https://doi.org/10.5281/zenodo.23019345)
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/see-lab/fmLCA/blob/main/LICENSE)
 [![CI Tests](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/see-lab/fmLCA/actions/workflows/ci.yml)
 
@@ -177,7 +178,7 @@ All AI-assisted code has been rigorously audited, verified through unit testing,
 
 ## Citation
 
-Citation details will be added here when available.
+Hinkelman, K. (2026). Functional Mockup Life Cycle Assessment (fmLCA) (Version 1.0.0) [Computer software]. Zenodo. Brightcon 2026, Aalborg, Denmark. https://doi.org/10.5281/zenodo.23019345
 
 ## Links
 
